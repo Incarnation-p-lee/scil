@@ -5,10 +5,11 @@ CC  = gcc
 all:$(TAR)
 
 $(OBJ):%.o:%.c
-	$(CC) -c -g -o $@ $<
+	$(CC) -c -g -Wall -Werror -DX86_64 -o $@ $<
 
 $(TAR):$(OBJ)
-	$(CC) -o $@ $^
+	$(CC) -o $@ $^ ../lib/libds.a -lm
+	rm -v *.o
 
 clean:
 	rm -v *.o
