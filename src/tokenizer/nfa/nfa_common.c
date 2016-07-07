@@ -1,3 +1,36 @@
+static inline s_nfa_edge_map_t *
+nfa_edge_map_create(char c, s_nfa_t *nfa)
+{
+    s_nfa_edge_map_t *map;
+
+    map = dp_malloc(sizeof(*map));
+    map->c = c;
+    map->nfa = nfa;
+
+    return map;
+}
+
+void
+nfa_edge_map_destroy(s_nfa_edge_map_t *map)
+{
+    dp_assert(NULL != map);
+
+    map->nfa = NULL;
+    dp_free(map);
+}
+
+static inline s_nfa_t *
+nfa_edge_map_nfa_obtain(s_nfa_edge_map_t *map)
+{
+    dp_assert(NULL != map);
+
+    if (!map->nfa) {
+        map->nfa = nfa_subset_rule_basic(map->c);
+    }
+
+    return map->nfa;
+}
+
 static inline uint32
 nfa_label_obtain(void)
 {
@@ -10,10 +43,10 @@ nfa_label_cleanup(void)
     nfa_status_lalel = 0;
 }
 
-static inline s_nfa_status_t *
+static inline s_fa_status_t *
 nfa_status_create(void)
 {
-    s_nfa_status_t *retval;
+    s_fa_status_t *retval;
 
     retval = dp_malloc(sizeof(*retval));
     dp_assert(NULL != retval);
@@ -26,7 +59,7 @@ nfa_status_create(void)
 }
 
 static inline void
-nfa_status_edge_chain(s_nfa_status_t *status, char c, s_nfa_status_t *next)
+nfa_status_edge_chain(s_fa_status_t *status, char c, s_fa_status_t *next)
 {
     uint32 index;
 
@@ -37,7 +70,7 @@ nfa_status_edge_chain(s_nfa_status_t *status, char c, s_nfa_status_t *next)
 
     index = status->edge_count++;
 
-    status->edge[index] = dp_malloc(sizeof(s_nfa_edge_t));
+    status->edge[index] = dp_malloc(sizeof(s_fa_edge_t));
     status->edge[index]->c = c;
     status->edge[index]->next = next;
 }
