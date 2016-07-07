@@ -1,6 +1,9 @@
 #ifndef HAVE_DEFINED_DEPENDS_H
 #define HAVE_DEFINED_DEPENDS_H
 
+#include "data_structure_interface.h"
+#include "external.h"
+
 #if defined LIBC
 
 #include <unistd.h>

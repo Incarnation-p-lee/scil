@@ -10,7 +10,7 @@ nfa_edge_map_create(char c, s_nfa_t *nfa)
     return map;
 }
 
-void
+static inline void
 nfa_edge_map_destroy(s_nfa_edge_map_t *map)
 {
     dp_assert(NULL != map);

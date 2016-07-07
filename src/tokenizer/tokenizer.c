@@ -1,12 +1,11 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <assert.h>
+#include "depends.h"
+#include "finite_automata.h"
 
-#include "../inc/types.h"
-#include "../inc/ds.h"
-#include "token.h"
+#include "tokenizer.h"
 
-#include "token.c"
+int
+main(void)
+{
+    return 0;
+}
 
