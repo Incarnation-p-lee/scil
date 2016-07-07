@@ -9,8 +9,8 @@ $(OBJ):%.o:%.c
 
 $(TAR):$(OBJ)
 	$(CC) -o $@ $^ ../lib/libds.a -lm
-	rm -v *.o
+	rm -vf *.o
 
 clean:
-	rm -v *.o
+	rm -vf *.o
 
