@@ -81,6 +81,8 @@ nfa_create(void)
     s_nfa_t *nfa;
 
     nfa = dp_malloc(sizeof(s_nfa_t));
-    nfa->start = nfa->terminal = NULL:
+    nfa->start = nfa->terminal = NULL;
+
+    return nfa;
 }
 

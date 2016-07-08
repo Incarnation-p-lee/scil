@@ -21,7 +21,7 @@ struct fa_status {
     s_fa_edge_t *edge[NFA_EDGE_MAX];
 };
 
-struct nfa_edge {
+struct fa_edge {
     char           c;
     s_fa_status_t *next;
 };

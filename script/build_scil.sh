@@ -74,46 +74,36 @@ mkdir -p $bindir
 ###########################################
 ## update some header files and makefile ##
 ###########################################
-perl script/produce_module_declaration_h.pl $debug_mode
-perl script/produce_universal_h.pl
-perl script/produce_data_structure_interface_h.pl
+perl script/generate_declaration.pl $src_dir
 perl script/produce_compile_makefile.pl $src_dir
 
 ####################################
 ## compiling object file function ##
 ####################################
 function obj_compile() {
-    make "cc_config=$cc_config" -f $1/Makefile
+    cd $1 > /dev/null
+    make "cc_config=$cc_config" > /dev/null
+    mv *.o $base
     if [ "$?" != 0 ]
     then
         exit 3
-    else
-        mv *.o $objdir
     fi
+    ## else
+    ##     mv *.o $objdir
+    cd - > /dev/null 
 }
-
-###################################
-## compile main.o for elf target ##
-###################################
-if [ "$target" == "elf" ]
-then
-    obj_compile $src_dir
-fi
 
 ########################################
 ## compiling all other subdir .o file ##
 ########################################
-for dir in `ls -d src/*/`
+module_list=$(find src/ -type d | grep -v inc)
+for var in ${module_list[@]}
 do
-    if [ "$target" != "elf" ] && [ "$dir" == "src/test/" ]
-    then
-        continue
-    fi
-    case $dir in
-        "src/inc/") continue ;;
-    esac
-    obj_compile $dir
+    echo "    Compile  .. $(basename $var)"
+    obj_compile $var
 done
+
+exit 0
 
 ###############################
 ## generate linking Makefile ##

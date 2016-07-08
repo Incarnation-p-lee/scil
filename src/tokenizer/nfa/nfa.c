@@ -5,4 +5,5 @@
 #include "nfa_declaration.h"
 #include "nfa_common.c"
 #include "nfa_subset_construction.c"
+#include "nfa_engine.c"
 

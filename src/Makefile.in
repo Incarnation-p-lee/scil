@@ -13,8 +13,5 @@ CFLAG        =-Wall -Werror -c
 CFLAG        +=$(cc_config)
 LFLAG        +=$(ld_config)
 
-ELF_TARGET   =ds.elf
-OBJ_TARGET   =libds.a
-DYN_TARGET   =libds.so
 LD_LIBRARY   =$(ld_library)
 
