@@ -3,6 +3,8 @@
 
 #include "finite_automata.h"
 
+#define NFA_LABEL_HASH_SIZE    127
+
 struct nfa_edge_map {
     char    c;
     s_nfa_t *nfa;

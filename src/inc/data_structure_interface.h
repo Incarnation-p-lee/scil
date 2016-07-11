@@ -184,6 +184,7 @@ struct separate_chain_hash {
 struct open_addressing_hash {
     struct hashing_table *table;
 };
+typedef struct open_addressing_hash s_open_addressing_hash_t;
 
 struct heap_data {
     sint64 nice;

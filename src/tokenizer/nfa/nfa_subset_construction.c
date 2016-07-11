@@ -19,6 +19,20 @@ nfa_subset_rule_basic(char c)
     return nfa;
 }
 
+static inline bool
+nfa_status_legal_p(s_fa_status_t *status)
+{
+    if (!status) {
+        return false;
+    } else if (status->edge_count >= NFA_EDGE_MAX) {
+        return false;
+    } else if (status->edge[status->edge_count]) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
 /*
  * RE: a|b
  */
