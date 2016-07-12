@@ -9,7 +9,6 @@
 *.pch
 
 # Libraries
-*.lib
 *.a
 *.la
 *.lo
@@ -27,3 +26,7 @@
 *.i*86
 *.x86_64
 *.hex
+
+output
+tags
+Session.vim
