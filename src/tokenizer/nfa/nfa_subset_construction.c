@@ -63,8 +63,8 @@ nfa_subset_rule_induction_or(s_nfa_t *s, s_nfa_t *t)
 static inline void
 nfa_subset_rule_induction_binary(s_nfa_t *s, s_nfa_t *t, e_nfa_subset_opt_t opt)
 {
-    dp_assert(NULL != s);
-    dp_assert(NULL != t);
+    assert(NULL != s);
+    assert(NULL != t);
 
     switch (opt) {
         case NFA_SUBSET_AND:
@@ -74,7 +74,7 @@ nfa_subset_rule_induction_binary(s_nfa_t *s, s_nfa_t *t, e_nfa_subset_opt_t opt)
             nfa_subset_rule_induction_or(s, t);
             break;
         default:
-            dp_assert(false);
+            assert(false);
             break;
     }
 }
@@ -82,7 +82,7 @@ nfa_subset_rule_induction_binary(s_nfa_t *s, s_nfa_t *t, e_nfa_subset_opt_t opt)
 static inline void
 nfa_subset_rule_induction_unary(s_nfa_t *s, e_nfa_subset_opt_t opt)
 {
-    dp_assert(NULL != s);
+    assert(NULL != s);
 
     switch (opt) {
         case NFA_SUBSET_STAR:
@@ -95,7 +95,7 @@ nfa_subset_rule_induction_unary(s_nfa_t *s, e_nfa_subset_opt_t opt)
             nfa_subset_rule_induction_question(s);
             break;
         default:
-            dp_assert(false);
+            assert(false);
             break;
     }
 }

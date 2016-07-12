@@ -4,7 +4,6 @@ cc_config="-fPIC"
 ld_config="-Wl,--stats"
 ld_library=
 debug_mode="Yes"
-target=
 
 if [ $# == 0 ]
 then
@@ -21,8 +20,9 @@ fi
 
 base=$(pwd)
 src_dir=$base/src
-objdir=$base/output
-bindir=$objdir/out
+obj_dir=$base/output
+bin_dir=$obj_dir/out
+lib_dir=$base/lib
 
 #######################
 ## parameters handle ##
@@ -48,13 +48,6 @@ do
             ld_library="-lc -lm" ;;
         "KERNEL")
             cc_config="$cc_config -DKERNEL -nostdlib -nostdinc -fno-builtin" ;;
-        "ELF")
-            target=elf ;;
-        "OBJ")
-            target=obj ;;
-        "DYN")
-            target=dyn
-            ld_config="$ld_config -shared -fPIC" ;;
         "COVERAGE")
             cc_config="$cc_config --coverage"
             ld_config="$ld_config --coverage" ;;
@@ -64,12 +57,12 @@ done
 #############################
 ## create output directory ##
 #############################
-if [ -d $objdir ]
+if [ -d $obj_dir ]
 then
-    rm -rf $objdir
-    echo "Remove last build directory $objdir"
+    rm -rf $obj_dir
+    echo "Remove last build directory $obj_dir"
 fi
-mkdir -p $bindir
+mkdir -p $bin_dir
 
 ###########################################
 ## update some header files and makefile ##
@@ -83,13 +76,13 @@ perl script/produce_compile_makefile.pl $src_dir
 function obj_compile() {
     cd $1 > /dev/null
     make "cc_config=$cc_config" > /dev/null
-    mv *.o $base
+    mv *.o $obj_dir
     if [ "$?" != 0 ]
     then
         exit 3
     fi
     ## else
-    ##     mv *.o $objdir
+    ##     mv *.o $obj_dir
     cd - > /dev/null 
 }
 
@@ -103,18 +96,16 @@ do
     obj_compile $var
 done
 
-exit 0
-
-###############################
-## generate linking Makefile ##
-###############################
+########################################################
+## generate linking Makefile and link to final target ##
+########################################################
+echo "    Copy     .. Makefile"
+cp $src_dir/Makefile.in $obj_dir
+echo "    Copy     .. libds.a"
+cp $lib_dir/* $obj_dir
 perl script/produce_link_makefile.pl
-
-#######################
-## link final target ##
-#######################
-cp $src_dir/Makefile.in $objdir && cd $objdir
-make "ld_config=$ld_config" "ld_library=$ld_library" $target
+echo "    Link     .. scil.elf"
+cd $obj_dir && make "ld_config=$ld_config" "ld_library=$ld_library" > /dev/null
 
 if [ "$?" != 0 ]
 then
@@ -126,7 +117,7 @@ fi
 #################################
 ## Update tags and cleanup log ##
 #################################
-ctags -R src && rm -vf libds.log
+ctags -R src
 
 ########################################
 ## End of build script execution flow ##

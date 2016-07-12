@@ -13,7 +13,7 @@ nfa_edge_map_create(char c, s_nfa_t *nfa)
 static inline void
 nfa_edge_map_destroy(s_nfa_edge_map_t *map)
 {
-    dp_assert(NULL != map);
+    assert(NULL != map);
 
     map->nfa = NULL;
     dp_free(map);
@@ -22,7 +22,7 @@ nfa_edge_map_destroy(s_nfa_edge_map_t *map)
 static inline s_nfa_t *
 nfa_edge_map_nfa_obtain(s_nfa_edge_map_t *map)
 {
-    dp_assert(NULL != map);
+    assert(NULL != map);
 
     if (!map->nfa) {
         map->nfa = nfa_subset_rule_basic(map->c);
@@ -49,7 +49,7 @@ nfa_status_create(void)
     s_fa_status_t *retval;
 
     retval = dp_malloc(sizeof(*retval));
-    dp_assert(NULL != retval);
+    assert(NULL != retval);
 
     retval->edge_count = 0;
     retval->label = nfa_label_obtain();
@@ -63,10 +63,10 @@ nfa_status_edge_chain(s_fa_status_t *status, char c, s_fa_status_t *next)
 {
     uint32 index;
 
-    dp_assert(NULL != next);
-    dp_assert(NULL != status);
-    dp_assert(NULL == status->edge[status->edge_count]);
-    dp_assert(status->edge_count < NFA_EDGE_MAX - 1);
+    assert(NULL != next);
+    assert(NULL != status);
+    assert(NULL == status->edge[status->edge_count]);
+    assert(status->edge_count < NFA_EDGE_MAX - 1);
 
     index = status->edge_count++;
 

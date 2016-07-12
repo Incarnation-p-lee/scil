@@ -1,5 +1,5 @@
 static inline bool
-nfa_engine_legal_p(s_nfa_t *nfa)
+nfa_engine_structure_legal_p(s_nfa_t *nfa)
 {
     if (!nfa) {
         return false;
@@ -54,7 +54,7 @@ nfa_engine_create(char *re)
                         array_stack_push(stack, map);
                         break;
                     default:
-                        dp_assert(false);
+                        assert(false);
                         break;
                 }
             }
@@ -62,7 +62,7 @@ nfa_engine_create(char *re)
         }
 
         map = array_stack_pop(stack);
-        dp_assert(array_stack_empty_p(stack));
+        assert(array_stack_empty_p(stack));
 
         nfa = map->nfa;
         map->nfa = NULL;
@@ -70,7 +70,8 @@ nfa_engine_create(char *re)
         array_stack_destroy(&stack);
     }
 
-    dp_assert(nfa_engine_legal_p(nfa));
+    assert(nfa_engine_graph_legal_p(nfa));
+    assert(nfa_engine_structure_legal_p(nfa));
     return nfa;
 }
 
@@ -80,7 +81,7 @@ nfa_status_destroy_dfs(s_fa_status_t *status, s_open_addressing_hash_t *hash)
     uint32 i;
     void *key;
 
-    dp_assert(status);
+    assert(status);
 
     key = (void *)(ptr_t)status->label;
 
@@ -89,7 +90,7 @@ nfa_status_destroy_dfs(s_fa_status_t *status, s_open_addressing_hash_t *hash)
 
         i = 0;
         while (i < status->edge_count) {
-            dp_assert(status->edge[i]);
+            assert(status->edge[i]);
             nfa_status_destroy_dfs(status->edge[i]->next, hash);
             i++;
         }
@@ -102,7 +103,9 @@ nfa_engine_destroy(s_nfa_t *nfa)
 {
     s_open_addressing_hash_t *hash;
 
-    if (!nfa_engine_legal_p(nfa)) {
+    if (!nfa_engine_structure_legal_p(nfa)) {
+        return;
+    } else if (!nfa_engine_graph_legal_p(nfa)) {
         return;
     } else {
         hash = open_addressing_hash_create(NFA_LABEL_HASH_SIZE);

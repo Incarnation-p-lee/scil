@@ -3,7 +3,9 @@
 
 
 s_nfa_t * nfa_engine_create(char *re);
-static inline bool nfa_engine_legal_p(s_nfa_t *nfa);
+static inline bool nfa_engine_graph_legal_p(s_nfa_t *nfa);
+static inline bool nfa_engine_structure_legal_p(s_nfa_t *nfa);
+static inline bool nfa_status_dfs_reached_p(s_fa_status_t *start, s_fa_status_t *terminal, s_open_addressing_hash_t *hash);
 static inline bool nfa_status_legal_p(s_fa_status_t *status);
 static inline s_fa_status_t * nfa_status_create(void);
 static inline s_nfa_edge_map_t * nfa_edge_map_create(char c, s_nfa_t *nfa);
