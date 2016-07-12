@@ -12,11 +12,13 @@ struct nfa_edge_map {
 typedef struct nfa_edge_map s_nfa_edge_map_t;
 
 enum nfa_subset_opt {
-    NFA_SUBSET_AND  = '&',
-    NFA_SUBSET_OR   = '|',
-    NFA_SUBSET_STAR = '*',
-    NFA_SUBSET_PLUS = '+',
-    NFA_SUBSET_QUST = '?',
+    NFA_SUBSET_BKT_L = '(', // left bracket
+    NFA_SUBSET_BKT_R = ')', // right bracket
+    NFA_SUBSET_AND   = '&',
+    NFA_SUBSET_OR    = '|',
+    NFA_SUBSET_STAR  = '*',
+    NFA_SUBSET_PLUS  = '+',
+    NFA_SUBSET_QUST  = '?',
 };
 typedef enum nfa_subset_opt e_nfa_subset_opt_t;
 

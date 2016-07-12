@@ -14,6 +14,18 @@ nfa_engine_graph_legal_p(s_nfa_t *nfa)
 }
 
 static inline bool
+nfa_engine_stack_opt_top_p(s_array_stack_t *stack, char expected)
+{
+    char *tmp;
+
+    assert(stack);
+
+    tmp = array_stack_top(stack);
+
+    return *tmp == expected;
+}
+
+static inline bool
 nfa_status_dfs_reached_p(s_fa_status_t *start, s_fa_status_t *terminal,
     s_open_addressing_hash_t *hash)
 {
