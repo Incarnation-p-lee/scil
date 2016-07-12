@@ -61,43 +61,64 @@ nfa_subset_rule_induction_or(s_nfa_t *s, s_nfa_t *t)
 }
 
 static inline void
-nfa_subset_rule_induction_binary(s_nfa_t *s, s_nfa_t *t, e_nfa_subset_opt_t opt)
+nfa_subset_rule_induction_binary(s_array_stack_t *stack,  e_nfa_subset_opt_t opt)
 {
-    assert(NULL != s);
-    assert(NULL != t);
+    s_nfa_t *nfa, *nfa_tmp;
+    s_nfa_edge_map_t *map, *map_tmp;
+
+    assert(stack);
+
+    map = array_stack_pop(stack);
+    map_tmp = array_stack_pop(stack);
+
+    nfa = nfa_edge_map_nfa_obtain(map);
+    nfa_tmp = nfa_edge_map_nfa_obtain(map_tmp);
 
     switch (opt) {
         case NFA_SUBSET_AND:
-            nfa_subset_rule_induction_and(s, t);
+            nfa_subset_rule_induction_and(nfa, nfa_tmp);
             break;
         case NFA_SUBSET_OR:
-            nfa_subset_rule_induction_or(s, t);
+            nfa_subset_rule_induction_or(nfa, nfa_tmp);
             break;
         default:
             assert(false);
             break;
     }
+
+    nfa_edge_map_destroy(map_tmp);
+    array_stack_push(stack, map);
+    assert(nfa_engine_structure_legal_p(nfa));
 }
 
 static inline void
-nfa_subset_rule_induction_unary(s_nfa_t *s, e_nfa_subset_opt_t opt)
+nfa_subset_rule_induction_unary(s_array_stack_t *stack, e_nfa_subset_opt_t opt)
 {
-    assert(NULL != s);
+    s_nfa_t *nfa;
+    s_nfa_edge_map_t *map;
+
+    assert(stack);
+
+    map = array_stack_pop(stack);
+    nfa = nfa_edge_map_nfa_obtain(map);
 
     switch (opt) {
         case NFA_SUBSET_STAR:
-            nfa_subset_rule_induction_star(s);
+            nfa_subset_rule_induction_star(nfa);
             break;
         case NFA_SUBSET_PLUS:
-            nfa_subset_rule_induction_plus(s);
+            nfa_subset_rule_induction_plus(nfa);
             break;
         case NFA_SUBSET_QUST:
-            nfa_subset_rule_induction_question(s);
+            nfa_subset_rule_induction_question(nfa);
             break;
         default:
             assert(false);
             break;
     }
+
+    array_stack_push(stack, map);
+    assert(nfa_engine_structure_legal_p(nfa));
 }
 
 /*

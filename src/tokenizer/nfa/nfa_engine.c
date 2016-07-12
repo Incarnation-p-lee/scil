@@ -120,7 +120,7 @@ nfa_engine_regular_to_reverse_polish(char *re, uint32 size, char *rp)
     stack_data = array_stack_create();
 
     while (*c) {
-        if (dp_isalnum(*c)) {
+        if (dp_isalnum(*c) || '_' == *c) {
             array_stack_push(stack_data, c);
         } else {
             tmp = array_stack_top(stack_opt);
@@ -153,64 +153,102 @@ nfa_engine_regular_to_reverse_polish(char *re, uint32 size, char *rp)
     array_stack_destroy(&stack_data);
 }
 
-s_nfa_t *
-nfa_engine_create(char *re)
+static inline s_nfa_t *
+nfa_engine_create_i(char *rp)
 {
     char *c;
+    s_nfa_t *nfa;
+    s_nfa_edge_map_t *map;
     s_array_stack_t *stack;
-    s_nfa_t *nfa, *nfa_tmp;
-    s_nfa_edge_map_t *map, *map_tmp;
+
+    assert(rp);
 
     nfa = NULL;
-    // re should be Reverse Polish Expression
-    // Add checking here.
-    if (re) {
-        c = re;
-        stack = array_stack_create();
+    c = rp;
+    stack = array_stack_create();
 
-        while (*c) {
-            if (dp_isalnum(*c) || '_' == *c) {
-                map = nfa_edge_map_create(*c, NULL);
-                array_stack_push(stack, map);
-            } else {
-                switch (*c) {
-                    case NFA_SUBSET_OR:
-                    case NFA_SUBSET_AND:
-                        map = array_stack_pop(stack);
-                        map_tmp = array_stack_pop(stack);
-                        nfa = nfa_edge_map_nfa_obtain(map);
-                        nfa_tmp = nfa_edge_map_nfa_obtain(map_tmp);
-                        nfa_subset_rule_induction_binary(nfa, nfa_tmp, *c);
-                        nfa_edge_map_destroy(map_tmp);
-                        array_stack_push(stack, map);
-                        break;
-                    case NFA_SUBSET_STAR:
-                    case NFA_SUBSET_PLUS:
-                    case NFA_SUBSET_QUST:
-                        map = array_stack_pop(stack);
-                        nfa = nfa_edge_map_nfa_obtain(map);
-                        nfa_subset_rule_induction_unary(nfa, *c);
-                        array_stack_push(stack, map);
-                        break;
-                    default:
-                        assert(false);
-                        break;
-                }
+    while (*c) {
+        if (dp_isalnum(*c) || '_' == *c) {
+            map = nfa_edge_map_create(*c, NULL);
+            array_stack_push(stack, map);
+        } else {
+            switch (*c) {
+                case NFA_SUBSET_OR:
+                case NFA_SUBSET_AND:
+                    nfa_subset_rule_induction_binary(stack, *c);
+                    break;
+                case NFA_SUBSET_STAR:
+                case NFA_SUBSET_PLUS:
+                case NFA_SUBSET_QUST:
+                    nfa_subset_rule_induction_unary(stack, *c);
+                    break;
+                default:
+                    assert(false);
+                    break;
             }
-            c++;
         }
-
-        map = array_stack_pop(stack);
-        assert(array_stack_empty_p(stack));
-
-        nfa = map->nfa;
-        map->nfa = NULL;
-        nfa_edge_map_destroy(map);
-        array_stack_destroy(&stack);
+        c++;
     }
+
+    map = array_stack_pop(stack);
+    assert(array_stack_empty_p(stack));
+    array_stack_destroy(&stack);
+
+    nfa = map->nfa;
+    map->nfa = NULL;
+    nfa_edge_map_destroy(map);
 
     assert(nfa_engine_graph_legal_p(nfa));
     assert(nfa_engine_structure_legal_p(nfa));
+    return nfa;
+}
+
+static inline void
+nfa_engine_re_pre_process(char *pre, uint32 size, char *re)
+{
+    char last;
+    uint32 index;
+
+    assert(pre && re && size);
+
+    index = 0;
+    last = NULL_CHAR;
+    while (*re) {
+        if (dp_isalnum(last) || '_' == last) {
+            pre[index] = NFA_SUBSET_AND;
+        }
+        pre[index++] = last = *re++;
+    }
+
+    if (index >= size) {
+        pre[0] = NULL_CHAR;
+        assert(false);
+    } else {
+        pre[index] = NULL_CHAR;
+    }
+}
+
+s_nfa_t *
+nfa_engine_create(char *re)
+{
+    uint32 size;
+    char *pre, *rp;
+    s_nfa_t *nfa;
+
+    assert(re);
+
+    size = 2 * dp_strlen(re);
+    pre = dp_malloc(size);
+    rp = dp_malloc(size);
+
+    nfa_engine_re_pre_process(pre, size, re);
+    nfa_engine_regular_to_reverse_polish(rp, size, pre);
+
+    nfa = nfa_engine_create_i(rp);
+
+    dp_free(pre);
+    dp_free(rp);
+
     return nfa;
 }
 
