@@ -56,19 +56,23 @@ nfa_engine_regular_to_reverse_polish_top_opt(s_array_stack_t *stack_opt,
     char *tmp;
 
     assert(c && stack_opt && stack_data);
-    assert(nfa_engine_stack_opt_top_p(stack_opt, NFA_SUBSET_AND));
-    assert(nfa_engine_stack_opt_top_p(stack_opt, NFA_SUBSET_OR));
-    assert(nfa_engine_stack_opt_top_p(stack_opt, NFA_SUBSET_STAR));
-    assert(nfa_engine_stack_opt_top_p(stack_opt, NFA_SUBSET_PLUS));
-    assert(nfa_engine_stack_opt_top_p(stack_opt, NFA_SUBSET_QUST));
+    assert(nfa_engine_stack_opt_top_p(stack_opt, NFA_SUBSET_AND)
+        || nfa_engine_stack_opt_top_p(stack_opt, NFA_SUBSET_OR)
+        || nfa_engine_stack_opt_top_p(stack_opt, NFA_SUBSET_STAR)
+        || nfa_engine_stack_opt_top_p(stack_opt, NFA_SUBSET_PLUS)
+        || nfa_engine_stack_opt_top_p(stack_opt, NFA_SUBSET_QUST));
 
     switch (*c) {
         case NFA_SUBSET_BKT_L:
-        case NFA_SUBSET_AND:
-        case NFA_SUBSET_OR:
         case NFA_SUBSET_STAR:
         case NFA_SUBSET_PLUS:
         case NFA_SUBSET_QUST:
+            array_stack_push(stack_opt, c);
+            break;
+        case NFA_SUBSET_AND:
+        case NFA_SUBSET_OR:
+            tmp = array_stack_pop(stack_opt);
+            array_stack_push(stack_data, tmp);
             array_stack_push(stack_opt, c);
             break;
         case NFA_SUBSET_BKT_R:
@@ -108,23 +112,26 @@ nfa_engine_regular_to_reverse_polish_final(char *re, uint32 size,
 }
 
 static inline void
-nfa_engine_regular_to_reverse_polish(char *re, uint32 size, char *rp)
+nfa_engine_regular_to_reverse_polish(char *rp, uint32 size, char *re)
 {
     char *c, *tmp, top;
     s_array_stack_t *stack_opt, *stack_data;
 
     assert(re && rp);
 
-    c = rp;
+    c = re;
     stack_opt = array_stack_create();
     stack_data = array_stack_create();
 
     while (*c) {
-        if (dp_isalnum(*c) || '_' == *c) {
+        if (nfa_engine_alpha_underline_p(*c)) {
             array_stack_push(stack_data, c);
+        } else if (array_stack_empty_p(stack_opt)) {
+            array_stack_push(stack_opt, c);
         } else {
+            assert(!array_stack_empty_p(stack_opt));
             tmp = array_stack_top(stack_opt);
-            top = tmp ? *tmp : NULL_CHAR;
+            top = *tmp;
             switch (top) {
                 case NFA_SUBSET_BKT_L:
                      nfa_engine_regular_to_reverse_polish_top_bkt(stack_opt, c);
@@ -143,11 +150,11 @@ nfa_engine_regular_to_reverse_polish(char *re, uint32 size, char *rp)
         c++;
     }
 
-    while (array_stack_empty_p(stack_opt)) {
+    while (!array_stack_empty_p(stack_opt)) {
         array_stack_push(stack_data, array_stack_pop(stack_opt));
     }
 
-    nfa_engine_regular_to_reverse_polish_final(re, size, stack_data);
+    nfa_engine_regular_to_reverse_polish_final(rp, size, stack_data);
 
     array_stack_destroy(&stack_opt);
     array_stack_destroy(&stack_data);
@@ -203,6 +210,26 @@ nfa_engine_create_i(char *rp)
     return nfa;
 }
 
+static inline bool
+nfa_engine_alpha_underline_p(char c)
+{
+    if (dp_isalpha(c) || '-' == c) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+static inline bool
+nfa_engine_bracket_p(char c)
+{
+    if (c == NFA_SUBSET_BKT_R || c == NFA_SUBSET_BKT_L) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 static inline void
 nfa_engine_re_pre_process(char *pre, uint32 size, char *re)
 {
@@ -214,8 +241,10 @@ nfa_engine_re_pre_process(char *pre, uint32 size, char *re)
     index = 0;
     last = NULL_CHAR;
     while (*re) {
-        if (dp_isalnum(last) || '_' == last) {
-            pre[index] = NFA_SUBSET_AND;
+        if ((nfa_engine_alpha_underline_p(last) && *re == NFA_SUBSET_BKT_L)
+            || (last == NFA_SUBSET_BKT_R && nfa_engine_alpha_underline_p(*re))
+            || (nfa_engine_alpha_underline_p(last) && nfa_engine_alpha_underline_p(*re))) {
+            pre[index++] = NFA_SUBSET_AND;
         }
         pre[index++] = last = *re++;
     }

@@ -35,7 +35,6 @@ nfa_status_dfs_reached_p(s_fa_status_t *start, s_fa_status_t *terminal,
     assert(hash);
     assert(start);
     assert(terminal);
-    assert(start != terminal);
     assert(!terminal->edge_count);
 
     key = (void *)(ptr_t)start->label;
