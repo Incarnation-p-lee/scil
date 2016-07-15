@@ -4,11 +4,20 @@
 #define true                   1
 #define false                  0
 
+#define assert_caution(exp)    do {                                                                     \
+                                   if (!(exp)) {                                                        \
+                                       complain_assert_caution(#exp, __FILE__, __FUNCTION__, __LINE__); \
+                                   }                                                                    \
+                               } while (false)
+
 #if defined DEBUG
-    #define assert(exp)        ((exp) || complain_assert(#exp, __FILE__, \
-                                   __FUNCTION__, __LINE__))
+    #define assert_exit(exp)   do {                                                                  \
+                                   if (!(exp)) {                                                     \
+                                       complain_assert_exit(#exp, __FILE__, __FUNCTION__, __LINE__); \
+                                   }                                                                 \
+                               } while (false)
 #else
-    #define assert(exp)
+    #define assert_exit(exp)
 #endif
 
 #endif

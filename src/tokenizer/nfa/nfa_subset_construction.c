@@ -20,7 +20,7 @@ nfa_subset_rule_basic(char c)
 }
 
 static inline bool
-nfa_status_legal_p(s_fa_status_t *status)
+nfa_status_structure_legal_p(s_fa_status_t *status)
 {
     if (!status) {
         return false;
@@ -66,13 +66,13 @@ nfa_subset_rule_induction_binary(s_array_stack_t *stack,  e_nfa_subset_opt_t opt
     s_nfa_t *nfa, *nfa_tmp;
     s_nfa_edge_map_t *map, *map_tmp;
 
-    assert(stack);
+    assert_exit(stack);
 
-    map = array_stack_pop(stack);
     map_tmp = array_stack_pop(stack);
+    map = array_stack_pop(stack);
 
-    nfa = nfa_edge_map_nfa_obtain(map);
     nfa_tmp = nfa_edge_map_nfa_obtain(map_tmp);
+    nfa = nfa_edge_map_nfa_obtain(map);
 
     switch (opt) {
         case NFA_SUBSET_AND:
@@ -82,13 +82,13 @@ nfa_subset_rule_induction_binary(s_array_stack_t *stack,  e_nfa_subset_opt_t opt
             nfa_subset_rule_induction_or(nfa, nfa_tmp);
             break;
         default:
-            assert(false);
+            assert_exit(false);
             break;
     }
 
     nfa_edge_map_destroy(map_tmp);
     array_stack_push(stack, map);
-    assert(nfa_engine_structure_legal_p(nfa));
+    assert_exit(nfa_engine_structure_legal_p(nfa));
 }
 
 static inline void
@@ -97,7 +97,7 @@ nfa_subset_rule_induction_unary(s_array_stack_t *stack, e_nfa_subset_opt_t opt)
     s_nfa_t *nfa;
     s_nfa_edge_map_t *map;
 
-    assert(stack);
+    assert_exit(stack);
 
     map = array_stack_pop(stack);
     nfa = nfa_edge_map_nfa_obtain(map);
@@ -113,12 +113,12 @@ nfa_subset_rule_induction_unary(s_array_stack_t *stack, e_nfa_subset_opt_t opt)
             nfa_subset_rule_induction_question(nfa);
             break;
         default:
-            assert(false);
+            assert_exit(false);
             break;
     }
 
     array_stack_push(stack, map);
-    assert(nfa_engine_structure_legal_p(nfa));
+    assert_exit(nfa_engine_structure_legal_p(nfa));
 }
 
 /*
@@ -127,13 +127,13 @@ nfa_subset_rule_induction_unary(s_array_stack_t *stack, e_nfa_subset_opt_t opt)
 static inline void
 nfa_subset_rule_induction_and(s_nfa_t *s, s_nfa_t *t)
 {
-    if (s && t) {
-        nfa_status_edge_chain(s->terminal, NULL_CHAR, t->start);
-        s->terminal = t->terminal;
+    assert_exit(s && t);
 
-        t->start = t->terminal = NULL;
-        dp_free(t);
-    }
+    nfa_status_terminal_merge(s->terminal, t->start);
+    s->terminal = t->terminal;
+
+    t->start = t->terminal = NULL;
+    dp_free(t);
 }
 
 /*

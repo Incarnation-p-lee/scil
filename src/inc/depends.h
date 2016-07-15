@@ -10,7 +10,6 @@
 
 #include <unistd.h>
 #include <limits.h>
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,13 +18,19 @@
 #include <ctype.h>
 #include <sys/time.h>
 
-#define dp_malloc              malloc
-#define dp_free                free
 #define dp_memset              memset
 #define dp_isalnum             isalnum
 #define dp_printf              printf
 #define dp_strlen              strlen
 #define dp_isalpha             isalpha
+
+#if defined DEBUG
+    #define dp_malloc          memory_track_melloc
+    #define dp_free            memory_track_free
+#else
+    #define dp_malloc          malloc
+    #define dp_free            free
+#endif
 
 #endif
 

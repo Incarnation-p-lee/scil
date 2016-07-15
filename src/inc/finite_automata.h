@@ -23,6 +23,7 @@ struct fa_status {
 
 struct fa_edge {
     char           c;
+    uint32        label;
     s_fa_status_t *next;
 };
 

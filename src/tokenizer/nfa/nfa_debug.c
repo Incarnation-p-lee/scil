@@ -4,7 +4,7 @@ nfa_engine_graph_legal_p(s_nfa_t *nfa)
     bool legal;
     s_open_addressing_hash_t *hash;
 
-    assert(nfa_engine_structure_legal_p(nfa));
+    assert_exit(nfa_engine_structure_legal_p(nfa));
 
     hash = open_addressing_hash_create(NFA_LABEL_HASH_SIZE);
     legal = nfa_status_dfs_reached_p(nfa->start, nfa->terminal, hash);
@@ -18,7 +18,7 @@ nfa_engine_stack_opt_top_p(s_array_stack_t *stack, char expected)
 {
     char *tmp;
 
-    assert(stack);
+    assert_exit(stack);
 
     tmp = array_stack_top(stack);
 
@@ -32,10 +32,10 @@ nfa_status_dfs_reached_p(s_fa_status_t *start, s_fa_status_t *terminal,
     uint32 i;
     void *key;
 
-    assert(hash);
-    assert(start);
-    assert(terminal);
-    assert(!terminal->edge_count);
+    assert_exit(hash);
+    assert_exit(start);
+    assert_exit(terminal);
+    assert_exit(!terminal->edge_count);
 
     key = (void *)(ptr_t)start->label;
 
@@ -47,7 +47,7 @@ nfa_status_dfs_reached_p(s_fa_status_t *start, s_fa_status_t *terminal,
 
         i = 0;
         while (i < start->edge_count) {
-            assert(start->edge[i]);
+            assert_exit(start->edge[i]);
             if (nfa_status_dfs_reached_p(start->edge[i]->next, terminal, hash)) {
                 return true;
             }

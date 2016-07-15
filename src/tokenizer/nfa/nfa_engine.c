@@ -5,9 +5,9 @@ nfa_engine_structure_legal_p(s_nfa_t *nfa)
         return false;
     } else if (!nfa->start || !nfa->terminal) {
         return false;
-    } else if (!nfa_status_legal_p(nfa->start)) {
+    } else if (!nfa_status_structure_legal_p(nfa->start)) {
         return false;
-    } else if (!nfa_status_legal_p(nfa->terminal)) {
+    } else if (!nfa_status_structure_legal_p(nfa->terminal)) {
         return false;
     } else {
         return true;
@@ -27,9 +27,9 @@ nfa_engine_structure_legal_p(s_nfa_t *nfa)
 static inline void
 nfa_engine_regular_to_reverse_polish_top_bkt(s_array_stack_t *stack, char *c)
 {
-    assert(c);
-    assert(stack);
-    assert(nfa_engine_stack_opt_top_p(stack, NFA_SUBSET_BKT_L));
+    assert_exit(c);
+    assert_exit(stack);
+    assert_exit(nfa_engine_stack_opt_top_p(stack, NFA_SUBSET_BKT_L));
 
     switch (*c) {
         case NFA_SUBSET_BKT_L:
@@ -44,7 +44,7 @@ nfa_engine_regular_to_reverse_polish_top_bkt(s_array_stack_t *stack, char *c)
             array_stack_pop(stack);
             break;
         default:
-            assert(false);
+            assert_exit(false);
             break;
     }
 }
@@ -55,8 +55,8 @@ nfa_engine_regular_to_reverse_polish_top_opt(s_array_stack_t *stack_opt,
 {
     char *tmp;
 
-    assert(c && stack_opt && stack_data);
-    assert(nfa_engine_stack_opt_top_p(stack_opt, NFA_SUBSET_AND)
+    assert_exit(c && stack_opt && stack_data);
+    assert_exit(nfa_engine_stack_opt_top_p(stack_opt, NFA_SUBSET_AND)
         || nfa_engine_stack_opt_top_p(stack_opt, NFA_SUBSET_OR)
         || nfa_engine_stack_opt_top_p(stack_opt, NFA_SUBSET_STAR)
         || nfa_engine_stack_opt_top_p(stack_opt, NFA_SUBSET_PLUS)
@@ -83,7 +83,7 @@ nfa_engine_regular_to_reverse_polish_top_opt(s_array_stack_t *stack_opt,
             }
             break;
         default:
-            assert(false);
+            assert_exit(false);
             break;
     }
 }
@@ -95,13 +95,13 @@ nfa_engine_regular_to_reverse_polish_final(char *re, uint32 size,
     char *tmp;
     uint32 stack_size;
 
-    assert(re);
-    assert(stack);
+    assert_exit(re);
+    assert_exit(stack);
 
     stack_size = array_stack_size(stack);
     if (size <= stack_size) {
         re[0] = NULL_CHAR;
-        assert(false);
+        assert_exit(false);
     } else {
         re[stack_size] = NULL_CHAR;
         do {
@@ -117,7 +117,7 @@ nfa_engine_regular_to_reverse_polish(char *rp, uint32 size, char *re)
     char *c, *tmp, top;
     s_array_stack_t *stack_opt, *stack_data;
 
-    assert(re && rp);
+    assert_exit(re && rp);
 
     c = re;
     stack_opt = array_stack_create();
@@ -129,7 +129,7 @@ nfa_engine_regular_to_reverse_polish(char *rp, uint32 size, char *re)
         } else if (array_stack_empty_p(stack_opt)) {
             array_stack_push(stack_opt, c);
         } else {
-            assert(!array_stack_empty_p(stack_opt));
+            assert_exit(!array_stack_empty_p(stack_opt));
             tmp = array_stack_top(stack_opt);
             top = *tmp;
             switch (top) {
@@ -168,7 +168,7 @@ nfa_engine_create_i(char *rp)
     s_nfa_edge_map_t *map;
     s_array_stack_t *stack;
 
-    assert(rp);
+    assert_exit(rp);
 
     nfa = NULL;
     c = rp;
@@ -190,7 +190,7 @@ nfa_engine_create_i(char *rp)
                     nfa_subset_rule_induction_unary(stack, *c);
                     break;
                 default:
-                    assert(false);
+                    assert_exit(false);
                     break;
             }
         }
@@ -198,15 +198,15 @@ nfa_engine_create_i(char *rp)
     }
 
     map = array_stack_pop(stack);
-    assert(array_stack_empty_p(stack));
+    assert_exit(array_stack_empty_p(stack));
     array_stack_destroy(&stack);
 
     nfa = map->nfa;
     map->nfa = NULL;
     nfa_edge_map_destroy(map);
 
-    assert(nfa_engine_graph_legal_p(nfa));
-    assert(nfa_engine_structure_legal_p(nfa));
+    assert_exit(nfa_engine_graph_legal_p(nfa));
+    assert_exit(nfa_engine_structure_legal_p(nfa));
     return nfa;
 }
 
@@ -236,7 +236,7 @@ nfa_engine_re_pre_process(char *pre, uint32 size, char *re)
     char last;
     uint32 index;
 
-    assert(pre && re && size);
+    assert_exit(pre && re && size);
 
     index = 0;
     last = NULL_CHAR;
@@ -251,7 +251,7 @@ nfa_engine_re_pre_process(char *pre, uint32 size, char *re)
 
     if (index >= size) {
         pre[0] = NULL_CHAR;
-        assert(false);
+        assert_exit(false);
     } else {
         pre[index] = NULL_CHAR;
     }
@@ -264,7 +264,7 @@ nfa_engine_create(char *re)
     char *pre, *rp;
     s_nfa_t *nfa;
 
-    assert(re);
+    assert_exit(re);
 
     size = 2 * dp_strlen(re);
     pre = dp_malloc(size);
@@ -287,7 +287,7 @@ nfa_status_destroy_dfs(s_fa_status_t *status, s_open_addressing_hash_t *hash)
     uint32 i;
     void *key;
 
-    assert(status);
+    assert_exit(status);
 
     key = (void *)(ptr_t)status->label;
 
@@ -296,8 +296,14 @@ nfa_status_destroy_dfs(s_fa_status_t *status, s_open_addressing_hash_t *hash)
 
         i = 0;
         while (i < status->edge_count) {
-            assert(status->edge[i]);
-            nfa_status_destroy_dfs(status->edge[i]->next, hash);
+            assert_exit(status->edge[i]);
+
+            key = (void *)(ptr_t)status->edge[i]->label;
+            if (!open_addressing_hash_find(hash, key)) {
+                nfa_status_destroy_dfs(status->edge[i]->next, hash);
+            }
+
+            dp_free(status->edge[i]);
             i++;
         }
         dp_free(status);
