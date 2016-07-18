@@ -110,3 +110,44 @@ nfa_create(void)
     return nfa;
 }
 
+static inline bool
+nfa_char_alpha_underline_p(char c)
+{
+    if (dp_isalpha(c) || '-' == c) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+static inline bool
+nfa_char_bracket_p(char c)
+{
+    if (c == NFA_SUBSET_BKT_R || c == NFA_SUBSET_BKT_L) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+static inline bool
+nfa_char_unary_opt_p(char c)
+{
+    if (NFA_SUBSET_STAR == c || NFA_SUBSET_PLUS == c || NFA_SUBSET_QUST == c) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+static inline bool
+nfa_char_binary_opt_p(char c)
+{
+    if (NFA_SUBSET_OR == c || NFA_SUBSET_AND == c) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+

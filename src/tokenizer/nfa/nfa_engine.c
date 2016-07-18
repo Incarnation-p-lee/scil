@@ -14,6 +14,54 @@ nfa_engine_structure_legal_p(s_nfa_t *nfa)
     }
 }
 
+static inline bool
+nfa_engine_graph_dfs_reached_p(s_fa_status_t *start, s_fa_status_t *terminal,
+    s_open_addressing_hash_t *hash)
+{
+    uint32 i;
+    void *key;
+
+    assert_exit(hash);
+    assert_exit(start);
+    assert_exit(terminal);
+    assert_exit(!terminal->edge_count);
+
+    key = (void *)(ptr_t)start->label;
+
+    if (!open_addressing_hash_find(hash, key)) {
+        open_addressing_hash_insert(&hash, key);
+        if (start == terminal) {
+            return true;
+        }
+
+        i = 0;
+        while (i < start->edge_count) {
+            assert_exit(start->edge[i]);
+            if (nfa_engine_graph_dfs_reached_p(start->edge[i]->next, terminal, hash)) {
+                return true;
+            }
+            i++;
+        }
+    }
+
+    return false;
+}
+
+static inline bool
+nfa_engine_graph_legal_p(s_nfa_t *nfa)
+{
+    bool legal;
+    s_open_addressing_hash_t *hash;
+
+    assert_exit(nfa_engine_structure_legal_p(nfa));
+
+    hash = open_addressing_hash_create(NFA_LABEL_HASH_SIZE);
+    legal = nfa_engine_graph_dfs_reached_p(nfa->start, nfa->terminal, hash);
+    open_addressing_hash_destroy(&hash);
+
+    return legal;
+}
+
 // static inline bool
 // nfa_engine_reverse_polish_p(char *rp)
 // {
@@ -124,7 +172,7 @@ nfa_engine_regular_to_reverse_polish(char *rp, uint32 size, char *re)
     stack_data = array_stack_create();
 
     while (*c) {
-        if (nfa_engine_alpha_underline_p(*c)) {
+        if (nfa_char_alpha_underline_p(*c)) {
             array_stack_push(stack_data, c);
         } else if (array_stack_empty_p(stack_opt)) {
             array_stack_push(stack_opt, c);
@@ -211,19 +259,12 @@ nfa_engine_create_i(char *rp)
 }
 
 static inline bool
-nfa_engine_alpha_underline_p(char c)
+nfa_engine_regular_and_needed_p(char last, char c)
 {
-    if (dp_isalpha(c) || '-' == c) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-static inline bool
-nfa_engine_bracket_p(char c)
-{
-    if (c == NFA_SUBSET_BKT_R || c == NFA_SUBSET_BKT_L) {
+    if ((nfa_char_alpha_underline_p(last) && NFA_SUBSET_BKT_L == c)
+        || (last == NFA_SUBSET_BKT_R && nfa_char_alpha_underline_p(c))
+        || (nfa_char_alpha_underline_p(last) && nfa_char_alpha_underline_p(c))
+        || (nfa_char_unary_opt_p(last) && nfa_char_alpha_underline_p(c))) {
         return true;
     } else {
         return false;
@@ -231,7 +272,7 @@ nfa_engine_bracket_p(char c)
 }
 
 static inline void
-nfa_engine_re_pre_process(char *pre, uint32 size, char *re)
+nfa_engine_regular_complete(char *pre, uint32 size, char *re)
 {
     char last;
     uint32 index;
@@ -241,9 +282,7 @@ nfa_engine_re_pre_process(char *pre, uint32 size, char *re)
     index = 0;
     last = NULL_CHAR;
     while (*re) {
-        if ((nfa_engine_alpha_underline_p(last) && *re == NFA_SUBSET_BKT_L)
-            || (last == NFA_SUBSET_BKT_R && nfa_engine_alpha_underline_p(*re))
-            || (nfa_engine_alpha_underline_p(last) && nfa_engine_alpha_underline_p(*re))) {
+        if (nfa_engine_regular_and_needed_p(last, *re)) {
             pre[index++] = NFA_SUBSET_AND;
         }
         pre[index++] = last = *re++;
@@ -270,7 +309,7 @@ nfa_engine_create(char *re)
     pre = dp_malloc(size);
     rp = dp_malloc(size);
 
-    nfa_engine_re_pre_process(pre, size, re);
+    nfa_engine_regular_complete(pre, size, re);
     nfa_engine_regular_to_reverse_polish(rp, size, pre);
 
     nfa = nfa_engine_create_i(rp);

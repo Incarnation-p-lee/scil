@@ -67,7 +67,7 @@ mkdir -p $bin_dir
 ###########################################
 ## update some header files and makefile ##
 ###########################################
-perl script/generate_declaration.pl $src_dir
+perl script/generate_declaration.pl $src_dir $debug_mode
 perl script/produce_compile_makefile.pl $src_dir
 
 ####################################
