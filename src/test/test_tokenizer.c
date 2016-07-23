@@ -3,7 +3,7 @@ test_tokenizer_nfa_engine_create_p(void)
 {
     s_nfa_t *nfa;
 
-    nfa = nfa_engine_create("(a+c)?(abb)*acd+");
+    nfa = nfa_engine_create("ab|ba");
     nfa_engine_destroy(nfa);
 
     return true;

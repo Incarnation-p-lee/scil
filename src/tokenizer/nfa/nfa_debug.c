@@ -1,5 +1,5 @@
 static inline bool
-nfa_engine_stack_opt_top_p(s_array_stack_t *stack, char expected)
+nfa_engine_stack_top_p(s_array_stack_t *stack, char expected)
 {
     char *tmp;
 

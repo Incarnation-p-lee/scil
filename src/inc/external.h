@@ -3,6 +3,7 @@
 #ifndef HAVE_DEFINED_EXTERNAL_H
 #define HAVE_DEFINED_EXTERNAL_H
 
+extern bool nfa_engine_pattern_match_p(s_nfa_t *nfa, char *pn);
 extern s_nfa_t * nfa_engine_create(char *re);
 extern void * memory_track_melloc(uint32 size);
 extern void assert_print_caution(char *msg, const char *fname, const char *func, uint32 line);

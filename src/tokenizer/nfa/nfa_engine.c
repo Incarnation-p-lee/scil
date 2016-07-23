@@ -63,14 +63,13 @@ nfa_engine_graph_legal_p(s_nfa_t *nfa)
 }
 
 static inline void
-nfa_engine_regular_to_reverse_polish_top_bkt(s_array_stack_t *stack, char *c)
+nfa_engine_re_to_rp_top_priority_0(s_array_stack_t *stack, char *c)
 {
     assert_exit(c);
     assert_exit(stack);
-    assert_exit(nfa_engine_stack_opt_top_p(stack, NFA_SUBSET_BKT_L));
+    assert_exit(nfa_engine_stack_top_p(stack, NFA_SUBSET_BKT_L));
 
     switch (*c) {
-        case NFA_SUBSET_BKT_L:
         case NFA_SUBSET_AND:
         case NFA_SUBSET_OR:
         case NFA_SUBSET_STAR:
@@ -88,36 +87,26 @@ nfa_engine_regular_to_reverse_polish_top_bkt(s_array_stack_t *stack, char *c)
 }
 
 static inline void
-nfa_engine_regular_to_reverse_polish_top_opt(s_array_stack_t *stack_opt,
+nfa_engine_re_to_rp_top_priority_1(s_array_stack_t *stack_opt,
     s_array_stack_t *stack_data, char *c)
 {
-    char *tmp;
-
     assert_exit(c && stack_opt && stack_data);
-    assert_exit(nfa_engine_stack_opt_top_p(stack_opt, NFA_SUBSET_AND)
-        || nfa_engine_stack_opt_top_p(stack_opt, NFA_SUBSET_OR)
-        || nfa_engine_stack_opt_top_p(stack_opt, NFA_SUBSET_STAR)
-        || nfa_engine_stack_opt_top_p(stack_opt, NFA_SUBSET_PLUS)
-        || nfa_engine_stack_opt_top_p(stack_opt, NFA_SUBSET_QUST));
+    assert_exit(nfa_engine_stack_top_p(stack_opt, NFA_SUBSET_STAR)
+        || nfa_engine_stack_top_p(stack_opt, NFA_SUBSET_PLUS)
+        || nfa_engine_stack_top_p(stack_opt, NFA_SUBSET_QUST));
 
     switch (*c) {
-        case NFA_SUBSET_BKT_L:
+        case NFA_SUBSET_OR:
+        case NFA_SUBSET_AND:
         case NFA_SUBSET_STAR:
         case NFA_SUBSET_PLUS:
         case NFA_SUBSET_QUST:
-            array_stack_push(stack_opt, c);
-            break;
-        case NFA_SUBSET_AND:
-        case NFA_SUBSET_OR:
-            tmp = array_stack_pop(stack_opt);
-            array_stack_push(stack_data, tmp);
+            array_stack_push(stack_data, array_stack_pop(stack_opt));
             array_stack_push(stack_opt, c);
             break;
         case NFA_SUBSET_BKT_R:
-            tmp = array_stack_pop(stack_opt);
-            while (*tmp != NFA_SUBSET_BKT_L) {
-                array_stack_push(stack_data, tmp);
-                tmp = array_stack_pop(stack_opt);
+	    while (!nfa_char_bracket_left_p(array_stack_top(stack_opt))) {
+                array_stack_push(stack_data, array_stack_pop(stack_opt));
             }
             break;
         default:
@@ -127,7 +116,67 @@ nfa_engine_regular_to_reverse_polish_top_opt(s_array_stack_t *stack_opt,
 }
 
 static inline void
-nfa_engine_regular_to_reverse_polish_final(char *re, uint32 size,
+nfa_engine_re_to_rp_top_priority_2(s_array_stack_t *stack_opt,
+    s_array_stack_t *stack_data, char *c)
+{
+    assert_exit(c && stack_opt && stack_data);
+    assert_exit(nfa_engine_stack_top_p(stack_opt, NFA_SUBSET_AND));
+
+    switch (*c) {
+        case NFA_SUBSET_STAR:
+        case NFA_SUBSET_PLUS:
+        case NFA_SUBSET_QUST:
+            array_stack_push(stack_opt, c);
+            break;
+        case NFA_SUBSET_OR:
+        case NFA_SUBSET_AND:
+            array_stack_push(stack_data, array_stack_pop(stack_opt));
+            array_stack_push(stack_opt, c);
+            break;
+        case NFA_SUBSET_BKT_R:
+	    while (!nfa_char_bracket_left_p(array_stack_top(stack_opt))) {
+                array_stack_push(stack_data, array_stack_pop(stack_opt));
+            }
+            array_stack_pop(stack_opt);
+            break;
+        default:
+            assert_exit(false);
+            break;
+    }
+}
+
+static inline void
+nfa_engine_re_to_rp_top_priority_3(s_array_stack_t *stack_opt,
+    s_array_stack_t *stack_data, char *c)
+{
+    assert_exit(c && stack_opt && stack_data);
+    assert_exit(nfa_engine_stack_top_p(stack_opt, NFA_SUBSET_OR));
+
+    switch (*c) {
+        case NFA_SUBSET_STAR:
+        case NFA_SUBSET_PLUS:
+        case NFA_SUBSET_QUST:
+        case NFA_SUBSET_AND:
+            array_stack_push(stack_opt, c);
+            break;
+        case NFA_SUBSET_OR:
+            array_stack_push(stack_data, array_stack_pop(stack_opt));
+            array_stack_push(stack_opt, c);
+            break;
+        case NFA_SUBSET_BKT_R:
+	    while (!nfa_char_bracket_left_p(array_stack_top(stack_opt))) {
+                array_stack_push(stack_data, array_stack_pop(stack_opt));
+            }
+            array_stack_pop(stack_opt);
+            break;
+        default:
+            assert_exit(false);
+            break;
+    }
+}
+
+static inline void
+nfa_engine_re_to_rp_final(char *re, uint32 size,
     s_array_stack_t *stack)
 {
     char *tmp;
@@ -149,8 +198,12 @@ nfa_engine_regular_to_reverse_polish_final(char *re, uint32 size,
     }
 }
 
+/*
+ * re means Regular Expression
+ * rp means Reverse Polish Expression
+ */
 static inline void
-nfa_engine_regular_to_reverse_polish(char *rp, uint32 size, char *re)
+nfa_engine_re_to_rp(char *rp, uint32 size, char *re)
 {
     char *c, *tmp, top;
     s_array_stack_t *stack_opt, *stack_data;
@@ -164,24 +217,30 @@ nfa_engine_regular_to_reverse_polish(char *rp, uint32 size, char *re)
     while (*c) {
         if (nfa_char_alpha_underline_p(*c)) {
             array_stack_push(stack_data, c);
-        } else if (array_stack_empty_p(stack_opt)) {
+        } else if (array_stack_empty_p(stack_opt) || NFA_SUBSET_BKT_L == *c) {
             array_stack_push(stack_opt, c);
         } else {
+            assert_exit(NFA_SUBSET_BKT_L != *c);
             assert_exit(!array_stack_empty_p(stack_opt));
             tmp = array_stack_top(stack_opt);
             top = *tmp;
             switch (top) {
                 case NFA_SUBSET_BKT_L:
-                     nfa_engine_regular_to_reverse_polish_top_bkt(stack_opt, c);
+                     nfa_engine_re_to_rp_top_priority_0(stack_opt, c);
                      break;
-                case NFA_SUBSET_AND:
-                case NFA_SUBSET_OR:
                 case NFA_SUBSET_STAR:
                 case NFA_SUBSET_PLUS:
                 case NFA_SUBSET_QUST:
-                    nfa_engine_regular_to_reverse_polish_top_opt(stack_opt, stack_data, c);
+                    nfa_engine_re_to_rp_top_priority_1(stack_opt, stack_data, c);
+                    break;
+                case NFA_SUBSET_AND:
+                    nfa_engine_re_to_rp_top_priority_2(stack_opt, stack_data, c);
+                    break;
+                case NFA_SUBSET_OR:
+                    nfa_engine_re_to_rp_top_priority_3(stack_opt, stack_data, c);
                     break;
                 default:
+                    assert_exit(false);
                     break;
             }
         }
@@ -192,11 +251,11 @@ nfa_engine_regular_to_reverse_polish(char *rp, uint32 size, char *re)
         array_stack_push(stack_data, array_stack_pop(stack_opt));
     }
 
-    nfa_engine_regular_to_reverse_polish_final(rp, size, stack_data);
+    nfa_engine_re_to_rp_final(rp, size, stack_data);
+    assert_exit(nfa_engine_reverse_polish_legal_p(rp));
 
     array_stack_destroy(&stack_opt);
     array_stack_destroy(&stack_data);
-    assert_exit(nfa_engine_reverse_polish_legal_p(rp));
 }
 
 static inline s_nfa_t *
@@ -252,7 +311,7 @@ nfa_engine_create_i(char *rp)
 }
 
 static inline bool
-nfa_engine_regular_and_needed_p(char last, char c)
+nfa_engine_re_and_needed_p(char last, char c)
 {
     if ((nfa_char_unary_opt_p(last) && c == NFA_SUBSET_BKT_L)
         || (nfa_char_alnum_underline_p(last) && NFA_SUBSET_BKT_L == c)
@@ -265,8 +324,11 @@ nfa_engine_regular_and_needed_p(char last, char c)
     }
 }
 
+/*
+ * re means Regular Expression
+ */
 static inline void
-nfa_engine_regular_complete(char *pre, uint32 size, char *re)
+nfa_engine_re_complete(char *pre, uint32 size, char *re)
 {
     char last;
     uint32 index;
@@ -276,7 +338,7 @@ nfa_engine_regular_complete(char *pre, uint32 size, char *re)
     index = 0;
     last = NULL_CHAR;
     while (*re) {
-        if (nfa_engine_regular_and_needed_p(last, *re)) {
+        if (nfa_engine_re_and_needed_p(last, *re)) {
             pre[index++] = NFA_SUBSET_AND;
         }
         pre[index++] = last = *re++;
@@ -290,6 +352,13 @@ nfa_engine_regular_complete(char *pre, uint32 size, char *re)
     }
 }
 
+/*
+ * Regular Expression operator priority:
+ *     Level 0: ()      (highest)
+ *     Level 1: +, *, ?
+ *     Level 2: &
+ *     Level 3: |
+ */
 s_nfa_t *
 nfa_engine_create(char *re)
 {
@@ -303,8 +372,8 @@ nfa_engine_create(char *re)
     pre = dp_malloc(size);
     rp = dp_malloc(size);
 
-    nfa_engine_regular_complete(pre, size, re);
-    nfa_engine_regular_to_reverse_polish(rp, size, pre);
+    nfa_engine_re_complete(pre, size, re);
+    nfa_engine_re_to_rp(rp, size, pre);
     nfa = nfa_engine_create_i(rp);
 
     dp_free(pre);
@@ -356,6 +425,18 @@ nfa_engine_destroy(s_nfa_t *nfa)
         nfa_status_destroy_dfs(nfa->start, hash);
         open_addressing_hash_destroy(&hash);
         dp_free(nfa);
+    }
+}
+
+bool
+nfa_engine_pattern_match_p(s_nfa_t *nfa, char *pn)
+{
+    if (pn) {
+        return false;
+    } else if (!nfa_engine_structure_legal_p(nfa)) {
+        return false;
+    } else {
+        return true;
     }
 }
 

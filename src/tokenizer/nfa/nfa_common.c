@@ -105,6 +105,18 @@ nfa_create(void)
 }
 
 static inline bool
+nfa_char_bracket_left_p(char *c)
+{
+    assert_exit(c);
+
+    if (NFA_SUBSET_BKT_L == *c) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+static inline bool
 nfa_char_alpha_underline_p(char c)
 {
     if (dp_isalpha(c) || '_' == c) {
