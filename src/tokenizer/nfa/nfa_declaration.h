@@ -14,6 +14,7 @@ static inline bool nfa_char_bracket_p(char c);
 static inline bool nfa_char_unary_opt_p(char c);
 static inline bool nfa_engine_graph_dfs_reached_p(s_fa_status_t *start, s_fa_status_t *terminal, s_open_addressing_hash_t *hash);
 static inline bool nfa_engine_graph_legal_p(s_nfa_t *nfa);
+static inline bool nfa_engine_pattern_match_ip(s_nfa_t *nfa, char *pn);
 static inline bool nfa_engine_re_and_needed_p(char last, char c);
 static inline bool nfa_engine_reverse_polish_legal_p(char *rp);
 static inline bool nfa_engine_stack_top_p(s_array_stack_t *stack, char expected);

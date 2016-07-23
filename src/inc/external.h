@@ -5,7 +5,7 @@
 
 extern bool nfa_engine_pattern_match_p(s_nfa_t *nfa, char *pn);
 extern s_nfa_t * nfa_engine_create(char *re);
-extern void * memory_track_melloc(uint32 size);
+extern void * memory_track_malloc(uint32 size);
 extern void assert_print_caution(char *msg, const char *fname, const char *func, uint32 line);
 extern void assert_print_exit(char *msg, const char *fname,const char *func, uint32 line);
 extern void memory_track_counters_print(void);

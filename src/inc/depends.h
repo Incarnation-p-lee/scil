@@ -25,7 +25,7 @@
 #define dp_isalpha             isalpha
 
 #if defined DEBUG
-    #define dp_malloc          memory_track_melloc
+    #define dp_malloc          memory_track_malloc
     #define dp_free            memory_track_free
 #else
     #define dp_malloc          malloc

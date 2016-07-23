@@ -36,6 +36,7 @@ typedef unsigned int           bool;
 #define SPT_CHN_HASH_LOAD_FTR  72u        // separate chain hash load factor
 #define OPN_ADDR_HASH_LOAD_FTR 50u        // open addressing hash load factor
 #define HASH_SIZE_INVALID      SIZE_INVALID
+#define HASH_IDX_INVALID       0xffffffffu
 #define HASH_LD_FTR_INVALID    101u       // load factor max is 100u
 #define HEAP_SIZE_INVALID      SIZE_INVALID
 #define HEAP_CPCT_INVALID      SIZE_INVALID
@@ -58,6 +59,16 @@ typedef unsigned int           bool;
 #define PTR_INVALID            (void *)-1 // invalid pointer
 #define HEAP_IDX_CHILD_L(x)    ((x) * 2)
 #define HEAP_IDX_CHILD_R(x)    ((x) * 2 + 1)
+typedef struct single_linked_list   s_single_linked_list_t;
+typedef struct doubly_linked_list   s_doubly_linked_list_t;
+typedef struct skip_linked_list     s_skip_linked_list_t;
+typedef struct separate_chain_hash  s_separate_chain_hash_t;
+typedef struct open_addressing_hash s_open_addressing_hash_t;
+typedef struct hashing_table        s_hashing_table_t;
+typedef struct separate_chain       s_separate_chain_t;
+typedef struct open_addressing_hash s_open_addressing_hash_t;
+typedef struct array_queue          s_array_queue_t;
+typedef struct array_stack          s_array_stack_t;
 
 enum ITER_ORDER {
     ORDER_START,
@@ -72,7 +83,6 @@ struct single_linked_list {
 };
 
 struct doubly_linked_list {
-    void *val;   // REMOVE ME AFTER CLEAN HASH
     struct doubly_linked_list *next;
     struct doubly_linked_list *previous;
 };
@@ -94,7 +104,6 @@ struct array_stack_space {
 struct array_stack {
     struct array_stack_space space;
 };
-typedef struct array_stack s_array_stack_t;
 
 struct linked_stack_space {
     struct array_stack_space  space;
@@ -177,6 +186,11 @@ struct hashing_table {
     };
 };
 
+struct separate_chain {
+    void                   *val;
+    s_doubly_linked_list_t list;
+};
+
 struct separate_chain_hash {
     struct hashing_table *table;
 };
@@ -184,7 +198,6 @@ struct separate_chain_hash {
 struct open_addressing_hash {
     struct hashing_table *table;
 };
-typedef struct open_addressing_hash s_open_addressing_hash_t;
 
 struct heap_data {
     sint64 nice;
@@ -217,56 +230,56 @@ struct leftist_heap {
 };
 
 
-extern bool doubly_linked_list_contains_p(struct doubly_linked_list *list, struct doubly_linked_list *node);
-extern bool doubly_linked_list_structure_legal_p(struct doubly_linked_list *list);
-extern bool single_linked_list_contains_p(struct single_linked_list *list, struct single_linked_list *node);
-extern bool single_linked_list_structure_legal_p(struct single_linked_list *list);
-extern bool skip_linked_list_contains_p(struct skip_linked_list *list, struct skip_linked_list *node);
-extern bool skip_linked_list_structure_legal_p(struct skip_linked_list *list);
-extern sint32 skip_linked_list_key(struct skip_linked_list *list);
-extern struct doubly_linked_list * doubly_linked_list_create(void);
-extern struct doubly_linked_list * doubly_linked_list_merge(struct doubly_linked_list *m, struct doubly_linked_list *n);
-extern struct doubly_linked_list * doubly_linked_list_next(struct doubly_linked_list *list);
-extern struct doubly_linked_list * doubly_linked_list_node_by_index(struct doubly_linked_list *list, uint32 index);
-extern struct doubly_linked_list * doubly_linked_list_node_copy(struct doubly_linked_list *node);
-extern struct doubly_linked_list * doubly_linked_list_previous(struct doubly_linked_list *list);
-extern struct doubly_linked_list * doubly_linked_list_remove(struct doubly_linked_list **list);
-extern struct single_linked_list * single_linked_list_create(void);
-extern struct single_linked_list * single_linked_list_merge(struct single_linked_list *m, struct single_linked_list *n);
-extern struct single_linked_list * single_linked_list_next(struct single_linked_list *list);
-extern struct single_linked_list * single_linked_list_node_by_index(struct single_linked_list *list, uint32 index);
-extern struct single_linked_list * single_linked_list_node_copy(struct single_linked_list *node);
-extern struct single_linked_list * single_linked_list_previous(struct single_linked_list *list);
-extern struct single_linked_list * single_linked_list_remove(struct single_linked_list **list);
-extern struct skip_linked_list * skip_linked_list_create(void);
-extern struct skip_linked_list * skip_linked_list_create_with_key(sint32 key);
-extern struct skip_linked_list * skip_linked_list_find_key(struct skip_linked_list *list, sint32 key);
-extern struct skip_linked_list * skip_linked_list_insert(struct skip_linked_list **list, struct skip_linked_list *tgt);
-extern struct skip_linked_list * skip_linked_list_merge(struct skip_linked_list *m, struct skip_linked_list *n);
-extern struct skip_linked_list * skip_linked_list_next(struct skip_linked_list *list);
-extern struct skip_linked_list * skip_linked_list_node_by_index(struct skip_linked_list *list, uint32 index);
-extern struct skip_linked_list * skip_linked_list_remove(struct skip_linked_list **list, struct skip_linked_list *tgt);
-extern uint32 doubly_linked_list_length(struct doubly_linked_list *list);
-extern uint32 single_linked_list_length(struct single_linked_list *list);
-extern uint32 skip_linked_list_length(struct skip_linked_list *list);
-extern void doubly_linked_list_destroy(struct doubly_linked_list **list);
-extern void doubly_linked_list_initial(struct doubly_linked_list *list);
-extern void doubly_linked_list_insert_after(struct doubly_linked_list *list, struct doubly_linked_list *node);
-extern void doubly_linked_list_insert_before(struct doubly_linked_list *list, struct doubly_linked_list *node);
-extern void doubly_linked_list_iterate(struct doubly_linked_list *list, void (*handler)(void *));
-extern void doubly_linked_list_next_set(struct doubly_linked_list *list, struct doubly_linked_list *next);
-extern void doubly_linked_list_previous_set(struct doubly_linked_list *list, struct doubly_linked_list *previous);
-extern void single_linked_list_destroy(struct single_linked_list **list);
-extern void single_linked_list_initial(struct single_linked_list *list);
-extern void single_linked_list_insert_after(struct single_linked_list *list, struct single_linked_list *node);
-extern void single_linked_list_insert_before(struct single_linked_list *list, struct single_linked_list *node);
-extern void single_linked_list_iterate(struct single_linked_list *list, void (*handler)(void *));
-extern void single_linked_list_next_set(struct single_linked_list *list, struct single_linked_list *next);
-extern void skip_linked_list_destroy(struct skip_linked_list **list);
-extern void skip_linked_list_initial(struct skip_linked_list *list);
-extern void skip_linked_list_iterate(struct skip_linked_list *list, void (*handler)(void *));
-extern void skip_linked_list_key_set(struct skip_linked_list *list, sint32 key);
-extern void skip_linked_list_next_set(struct skip_linked_list *list, struct skip_linked_list *next);
+extern bool doubly_linked_list_contains_p(s_doubly_linked_list_t *list, s_doubly_linked_list_t *node);
+extern bool doubly_linked_list_structure_legal_p(s_doubly_linked_list_t *list);
+extern bool single_linked_list_contains_p(s_single_linked_list_t *list, s_single_linked_list_t *node);
+extern bool single_linked_list_structure_legal_p(s_single_linked_list_t *list);
+extern bool skip_linked_list_contains_p(s_skip_linked_list_t *list, s_skip_linked_list_t *node);
+extern bool skip_linked_list_structure_legal_p(s_skip_linked_list_t *list);
+extern s_doubly_linked_list_t * doubly_linked_list_create(void);
+extern s_doubly_linked_list_t * doubly_linked_list_merge(s_doubly_linked_list_t *m, s_doubly_linked_list_t *n);
+extern s_doubly_linked_list_t * doubly_linked_list_next(s_doubly_linked_list_t *list);
+extern s_doubly_linked_list_t * doubly_linked_list_node_by_index(s_doubly_linked_list_t *list, uint32 index);
+extern s_doubly_linked_list_t * doubly_linked_list_node_copy(s_doubly_linked_list_t *node);
+extern s_doubly_linked_list_t * doubly_linked_list_previous(s_doubly_linked_list_t *list);
+extern s_doubly_linked_list_t * doubly_linked_list_remove(s_doubly_linked_list_t **list);
+extern s_single_linked_list_t * single_linked_list_create(void);
+extern s_single_linked_list_t * single_linked_list_merge(s_single_linked_list_t *m, s_single_linked_list_t *n);
+extern s_single_linked_list_t * single_linked_list_next(s_single_linked_list_t *list);
+extern s_single_linked_list_t * single_linked_list_node_by_index(s_single_linked_list_t *list, uint32 index);
+extern s_single_linked_list_t * single_linked_list_node_copy(s_single_linked_list_t *node);
+extern s_single_linked_list_t * single_linked_list_previous(s_single_linked_list_t *list);
+extern s_single_linked_list_t * single_linked_list_remove(s_single_linked_list_t **list);
+extern s_skip_linked_list_t * skip_linked_list_create(void);
+extern s_skip_linked_list_t * skip_linked_list_create_with_key(sint32 key);
+extern s_skip_linked_list_t * skip_linked_list_find_key(s_skip_linked_list_t *list, sint32 key);
+extern s_skip_linked_list_t * skip_linked_list_insert(s_skip_linked_list_t **list, s_skip_linked_list_t *tgt);
+extern s_skip_linked_list_t * skip_linked_list_merge(s_skip_linked_list_t *m, s_skip_linked_list_t *n);
+extern s_skip_linked_list_t * skip_linked_list_next(s_skip_linked_list_t *list);
+extern s_skip_linked_list_t * skip_linked_list_node_by_index(s_skip_linked_list_t *list, uint32 index);
+extern s_skip_linked_list_t * skip_linked_list_remove(s_skip_linked_list_t **list, s_skip_linked_list_t *tgt);
+extern sint32 skip_linked_list_key(s_skip_linked_list_t *list);
+extern uint32 doubly_linked_list_length(s_doubly_linked_list_t *list);
+extern uint32 single_linked_list_length(s_single_linked_list_t *list);
+extern uint32 skip_linked_list_length(s_skip_linked_list_t *list);
+extern void doubly_linked_list_destroy(s_doubly_linked_list_t **list);
+extern void doubly_linked_list_initial(s_doubly_linked_list_t *list);
+extern void doubly_linked_list_insert_after(s_doubly_linked_list_t *list, s_doubly_linked_list_t *node);
+extern void doubly_linked_list_insert_before(s_doubly_linked_list_t *list, s_doubly_linked_list_t *node);
+extern void doubly_linked_list_iterate(s_doubly_linked_list_t *list, void (*handler)(void *));
+extern void doubly_linked_list_next_set(s_doubly_linked_list_t *list, s_doubly_linked_list_t *next);
+extern void doubly_linked_list_previous_set(s_doubly_linked_list_t *list, s_doubly_linked_list_t *previous);
+extern void single_linked_list_destroy(s_single_linked_list_t **list);
+extern void single_linked_list_initial(s_single_linked_list_t *list);
+extern void single_linked_list_insert_after(s_single_linked_list_t *list, s_single_linked_list_t *node);
+extern void single_linked_list_insert_before(s_single_linked_list_t *list, s_single_linked_list_t *node);
+extern void single_linked_list_iterate(s_single_linked_list_t *list, void (*handler)(void *));
+extern void single_linked_list_next_set(s_single_linked_list_t *list, s_single_linked_list_t *next);
+extern void skip_linked_list_destroy(s_skip_linked_list_t **list);
+extern void skip_linked_list_initial(s_skip_linked_list_t *list);
+extern void skip_linked_list_iterate(s_skip_linked_list_t *list, void (*handler)(void *));
+extern void skip_linked_list_key_set(s_skip_linked_list_t *list, sint32 key);
+extern void skip_linked_list_next_set(s_skip_linked_list_t *list, s_skip_linked_list_t *next);
 
 extern bool array_queue_empty_p(struct array_queue *queue);
 extern bool array_queue_full_p(struct array_queue *queue);
@@ -283,7 +296,9 @@ extern uint32 doubly_end_queue_length(struct doubly_end_queue *queue);
 extern uint32 stacked_queue_capacity(struct stacked_queue *queue);
 extern uint32 stacked_queue_dim(struct stacked_queue *queue);
 extern uint32 stacked_queue_space_rest(struct stacked_queue *queue);
+extern void * array_queue_front(s_array_queue_t *queue);
 extern void * array_queue_leave(struct array_queue *queue);
+extern void * array_queue_rear(s_array_queue_t *queue);
 extern void * doubly_end_queue_head_leave(struct doubly_end_queue *queue);
 extern void * doubly_end_queue_tail_leave(struct doubly_end_queue *queue);
 extern void * stacked_queue_leave(struct stacked_queue *queue);
@@ -310,8 +325,9 @@ extern bool linked_stack_full_p(struct linked_stack *stack);
 extern struct array_stack * array_stack_create(void);
 extern struct linked_stack * linked_stack_create(void);
 extern uint32 array_stack_capacity(struct array_stack *stack);
-extern uint32 array_stack_size(struct array_stack *stack);
+extern uint32 array_stack_dim(struct array_stack *stack);
 extern uint32 array_stack_rest(struct array_stack *stack);
+extern uint32 array_stack_size(struct array_stack *stack);
 extern uint32 linked_stack_capacity(struct linked_stack *stack);
 extern uint32 linked_stack_rest(struct linked_stack *stack);
 extern void * array_stack_pop(struct array_stack *stack);
@@ -386,26 +402,27 @@ extern void splay_tree_initial(struct splay_tree *tree, sint64 nice);
 extern void splay_tree_iterate(struct splay_tree *tree, void (*handle)(void *), enum ITER_ORDER order);
 extern void splay_tree_nice_set(struct splay_tree *tree, sint64 nice);
 
-extern struct open_addressing_hash * open_addressing_hash_create(uint32 size);
-extern struct open_addressing_hash * open_addressing_hash_rehashing(struct open_addressing_hash **hash);
-extern struct separate_chain_hash * separate_chain_hash_create(uint32 size);
-extern struct separate_chain_hash * separate_chain_hash_rehashing(struct separate_chain_hash **hash);
-extern uint32 hashing_function_open_addressing(void *key, uint32 size, uint32 iter);
+extern s_open_addressing_hash_t * open_addressing_hash_create(uint32 size);
+extern s_open_addressing_hash_t * open_addressing_hash_rehashing(s_open_addressing_hash_t **hash);
+extern s_separate_chain_hash_t * separate_chain_hash_create(uint32 size);
+extern s_separate_chain_hash_t * separate_chain_hash_rehashing(s_separate_chain_hash_t **hash);
+extern uint32 hashing_function_open_addressing(void *key, uint32 size, uint32 counter);
 extern uint32 hashing_function_polynomial(void *key, uint32 size);
-extern uint32 open_addressing_hash_load_factor(struct open_addressing_hash *hash);
-extern uint32 open_addressing_hash_load_factor_calculate(struct open_addressing_hash *hash);
-extern uint32 open_addressing_hash_size(struct open_addressing_hash *hash);
-extern uint32 separate_chain_hash_load_factor(struct separate_chain_hash *hash);
-extern uint32 separate_chain_hash_load_factor_calculate(struct separate_chain_hash *hash);
-extern uint32 separate_chain_hash_size(struct separate_chain_hash *hash);
-extern void * open_addressing_hash_find(struct open_addressing_hash *hash, void *key);
-extern void * open_addressing_hash_remove(struct open_addressing_hash *hash, void *key);
-extern void * separate_chain_hash_find(struct separate_chain_hash *hash, void *key);
-extern void * separate_chain_hash_remove(struct separate_chain_hash *hash, void *key);
-extern void open_addressing_hash_destroy(struct open_addressing_hash **hash);
-extern void open_addressing_hash_insert(struct open_addressing_hash **hash, void *key);
-extern void separate_chain_hash_destroy(struct separate_chain_hash **hash);
-extern void separate_chain_hash_insert(struct separate_chain_hash **hash, void *key);
+extern uint32 open_addressing_hash_load_factor(s_open_addressing_hash_t *hash);
+extern uint32 open_addressing_hash_load_factor_calculate(s_open_addressing_hash_t *hash);
+extern uint32 open_addressing_hash_size(s_open_addressing_hash_t *hash);
+extern uint32 separate_chain_hash_load_factor(s_separate_chain_hash_t *hash);
+extern uint32 separate_chain_hash_load_factor_calculate(s_separate_chain_hash_t *hash);
+extern uint32 separate_chain_hash_size(s_separate_chain_hash_t *hash);
+extern void * open_addressing_hash_find(s_open_addressing_hash_t *hash, void *key);
+extern void * open_addressing_hash_insert(s_open_addressing_hash_t **hash, void *key);
+extern void * open_addressing_hash_insert_i(s_open_addressing_hash_t **hash, void *key);
+extern void * open_addressing_hash_remove(s_open_addressing_hash_t *hash, void *key);
+extern void * separate_chain_hash_find(s_separate_chain_hash_t *hash, void *key);
+extern void * separate_chain_hash_insert(s_separate_chain_hash_t **hash, void *key);
+extern void * separate_chain_hash_remove(s_separate_chain_hash_t *hash, void *key);
+extern void open_addressing_hash_destroy(s_open_addressing_hash_t **hash);
+extern void separate_chain_hash_destroy(s_separate_chain_hash_t **hash);
 
 extern bool maximal_heap_empty_p(struct maximal_heap *heap);
 extern bool maximal_heap_full_p(struct maximal_heap *heap);

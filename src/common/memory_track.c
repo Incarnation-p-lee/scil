@@ -1,5 +1,5 @@
 void *
-memory_track_melloc(uint32 size)
+memory_track_malloc(uint32 size)
 {
     malloc_cnt++;
     return malloc(size);

@@ -4,6 +4,7 @@ cc_config="-fPIC"
 ld_config="-Wl,--stats"
 ld_library=
 debug_mode="Yes"
+verbose="/dev/null"
 
 if [ $# == 0 ]
 then
@@ -12,6 +13,7 @@ Build Script Usage:
     sh src/script/build.sh DEBUG/RELEASE
                            X86_64/X86_32
                            LIBC
+                           VERBOSE       -optional
                            PROFILE       -optional
                            COVERAGE      -optional
 EOF
@@ -51,6 +53,8 @@ do
         "COVERAGE")
             cc_config="$cc_config --coverage"
             ld_config="$ld_config --coverage" ;;
+        "VERBOSE")
+            verbose="/dev/stdout" ;;
     esac
 done
 
@@ -75,12 +79,14 @@ perl script/produce_compile_makefile.pl $src_dir
 ####################################
 function obj_compile() {
     cd $1 > /dev/null
-    make "cc_config=$cc_config" > /dev/null
+    make "cc_config=$cc_config" > $verbose
     mv *.o $obj_dir
+
     if [ "$?" != 0 ]
     then
         exit 3
     fi
+
     ## else
     ##     mv *.o $obj_dir
     cd - > /dev/null 
@@ -105,7 +111,7 @@ echo "    Copy     .. libds.a"
 cp $lib_dir/* $obj_dir
 perl script/produce_link_makefile.pl
 echo "    Link     .. scil.elf"
-cd $obj_dir && make "ld_config=$ld_config" "ld_library=$ld_library" > /dev/null
+cd $obj_dir && make "ld_config=$ld_config" "ld_library=$ld_library" > $verbose
 
 if [ "$?" != 0 ]
 then

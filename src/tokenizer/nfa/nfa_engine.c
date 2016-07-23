@@ -428,15 +428,62 @@ nfa_engine_destroy(s_nfa_t *nfa)
     }
 }
 
+static inline bool
+nfa_engine_pattern_match_ip(s_nfa_t *nfa, char *pn)
+{
+    char *c;
+    uint32 i;
+    bool matched;
+    s_fa_status_t *status;
+    s_array_queue_t *queue;
+
+    assert_exit(pn);
+    assert_exit(nfa_engine_graph_legal_p(nfa));
+    assert_exit(nfa_engine_structure_legal_p(nfa));
+
+    c = pn;
+    queue = array_queue_create();
+
+    i = 0;
+    while (i < nfa->start->edge_count) {
+        array_queue_enter(queue, nfa->start->edge[i]->next);
+        i++;
+    }
+
+    array_queue_enter(queue, PTR_INVALID); /* Add one sentinel here */
+
+    while (*c) {
+        do {
+            i = 0;
+            status = array_queue_leave(queue);
+            while (i < status->edge_count) {
+                if (status->edge[i]->c == *c) {
+                    array_queue_enter(queue, status->edge[i]->next);
+                }
+                i++;
+            }
+        } while (PTR_INVALID == array_queue_front(queue));
+        array_queue_enter(queue, array_queue_leave(queue));
+        c++;
+    }
+
+    matched = !array_queue_empty_p(queue);
+    array_queue_destroy(&queue);
+
+    return matched;
+}
+
 bool
 nfa_engine_pattern_match_p(s_nfa_t *nfa, char *pn)
 {
-    if (pn) {
+    if (!pn) {
         return false;
     } else if (!nfa_engine_structure_legal_p(nfa)) {
         return false;
+    } else if (!nfa_engine_graph_legal_p(nfa)) {
+        return false;
     } else {
-        return true;
+        return nfa_engine_pattern_match_ip(nfa, pn);
     }
 }
 
