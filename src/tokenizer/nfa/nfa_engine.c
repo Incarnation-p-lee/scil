@@ -62,16 +62,6 @@ nfa_engine_graph_legal_p(s_nfa_t *nfa)
     return legal;
 }
 
-// static inline bool
-// nfa_engine_reverse_polish_p(char *rp)
-// {
-//     if (!rp) {
-//         return false;
-//     } else {
-//         return true;
-//     }
-// }
-
 static inline void
 nfa_engine_regular_to_reverse_polish_top_bkt(s_array_stack_t *stack, char *c)
 {
@@ -206,6 +196,7 @@ nfa_engine_regular_to_reverse_polish(char *rp, uint32 size, char *re)
 
     array_stack_destroy(&stack_opt);
     array_stack_destroy(&stack_data);
+    assert_exit(nfa_engine_reverse_polish_legal_p(rp));
 }
 
 static inline s_nfa_t *
@@ -250,6 +241,8 @@ nfa_engine_create_i(char *rp)
     array_stack_destroy(&stack);
 
     nfa = map->nfa;
+    // nfa_simplify(nfa);
+
     map->nfa = NULL;
     nfa_edge_map_destroy(map);
 
@@ -261,10 +254,11 @@ nfa_engine_create_i(char *rp)
 static inline bool
 nfa_engine_regular_and_needed_p(char last, char c)
 {
-    if ((nfa_char_alpha_underline_p(last) && NFA_SUBSET_BKT_L == c)
-        || (last == NFA_SUBSET_BKT_R && nfa_char_alpha_underline_p(c))
-        || (nfa_char_alpha_underline_p(last) && nfa_char_alpha_underline_p(c))
-        || (nfa_char_unary_opt_p(last) && nfa_char_alpha_underline_p(c))) {
+    if ((nfa_char_unary_opt_p(last) && c == NFA_SUBSET_BKT_L)
+        || (nfa_char_alnum_underline_p(last) && NFA_SUBSET_BKT_L == c)
+        || (last == NFA_SUBSET_BKT_R && nfa_char_alnum_underline_p(c))
+        || (nfa_char_unary_opt_p(last) && nfa_char_alpha_underline_p(c))
+        || (nfa_char_alpha_underline_p(last) && nfa_char_alpha_underline_p(c))) {
         return true;
     } else {
         return false;
@@ -311,7 +305,6 @@ nfa_engine_create(char *re)
 
     nfa_engine_regular_complete(pre, size, re);
     nfa_engine_regular_to_reverse_polish(rp, size, pre);
-
     nfa = nfa_engine_create_i(rp);
 
     dp_free(pre);

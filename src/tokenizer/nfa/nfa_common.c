@@ -87,16 +87,10 @@ nfa_status_edge_chain(s_fa_status_t *status, char c, s_fa_status_t *next)
     assert_exit(status->edge_count < NFA_EDGE_MAX - 1);
 
     index = status->edge_count++;
-    if (1 == next->edge_count && NULL_CHAR == c) {
-        status->edge[index] = next->edge[0];
-        next->edge[0] = NULL;
-        dp_free(next);
-    } else {
-        status->edge[index] = dp_malloc(sizeof(s_fa_edge_t));
-        status->edge[index]->c = c;
-        status->edge[index]->next = next;
-        status->edge[index]->label = next->label;
-    }
+    status->edge[index] = dp_malloc(sizeof(s_fa_edge_t));
+    status->edge[index]->c = c;
+    status->edge[index]->next = next;
+    status->edge[index]->label = next->label;
 }
 
 static inline s_nfa_t *
@@ -113,7 +107,7 @@ nfa_create(void)
 static inline bool
 nfa_char_alpha_underline_p(char c)
 {
-    if (dp_isalpha(c) || '-' == c) {
+    if (dp_isalpha(c) || '_' == c) {
         return true;
     } else {
         return false;
@@ -150,4 +144,13 @@ nfa_char_binary_opt_p(char c)
     }
 }
 
+static inline bool
+nfa_char_alnum_underline_p(char c)
+{
+    if (isalnum(c) || '_' == c) {
+        return true;
+    } else {
+        return false;
+    }
+}
 

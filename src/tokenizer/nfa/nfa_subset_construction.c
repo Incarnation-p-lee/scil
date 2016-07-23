@@ -149,10 +149,10 @@ nfa_subset_rule_induction_star(s_nfa_t *s)
         start = nfa_status_create();
         terminal = nfa_status_create();
 
-        nfa_status_edge_chain(start, NULL_CHAR, s->start);
-        nfa_status_edge_chain(s->terminal, NULL_CHAR, terminal);
         nfa_status_edge_chain(s->terminal, NULL_CHAR, s->start);
         nfa_status_edge_chain(start, NULL_CHAR, terminal);
+        nfa_status_edge_chain(start, NULL_CHAR, s->start);
+        nfa_status_edge_chain(s->terminal, NULL_CHAR, terminal);
 
         s->start = start;
         s->terminal = terminal;
@@ -172,9 +172,9 @@ nfa_subset_rule_induction_plus(s_nfa_t *s)
         start = nfa_status_create();
         terminal = nfa_status_create();
 
+        nfa_status_edge_chain(s->terminal, NULL_CHAR, s->start);
         nfa_status_edge_chain(start, NULL_CHAR, s->start);
         nfa_status_edge_chain(s->terminal, NULL_CHAR, terminal);
-        nfa_status_edge_chain(s->terminal, NULL_CHAR, s->start);
 
         s->start = start;
         s->terminal = terminal;
@@ -194,9 +194,9 @@ nfa_subset_rule_induction_question(s_nfa_t *s)
         start = nfa_status_create();
         terminal = nfa_status_create();
 
+        nfa_status_edge_chain(start, NULL_CHAR, terminal);
         nfa_status_edge_chain(start, NULL_CHAR, s->start);
         nfa_status_edge_chain(s->terminal, NULL_CHAR, terminal);
-        nfa_status_edge_chain(start, NULL_CHAR, terminal);
 
         s->start = start;
         s->terminal = terminal;

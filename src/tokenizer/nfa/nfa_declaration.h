@@ -5,6 +5,7 @@
 
 
 s_nfa_t * nfa_engine_create(char *re);
+static inline bool nfa_char_alnum_underline_p(char c);
 static inline bool nfa_char_alpha_underline_p(char c);
 static inline bool nfa_char_binary_opt_p(char c);
 static inline bool nfa_char_bracket_p(char c);
@@ -12,6 +13,7 @@ static inline bool nfa_char_unary_opt_p(char c);
 static inline bool nfa_engine_graph_dfs_reached_p(s_fa_status_t *start, s_fa_status_t *terminal, s_open_addressing_hash_t *hash);
 static inline bool nfa_engine_graph_legal_p(s_nfa_t *nfa);
 static inline bool nfa_engine_regular_and_needed_p(char last, char c);
+static inline bool nfa_engine_reverse_polish_legal_p(char *rp);
 static inline bool nfa_engine_stack_opt_top_p(s_array_stack_t *stack, char expected);
 static inline bool nfa_engine_structure_legal_p(s_nfa_t *nfa);
 static inline bool nfa_status_structure_legal_p(s_fa_status_t *status);
@@ -29,6 +31,7 @@ static inline void nfa_engine_regular_to_reverse_polish_final(char *re, uint32 s
 static inline void nfa_engine_regular_to_reverse_polish_top_bkt(s_array_stack_t *stack, char *c);
 static inline void nfa_engine_regular_to_reverse_polish_top_opt(s_array_stack_t *stack_opt, s_array_stack_t *stack_data, char *c);
 static inline void nfa_label_cleanup(void);
+static inline void nfa_simplify(s_nfa_t *nfa);
 static inline void nfa_status_destroy_dfs(s_fa_status_t *status, s_open_addressing_hash_t *hash);
 static inline void nfa_status_edge_chain(s_fa_status_t *status, char c, s_fa_status_t *next);
 static inline void nfa_status_terminal_merge(s_fa_status_t *t, s_fa_status_t *m);
