@@ -4,6 +4,9 @@
 #define true                   1
 #define false                  0
 
+#define PTR_SENTINEL           (void *)0xA5
+#define TO_STRING(x)           (#x)
+
 #define assert_caution(exp)    do {                                                                  \
                                    if (!(exp)) {                                                     \
                                        assert_print_caution(#exp, __FILE__, __FUNCTION__, __LINE__); \

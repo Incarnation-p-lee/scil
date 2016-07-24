@@ -428,48 +428,114 @@ nfa_engine_destroy(s_nfa_t *nfa)
     }
 }
 
+static inline void
+nfa_engine_array_queue_swap(s_array_queue_t **a, s_array_queue_t **b)
+{
+    void *tmp;
+
+    tmp = *a;
+    *a = *b;
+    *b = tmp;
+}
+
+static inline void
+nfa_engine_pattern_match_final(s_array_queue_t **master, s_array_queue_t **slave)
+{
+    uint32 i;
+    s_array_queue_t *m;
+    s_array_queue_t *s;
+    s_fa_status_t *status;
+
+    assert_exit(master && slave && *master && *slave);
+
+    m = *master;
+    s = *slave;
+
+    while (!array_queue_empty_p(m)) {
+        status = array_queue_leave(m);
+        if (0 == status->edge_count) {
+            array_queue_enter(s, status);
+        } else {
+            i = 0;
+            while (i < status->edge_count) {
+                if (NULL_CHAR == status->edge[i]->c) {
+                    array_queue_enter(m, status->edge[i]->next);
+                }
+                i++;
+            }
+        }
+    }
+
+    *master = s;
+    *slave = m;
+}
+
+static inline void
+nfa_engine_pattern_match_setup(s_array_queue_t *master, s_nfa_t *nfa)
+{
+    uint32 i;
+
+    assert_exit(master);
+
+    i = 0;
+    while (i < nfa->start->edge_count) {
+        if (NULL_CHAR == nfa->start->edge[i]->c) {
+            array_queue_enter(master, nfa->start->edge[i]->next);
+        }
+        i++;
+    }
+
+    if (array_queue_empty_p(master)) {
+        array_queue_enter(master, nfa->start);
+    }
+}
+
 static inline bool
 nfa_engine_pattern_match_ip(s_nfa_t *nfa, char *pn)
 {
-    char *c;
     uint32 i;
     bool matched;
+    char *c, tmp;
     s_fa_status_t *status;
-    s_array_queue_t *queue;
+    s_array_queue_t *master, *slave;
 
     assert_exit(pn);
     assert_exit(nfa_engine_graph_legal_p(nfa));
     assert_exit(nfa_engine_structure_legal_p(nfa));
 
     c = pn;
-    queue = array_queue_create();
+    slave = array_queue_create();
+    master = array_queue_create();
 
-    i = 0;
-    while (i < nfa->start->edge_count) {
-        array_queue_enter(queue, nfa->start->edge[i]->next);
-        i++;
-    }
-
-    array_queue_enter(queue, PTR_INVALID); /* Add one sentinel here */
-
+    nfa_engine_pattern_match_setup(master, nfa);
     while (*c) {
         do {
             i = 0;
-            status = array_queue_leave(queue);
+            status = array_queue_leave(master);
             while (i < status->edge_count) {
-                if (status->edge[i]->c == *c) {
-                    array_queue_enter(queue, status->edge[i]->next);
+                tmp = status->edge[i]->c;
+                if (*c == tmp) {
+                    array_queue_enter(slave, status->edge[i]->next);
+                } else if (NULL_CHAR == tmp) {
+                    array_queue_enter(master, status->edge[i]->next);
                 }
                 i++;
             }
-        } while (PTR_INVALID == array_queue_front(queue));
-        array_queue_enter(queue, array_queue_leave(queue));
+        } while (!array_queue_empty_p(master));
+        nfa_engine_array_queue_swap(&master, &slave);
         c++;
     }
 
-    matched = !array_queue_empty_p(queue);
-    array_queue_destroy(&queue);
+    nfa_engine_pattern_match_final(&master, &slave);
+    if (array_queue_empty_p(master)) {
+        matched = false;
+    } else {
+        matched = true;
+        assert_exit(array_queue_empty_p(slave));
+    }
 
+    array_queue_destroy(&master);
+    array_queue_destroy(&slave);
     return matched;
 }
 

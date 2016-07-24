@@ -51,3 +51,15 @@ nfa_engine_reverse_polish_legal_p(char *rp)
     return is_legal;
 }
 
+static inline bool
+nfa_status_terminal_p(s_fa_status_t *status)
+{
+    assert_exit(nfa_status_structure_legal_p(status));
+
+    if (0 == status->edge_count) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
