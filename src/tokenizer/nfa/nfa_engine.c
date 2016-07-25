@@ -15,29 +15,32 @@ nfa_engine_structure_legal_p(s_nfa_t *nfa)
 }
 
 static inline bool
-nfa_engine_graph_dfs_reached_p(s_fa_status_t *start, s_fa_status_t *terminal,
-    s_open_addressing_hash_t *hash)
+nfa_engine_graph_dfs_reached_p(s_nfa_t *nfa,
+    s_open_addressing_hash_t *hash, s_fa_status_t *status)
 {
     uint32 i;
     void *key;
+    s_fa_status_t *next;
 
     assert_exit(hash);
-    assert_exit(start);
-    assert_exit(terminal);
-    assert_exit(!terminal->edge_count);
+    assert_exit(status);
+    assert_exit(nfa_engine_structure_legal_p(nfa));
 
-    key = (void *)(ptr_t)start->label;
+    key = (void *)(ptr_t)status->label;
 
     if (!open_addressing_hash_find(hash, key)) {
         open_addressing_hash_insert(&hash, key);
-        if (start == terminal) {
+        if (status == nfa->terminal) {
             return true;
         }
 
         i = 0;
-        while (i < start->edge_count) {
-            assert_exit(start->edge[i]);
-            if (nfa_engine_graph_dfs_reached_p(start->edge[i]->next, terminal, hash)) {
+        while (i < status->edge_count) {
+            assert_exit(status->edge[i]);
+            next = status->edge[i]->next;
+            if (next == nfa->start) {
+                return false; /* Start status should not have enter edge */
+            } else if (nfa_engine_graph_dfs_reached_p(nfa, hash, next)) {
                 return true;
             }
             i++;
@@ -56,7 +59,7 @@ nfa_engine_graph_legal_p(s_nfa_t *nfa)
     assert_exit(nfa_engine_structure_legal_p(nfa));
 
     hash = open_addressing_hash_create(NFA_LABEL_HASH_SIZE);
-    legal = nfa_engine_graph_dfs_reached_p(nfa->start, nfa->terminal, hash);
+    legal = nfa_engine_graph_dfs_reached_p(nfa, hash, nfa->start);
     open_addressing_hash_destroy(&hash);
 
     return legal;
@@ -198,6 +201,41 @@ nfa_engine_re_to_rp_final(char *re, uint32 size,
     }
 }
 
+static inline void
+nfa_engine_re_to_rp_operator(s_array_stack_t *stack_data,
+    s_array_stack_t *stack_opt, char *c)
+{
+    char *top;
+
+    assert_exit(c);
+    assert_exit(stack_opt);
+    assert_exit(stack_data);
+    assert_exit(nfa_char_operator_p(*c));
+    assert_exit(!array_stack_empty_p(stack_opt));
+
+    top = array_stack_top(stack_opt);
+
+    switch (*top) {
+        case NFA_SUBSET_BKT_L:
+            nfa_engine_re_to_rp_top_priority_0(stack_opt, c);
+            break;
+        case NFA_SUBSET_STAR:
+        case NFA_SUBSET_PLUS:
+        case NFA_SUBSET_QUST:
+            nfa_engine_re_to_rp_top_priority_1(stack_opt, stack_data, c);
+            break;
+        case NFA_SUBSET_AND:
+            nfa_engine_re_to_rp_top_priority_2(stack_opt, stack_data, c);
+            break;
+        case NFA_SUBSET_OR:
+            nfa_engine_re_to_rp_top_priority_3(stack_opt, stack_data, c);
+            break;
+        default:
+            assert_exit(false);
+            break;
+    }
+}
+
 /*
  * re means Regular Expression
  * rp means Reverse Polish Expression
@@ -205,7 +243,7 @@ nfa_engine_re_to_rp_final(char *re, uint32 size,
 static inline void
 nfa_engine_re_to_rp(char *rp, uint32 size, char *re)
 {
-    char *c, *tmp, top;
+    char *c;
     s_array_stack_t *stack_opt, *stack_data;
 
     assert_exit(re && rp);
@@ -220,29 +258,7 @@ nfa_engine_re_to_rp(char *rp, uint32 size, char *re)
         } else if (array_stack_empty_p(stack_opt) || NFA_SUBSET_BKT_L == *c) {
             array_stack_push(stack_opt, c);
         } else {
-            assert_exit(NFA_SUBSET_BKT_L != *c);
-            assert_exit(!array_stack_empty_p(stack_opt));
-            tmp = array_stack_top(stack_opt);
-            top = *tmp;
-            switch (top) {
-                case NFA_SUBSET_BKT_L:
-                     nfa_engine_re_to_rp_top_priority_0(stack_opt, c);
-                     break;
-                case NFA_SUBSET_STAR:
-                case NFA_SUBSET_PLUS:
-                case NFA_SUBSET_QUST:
-                    nfa_engine_re_to_rp_top_priority_1(stack_opt, stack_data, c);
-                    break;
-                case NFA_SUBSET_AND:
-                    nfa_engine_re_to_rp_top_priority_2(stack_opt, stack_data, c);
-                    break;
-                case NFA_SUBSET_OR:
-                    nfa_engine_re_to_rp_top_priority_3(stack_opt, stack_data, c);
-                    break;
-                default:
-                    assert_exit(false);
-                    break;
-            }
+            nfa_engine_re_to_rp_operator(stack_data, stack_opt, c);
         }
         c++;
     }
@@ -256,6 +272,27 @@ nfa_engine_re_to_rp(char *rp, uint32 size, char *re)
 
     array_stack_destroy(&stack_opt);
     array_stack_destroy(&stack_data);
+}
+
+static inline void
+nfa_engine_create_operator(s_array_stack_t *stack, char c)
+{
+    assert_exit(stack);
+
+    switch (c) {
+        case NFA_SUBSET_OR:
+        case NFA_SUBSET_AND:
+            nfa_subset_rule_induction_binary(stack, c);
+            break;
+        case NFA_SUBSET_STAR:
+        case NFA_SUBSET_PLUS:
+        case NFA_SUBSET_QUST:
+            nfa_subset_rule_induction_unary(stack, c);
+            break;
+        default:
+            assert_exit(false);
+            break;
+    }
 }
 
 static inline s_nfa_t *
@@ -277,20 +314,7 @@ nfa_engine_create_i(char *rp)
             map = nfa_edge_map_create(*c, NULL);
             array_stack_push(stack, map);
         } else {
-            switch (*c) {
-                case NFA_SUBSET_OR:
-                case NFA_SUBSET_AND:
-                    nfa_subset_rule_induction_binary(stack, *c);
-                    break;
-                case NFA_SUBSET_STAR:
-                case NFA_SUBSET_PLUS:
-                case NFA_SUBSET_QUST:
-                    nfa_subset_rule_induction_unary(stack, *c);
-                    break;
-                default:
-                    assert_exit(false);
-                    break;
-            }
+            nfa_engine_create_operator(stack, *c);
         }
         c++;
     }
@@ -300,9 +324,6 @@ nfa_engine_create_i(char *rp)
     array_stack_destroy(&stack);
 
     nfa = map->nfa;
-    // nfa_simplify(nfa);
-
-    map->nfa = NULL;
     nfa_edge_map_destroy(map);
 
     assert_exit(nfa_engine_graph_legal_p(nfa));
@@ -438,36 +459,30 @@ nfa_engine_array_queue_swap(s_array_queue_t **a, s_array_queue_t **b)
     *b = tmp;
 }
 
-static inline void
-nfa_engine_pattern_match_final(s_array_queue_t **master, s_array_queue_t **slave)
+static inline bool
+nfa_engine_pattern_match_final_p(s_array_queue_t *master)
 {
     uint32 i;
-    s_array_queue_t *m;
-    s_array_queue_t *s;
     s_fa_status_t *status;
 
-    assert_exit(master && slave && *master && *slave);
+    assert_exit(master);
 
-    m = *master;
-    s = *slave;
-
-    while (!array_queue_empty_p(m)) {
-        status = array_queue_leave(m);
+    while (!array_queue_empty_p(master)) {
+        status = array_queue_leave(master);
         if (0 == status->edge_count) {
-            array_queue_enter(s, status);
+            return true;
         } else {
             i = 0;
             while (i < status->edge_count) {
                 if (NULL_CHAR == status->edge[i]->c) {
-                    array_queue_enter(m, status->edge[i]->next);
+                    array_queue_enter(master, status->edge[i]->next);
                 }
                 i++;
             }
         }
     }
 
-    *master = s;
-    *slave = m;
+    return false;
 }
 
 static inline void
@@ -506,8 +521,8 @@ nfa_engine_pattern_match_ip(s_nfa_t *nfa, char *pn)
     c = pn;
     slave = array_queue_create();
     master = array_queue_create();
-
     nfa_engine_pattern_match_setup(master, nfa);
+
     while (*c) {
         while (!array_queue_empty_p(master)) {
             i = 0;
@@ -526,16 +541,10 @@ nfa_engine_pattern_match_ip(s_nfa_t *nfa, char *pn)
         c++;
     }
 
-    nfa_engine_pattern_match_final(&master, &slave);
-    if (array_queue_empty_p(master)) {
-        matched = false;
-    } else {
-        matched = true;
-        assert_exit(array_queue_empty_p(slave));
-    }
-
+    matched = nfa_engine_pattern_match_final_p(master);
     array_queue_destroy(&master);
     array_queue_destroy(&slave);
+
     return matched;
 }
 

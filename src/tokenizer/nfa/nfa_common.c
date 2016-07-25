@@ -157,6 +157,20 @@ nfa_char_binary_opt_p(char c)
 }
 
 static inline bool
+nfa_char_operator_p(char c)
+{
+    if (nfa_char_binary_opt_p(c)) {
+        return true;
+    } else if (nfa_char_unary_opt_p(c)) {
+        return true;
+    } else if (nfa_char_bracket_p(c)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+static inline bool
 nfa_char_alnum_underline_p(char c)
 {
     if (isalnum(c) || '_' == c) {
