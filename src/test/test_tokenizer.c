@@ -1,5 +1,5 @@
 static inline void
-test_tokenizer_nfa_engine(void)
+test_tokenizer_nfa_engine_basic(void)
 {
     s_nfa_t *nfa;
 
@@ -19,12 +19,57 @@ test_tokenizer_nfa_engine(void)
     nfa_engine_destroy(nfa);
 
     nfa = nfa_engine_create("a*");
+    assert_caution(nfa_engine_pattern_match_p(nfa, ""));
     assert_caution(nfa_engine_pattern_match_p(nfa, "a"));
     assert_caution(!nfa_engine_pattern_match_p(nfa, "b"));
     assert_caution(nfa_engine_pattern_match_p(nfa, "aa"));
     assert_caution(!nfa_engine_pattern_match_p(nfa, "ab"));
     assert_caution(nfa_engine_pattern_match_p(nfa, "aaaaaaa"));
     nfa_engine_destroy(nfa);
+
+    nfa = nfa_engine_create("a+");
+    assert_caution(!nfa_engine_pattern_match_p(nfa, ""));
+    assert_caution(nfa_engine_pattern_match_p(nfa, "a"));
+    assert_caution(!nfa_engine_pattern_match_p(nfa, "b"));
+    assert_caution(nfa_engine_pattern_match_p(nfa, "aa"));
+    assert_caution(!nfa_engine_pattern_match_p(nfa, "ab"));
+    assert_caution(nfa_engine_pattern_match_p(nfa, "aaaaaaa"));
+    nfa_engine_destroy(nfa);
+
+    nfa = nfa_engine_create("a?");
+    assert_caution(nfa_engine_pattern_match_p(nfa, ""));
+    assert_caution(nfa_engine_pattern_match_p(nfa, "a"));
+    assert_caution(!nfa_engine_pattern_match_p(nfa, "b"));
+    assert_caution(!nfa_engine_pattern_match_p(nfa, "aa"));
+    assert_caution(!nfa_engine_pattern_match_p(nfa, "ab"));
+    assert_caution(!nfa_engine_pattern_match_p(nfa, "aaaaaaa"));
+    nfa_engine_destroy(nfa);
+}
+
+static inline void
+test_tokenizer_nfa_engine_advance(void)
+{
+    s_nfa_t *nfa;
+
+    nfa = nfa_engine_create("(abc)+(b|e)?");
+    assert_caution(!nfa_engine_pattern_match_p(nfa, ""));
+    assert_caution(nfa_engine_pattern_match_p(nfa, "abc"));
+    assert_caution(!nfa_engine_pattern_match_p(nfa, "ab"));
+    assert_caution(nfa_engine_pattern_match_p(nfa, "abcabc"));
+    assert_caution(nfa_engine_pattern_match_p(nfa, "abcb"));
+    assert_caution(nfa_engine_pattern_match_p(nfa, "abce"));
+    assert_caution(!nfa_engine_pattern_match_p(nfa, "abcbe"));
+    assert_caution(!nfa_engine_pattern_match_p(nfa, "abca"));
+    assert_caution(!nfa_engine_pattern_match_p(nfa, "abcabcabcea"));
+    assert_caution(nfa_engine_pattern_match_p(nfa, "abcabcabce"));
+    nfa_engine_destroy(nfa);
+}
+
+static inline void
+test_tokenizer_nfa_engine(void)
+{
+    test_tokenizer_nfa_engine_basic();
+    test_tokenizer_nfa_engine_advance();
 }
 
 static inline void

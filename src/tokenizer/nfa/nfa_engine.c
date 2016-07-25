@@ -509,7 +509,7 @@ nfa_engine_pattern_match_ip(s_nfa_t *nfa, char *pn)
 
     nfa_engine_pattern_match_setup(master, nfa);
     while (*c) {
-        do {
+        while (!array_queue_empty_p(master)) {
             i = 0;
             status = array_queue_leave(master);
             while (i < status->edge_count) {
@@ -521,7 +521,7 @@ nfa_engine_pattern_match_ip(s_nfa_t *nfa, char *pn)
                 }
                 i++;
             }
-        } while (!array_queue_empty_p(master));
+        }
         nfa_engine_array_queue_swap(&master, &slave);
         c++;
     }
