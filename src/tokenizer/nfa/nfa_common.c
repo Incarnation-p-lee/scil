@@ -10,6 +10,14 @@ nfa_edge_map_create(char c, s_nfa_t *nfa)
     return map;
 }
 
+static inline s_fa_edge_t *
+nfa_edge_next(s_fa_edge_t *edge)
+{
+    assert_exit(edge);
+
+    return CONTAINS_OF(edge->list.next, s_fa_edge_t, list);
+}
+
 static inline void
 nfa_edge_map_destroy(s_nfa_edge_map_t *map)
 {
@@ -51,57 +59,44 @@ nfa_status_create(void)
     retval = dp_malloc(sizeof(*retval));
     assert_exit(NULL != retval);
 
-    retval->edge_count = 0;
     retval->label = nfa_label_obtain();
+    retval->adj_list = NULL;
 
-    dp_memset(retval->edge, 0, sizeof(retval->edge));
     return retval;
 }
 
 static inline void
 nfa_status_terminal_merge(s_fa_status_t *t, s_fa_status_t *m)
 {
-    uint32 index;
-
     assert_exit(nfa_status_structure_legal_p(t));
-    assert_exit(t->edge_count == 0);
     assert_exit(nfa_status_structure_legal_p(m));
+    assert_exit(nfa_status_terminal_p(t));
 
-    index = 0;
-    while (index < m->edge_count) {
-        t->edge[t->edge_count++] = m->edge[index];
-        m->edge[index++] = NULL;
-    }
+    t->adj_list = m->adj_list;
+    m->adj_list = NULL;
 
     dp_free(m);
 }
 
 static inline void
-nfa_status_edge_chain(s_fa_status_t *status, char c, s_fa_status_t *next)
+nfa_status_edge_chain(s_fa_status_t *status, char c, s_fa_status_t *succ)
 {
-    uint32 index;
+    s_fa_edge_t *edge;
 
-    assert_exit(NULL != next);
-    assert_exit(NULL != status);
-    assert_exit(NULL == status->edge[status->edge_count]);
-    assert_exit(status->edge_count < NFA_EDGE_MAX - 1);
+    assert_exit(nfa_status_structure_legal_p(succ));
+    assert_exit(nfa_status_structure_legal_p(status));
 
-    index = status->edge_count++;
-    status->edge[index] = dp_malloc(sizeof(s_fa_edge_t));
-    status->edge[index]->c = c;
-    status->edge[index]->next = next;
-    status->edge[index]->label = next->label;
-}
+    edge = dp_malloc(sizeof(s_fa_edge_t));
+    edge->c = c;
+    edge->succ = succ;
+    edge->label = succ->label;
+    doubly_linked_list_initial(&edge->list);
 
-static inline s_nfa_t *
-nfa_create(void)
-{
-    s_nfa_t *nfa;
-
-    nfa = dp_malloc(sizeof(s_nfa_t));
-    nfa->start = nfa->terminal = NULL;
-
-    return nfa;
+    if (status->adj_list) {
+        doubly_linked_list_insert_before(&status->adj_list->list, &edge->list);
+    } else {
+        status->adj_list = edge;
+    }
 }
 
 static inline bool

@@ -24,5 +24,12 @@ typedef enum nfa_subset_opt e_nfa_subset_opt_t;
 
 static uint32 nfa_status_lalel = 1;
 
+#if defined DEBUG
+    #define NFA_PRINT_BUF_SIZE     1024
+    #define NFA_ENGINE_GRAPH_PRINT(nfa)  nfa_engine_graph_print(nfa)
+#else
+    #define NFA_ENGINE_GRAPH_PRINT(nfa)
+#endif
+
 #endif
 

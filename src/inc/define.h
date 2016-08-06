@@ -6,6 +6,8 @@
 
 #define PTR_SENTINEL           (void *)0xA5
 #define TO_STRING(x)           (#x)
+#define CONTAINS_OF(addr, type, member) \
+                               (void *)((ptr_t)(addr) - (ptr_t)(&((type *)0)->member))
 
 #define assert_caution(exp)    do {                                                                  \
                                    if (!(exp)) {                                                     \

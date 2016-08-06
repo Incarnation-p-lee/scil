@@ -18,9 +18,10 @@ static inline bool
 nfa_engine_graph_dfs_reached_p(s_nfa_t *nfa,
     s_open_addressing_hash_t *hash, s_fa_status_t *status)
 {
-    uint32 i;
     void *key;
-    s_fa_status_t *next;
+    s_fa_edge_t *edge;
+    s_fa_edge_t *edge_head;
+    s_fa_status_t *succ;
 
     assert_exit(hash);
     assert_exit(status);
@@ -34,17 +35,16 @@ nfa_engine_graph_dfs_reached_p(s_nfa_t *nfa,
             return true;
         }
 
-        i = 0;
-        while (i < status->edge_count) {
-            assert_exit(status->edge[i]);
-            next = status->edge[i]->next;
-            if (next == nfa->start) {
+        edge = edge_head = status->adj_list;
+        do {
+            succ = edge->succ;
+            if (succ == nfa->start) {
                 return false; /* Start status should not have enter edge */
-            } else if (nfa_engine_graph_dfs_reached_p(nfa, hash, next)) {
+            } else if (nfa_engine_graph_dfs_reached_p(nfa, hash, succ)) {
                 return true;
             }
-            i++;
-        }
+            edge = nfa_edge_next(edge);
+        } while (edge_head != edge);
     }
 
     return false;
@@ -326,8 +326,10 @@ nfa_engine_create_i(char *rp)
     nfa = map->nfa;
     nfa_edge_map_destroy(map);
 
-    assert_exit(nfa_engine_graph_legal_p(nfa));
     assert_exit(nfa_engine_structure_legal_p(nfa));
+    assert_exit(nfa_engine_graph_legal_p(nfa));
+    NFA_ENGINE_GRAPH_PRINT(nfa);
+
     return nfa;
 }
 
@@ -406,8 +408,10 @@ nfa_engine_create(char *re)
 static inline void
 nfa_status_destroy_dfs(s_fa_status_t *status, s_open_addressing_hash_t *hash)
 {
-    uint32 i;
     void *key;
+    s_fa_edge_t *edge;
+    s_fa_edge_t *edge_head;
+    s_fa_edge_t *edge_next;
 
     assert_exit(status);
 
@@ -416,18 +420,20 @@ nfa_status_destroy_dfs(s_fa_status_t *status, s_open_addressing_hash_t *hash)
     if (!open_addressing_hash_find(hash, key)) {
         open_addressing_hash_insert(&hash, key);
 
-        i = 0;
-        while (i < status->edge_count) {
-            assert_exit(status->edge[i]);
+        if (status->adj_list) {
+            edge = edge_head = status->adj_list;
+            do {
+                key = (void *)(ptr_t)edge->label;
+                if (!open_addressing_hash_find(hash, key)) {
+                    nfa_status_destroy_dfs(edge->succ, hash);
+                }
 
-            key = (void *)(ptr_t)status->edge[i]->label;
-            if (!open_addressing_hash_find(hash, key)) {
-                nfa_status_destroy_dfs(status->edge[i]->next, hash);
-            }
-
-            dp_free(status->edge[i]);
-            i++;
+                edge_next = nfa_edge_next(edge);
+                dp_free(edge);
+                edge = edge_next;
+            } while (edge_head != edge);
         }
+
         dp_free(status);
     }
 }
@@ -462,23 +468,23 @@ nfa_engine_array_queue_swap(s_array_queue_t **a, s_array_queue_t **b)
 static inline bool
 nfa_engine_pattern_match_final_p(s_array_queue_t *master)
 {
-    uint32 i;
     s_fa_status_t *status;
+    s_fa_edge_t *edge, *edge_head;
 
     assert_exit(master);
 
     while (!array_queue_empty_p(master)) {
         status = array_queue_leave(master);
-        if (0 == status->edge_count) {
+        if (!status->adj_list) {
             return true;
         } else {
-            i = 0;
-            while (i < status->edge_count) {
-                if (NULL_CHAR == status->edge[i]->c) {
-                    array_queue_enter(master, status->edge[i]->next);
+            edge = edge_head = status->adj_list;
+            do {
+                if (NULL_CHAR == edge->c) {
+                    array_queue_enter(master, edge->succ);
                 }
-                i++;
-            }
+                edge = nfa_edge_next(edge);
+            } while (edge_head != edge);
         }
     }
 
@@ -488,17 +494,19 @@ nfa_engine_pattern_match_final_p(s_array_queue_t *master)
 static inline void
 nfa_engine_pattern_match_setup(s_array_queue_t *master, s_nfa_t *nfa)
 {
-    uint32 i;
+    s_fa_edge_t *edge, *edge_head;
 
     assert_exit(master);
+    assert_exit(nfa_engine_structure_legal_p(nfa));
 
-    i = 0;
-    while (i < nfa->start->edge_count) {
-        if (NULL_CHAR == nfa->start->edge[i]->c) {
-            array_queue_enter(master, nfa->start->edge[i]->next);
+    edge = edge_head = nfa->start->adj_list;
+
+    do {
+        if (NULL_CHAR == edge->c) {
+            array_queue_enter(master, edge->succ);
         }
-        i++;
-    }
+        edge = nfa_edge_next(edge);
+    } while (edge_head != edge);
 
     if (array_queue_empty_p(master)) {
         array_queue_enter(master, nfa->start);
@@ -508,11 +516,11 @@ nfa_engine_pattern_match_setup(s_array_queue_t *master, s_nfa_t *nfa)
 static inline bool
 nfa_engine_pattern_match_ip(s_nfa_t *nfa, char *pn)
 {
-    uint32 i;
+    char *c;
     bool matched;
-    char *c, tmp;
     s_fa_status_t *status;
     s_array_queue_t *master, *slave;
+    s_fa_edge_t *edge, *edge_head;
 
     assert_exit(pn);
     assert_exit(nfa_engine_graph_legal_p(nfa));
@@ -525,16 +533,17 @@ nfa_engine_pattern_match_ip(s_nfa_t *nfa, char *pn)
 
     while (*c) {
         while (!array_queue_empty_p(master)) {
-            i = 0;
             status = array_queue_leave(master);
-            while (i < status->edge_count) {
-                tmp = status->edge[i]->c;
-                if (*c == tmp) {
-                    array_queue_enter(slave, status->edge[i]->next);
-                } else if (NULL_CHAR == tmp) {
-                    array_queue_enter(master, status->edge[i]->next);
-                }
-                i++;
+            if (status->adj_list) {
+                edge = edge_head = status->adj_list;
+                do {
+                    if (*c == edge->c) {
+                        array_queue_enter(slave, edge->succ);
+                    } else if (NULL_CHAR == edge->c) {
+                        array_queue_enter(master, edge->succ);
+                    }
+                    edge = nfa_edge_next(edge);
+                } while (edge_head != edge);
             }
         }
         nfa_engine_array_queue_swap(&master, &slave);

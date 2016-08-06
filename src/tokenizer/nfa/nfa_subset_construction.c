@@ -12,7 +12,7 @@ nfa_subset_rule_basic(char c)
     next = nfa_status_create();
     nfa_status_edge_chain(status, c, next);
 
-    nfa = nfa_create();
+    nfa = dp_malloc(sizeof(s_nfa_t));
     nfa->start = status;
     nfa->terminal = next;
 
@@ -24,9 +24,7 @@ nfa_status_structure_legal_p(s_fa_status_t *status)
 {
     if (!status) {
         return false;
-    } else if (status->edge_count >= NFA_EDGE_MAX) {
-        return false;
-    } else if (status->edge[status->edge_count]) {
+    } else if (status->adj_list && !status->adj_list->succ) {
         return false;
     } else {
         return true;

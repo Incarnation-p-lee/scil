@@ -40,7 +40,8 @@ do
             ld_config="$ld_config -m32" ;;
         "DEBUG")
             debug_mode="Yes"
-            cc_config="$cc_config -g3 -DDEBUG" ;;
+            cc_config="$cc_config -g3 -DDEBUG"
+            ld_config="$ld_config -g3" ;;
         "RELEASE")
             debug_mode="No"
             cc_config="$cc_config -o3 -ofast"

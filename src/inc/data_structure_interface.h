@@ -502,6 +502,7 @@ extern void merge_sort(void *base, uint32 size, uint32 csize, sint32 (*compare)(
 extern void quick_sort(void *base, uint32 size, uint32 csize, sint32 (*compare)(const void *, const void *));
 extern void shell_sort(void *base, uint32 size, uint32 csize, sint32 (*compare)(const void *, const void *));
 
+extern void memory_cache_cleanup(void);
 
 #endif
 
