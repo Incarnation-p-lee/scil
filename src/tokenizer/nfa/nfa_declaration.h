@@ -38,6 +38,7 @@ static inline void nfa_engine_graph_print(s_nfa_t *nfa);
 static inline void nfa_engine_graph_print_status(s_fa_status_t *status);
 static inline void nfa_engine_pattern_match_setup(s_array_queue_t *master, s_nfa_t *nfa);
 static inline void nfa_engine_re_complete(char *pre, uint32 size, char *re);
+static inline void nfa_engine_re_copy(s_nfa_t *nfa, char *re);
 static inline void nfa_engine_re_to_rp(char *rp, uint32 size, char *re);
 static inline void nfa_engine_re_to_rp_final(char *re, uint32 size, s_array_stack_t *stack);
 static inline void nfa_engine_re_to_rp_operator(s_array_stack_t *stack_data, s_array_stack_t *stack_opt, char *c);

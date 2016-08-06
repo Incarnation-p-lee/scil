@@ -25,6 +25,8 @@
 #define dp_va_start            va_start
 #define dp_va_end              va_end
 #define dp_fflush              fflush
+#define dp_memcpy              memcpy
+#define dp_strlen              strlen
 
 #if defined DEBUG
     #define dp_malloc          memory_track_malloc

@@ -68,13 +68,13 @@ nfa_engine_graph_print(s_nfa_t *nfa)
 
     assert_exit(nfa_engine_structure_legal_p(nfa));
 
-    log_print("\n<NFA engine graph print>\n");
+    log_print("\n<NFA engine graph print for regular expression '%s'>\n", nfa->re);
 
     hash = open_addressing_hash_create(NFA_LABEL_HASH_SIZE);
     nfa_engine_graph_dfs_print(nfa->start, hash);
     open_addressing_hash_destroy(&hash);
 
-    log_print(">> END of NFA engine graph print <<\n\n");
+    log_print(">> END of NFA engine graph print '%s' <<\n\n", nfa->re);
 }
 
 static inline bool

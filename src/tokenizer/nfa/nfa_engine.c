@@ -328,8 +328,6 @@ nfa_engine_create_i(char *rp)
 
     assert_exit(nfa_engine_structure_legal_p(nfa));
     assert_exit(nfa_engine_graph_legal_p(nfa));
-    NFA_ENGINE_GRAPH_PRINT(nfa);
-
     return nfa;
 }
 
@@ -375,6 +373,20 @@ nfa_engine_re_complete(char *pre, uint32 size, char *re)
     }
 }
 
+static inline void
+nfa_engine_re_copy(s_nfa_t *nfa, char *re)
+{
+    uint32 l;
+
+    assert_exit(re);
+    assert_exit(nfa_engine_structure_legal_p(nfa));
+
+    l = dp_strlen(re);
+    nfa->re = dp_malloc(sizeof(*re) * (l + 1));
+    dp_memcpy(nfa->re, re, l);
+    nfa->re[l] = NULL_CHAR;
+}
+
 /*
  * Regular Expression operator priority:
  *     Level 0: ()      (highest)
@@ -397,11 +409,14 @@ nfa_engine_create(char *re)
 
     nfa_engine_re_complete(pre, size, re);
     nfa_engine_re_to_rp(rp, size, pre);
+
     nfa = nfa_engine_create_i(rp);
+    nfa_engine_re_copy(nfa, re);
 
     dp_free(pre);
     dp_free(rp);
 
+    NFA_ENGINE_GRAPH_PRINT(nfa);
     return nfa;
 }
 
@@ -451,6 +466,8 @@ nfa_engine_destroy(s_nfa_t *nfa)
         hash = open_addressing_hash_create(NFA_LABEL_HASH_SIZE);
         nfa_status_destroy_dfs(nfa->start, hash);
         open_addressing_hash_destroy(&hash);
+
+        dp_free(nfa->re);
         dp_free(nfa);
     }
 }

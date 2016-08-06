@@ -30,4 +30,5 @@ output
 tags
 Session.vim
 core
+*.log
 

@@ -10,6 +10,7 @@ typedef struct fa_status s_fa_status_t;
 typedef struct fa_edge   s_fa_edge_t;
 
 struct fa {
+    char          *re;
     s_fa_status_t *start;
     s_fa_status_t *terminal;
 };
