@@ -24,6 +24,7 @@ static inline bool nfa_engine_structure_legal_p(s_nfa_t *nfa);
 static inline bool nfa_status_structure_legal_p(s_fa_status_t *status);
 static inline bool nfa_status_terminal_p(s_fa_status_t *status);
 static inline char * nfa_engine_re_preprocessing(char *re);
+static inline char * nfa_engine_re_preprocessing_normalize(char *re);
 static inline char * nfa_engine_re_to_rp(char *pre_re);
 static inline s_fa_edge_t * nfa_edge_next(s_fa_edge_t *edge);
 static inline s_fa_status_t * nfa_status_create(void);

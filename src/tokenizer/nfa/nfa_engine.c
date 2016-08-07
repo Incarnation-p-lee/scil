@@ -355,26 +355,80 @@ nfa_engine_re_and_needed_p(char last, char c)
 }
 
 /*
+ * Normalize [A-Z] to (A|B|C|...|Z)
+ */
+static inline char *
+nfa_engine_re_preprocessing_normalize(char *re)
+{
+    uint32 size, i, exp;
+    char *normal, *c;
+    char last, start, advanced;
+
+    assert_exit(re);
+
+    i = 0;
+    c = re;
+    size = dp_strlen(re) * 2 + NFA_RE_SIZE_MIN;
+    normal = dp_malloc(sizeof(char) * size);
+
+    while (*c) {
+        if (NFA_SUBSET_BKT_LM != *c) {
+            normal[i++] = *c;
+        } else {
+            c++;                                     /* [A */
+            normal[i++] = NFA_SUBSET_BKT_L;
+            while (NFA_SUBSET_BKT_RM != *c) {
+                advanced = *(c + 1);
+                if (NFA_SUBSET_CNNT != advanced) {
+                    normal[i++] = *c;
+                    normal[i++] = NFA_SUBSET_OR;
+                } else {                             /* Handle '-' in [], like [A-Z] */
+                    start = *c;                      /* [A-Z */
+                    last = c[2];
+                    exp = (uint32)(last - start) * 2 + NFA_RE_SIZE_MIN;
+                    size = exp + size;
+                    normal = dp_realloc(normal, size);
+                    while (start <= last) {
+                        normal[i++] = start;
+                        normal[i++] = NFA_SUBSET_OR;
+                        start++;
+                    }
+                    c += 2;
+                }
+                c++;
+            }
+            normal[i - 1] = NFA_SUBSET_BKT_R;    /* overwrite last NFA_SUBSET_OR */
+        }
+        c++;
+    }
+
+    normal[i] = NULL_CHAR;
+    return normal;
+}
+
+/*
  * re means Regular Expression
  */
 static inline char *
 nfa_engine_re_preprocessing(char *re)
 {
-    char last, *pre;
     uint32 index, pre_size;
+    char last, *pre, *normalized, *c;
 
     assert_exit(re);
 
-    index = 0;
-    last = NULL_CHAR;
-    pre_size = dp_strlen(re) * 2 + NFA_RE_SIZE_MIN;
+    normalized = nfa_engine_re_preprocessing_normalize(re);
+    pre_size = dp_strlen(normalized) * 2 + NFA_RE_SIZE_MIN;
     pre = dp_malloc(pre_size);
 
-    while (*re) {
-        if (nfa_engine_re_and_needed_p(last, *re)) {
+    index = 0;
+    c = normalized;
+    last = NULL_CHAR;
+    while (*c) {
+        if (nfa_engine_re_and_needed_p(last, *c)) {
             pre[index++] = NFA_SUBSET_AND;
         }
-        pre[index++] = last = *re++;
+        pre[index++] = last = *c++;
 
         if (index + 3 >= pre_size) {
             pre_size = pre_size * 2;
@@ -382,8 +436,9 @@ nfa_engine_re_preprocessing(char *re)
         }
     }
 
+    dp_free(normalized);
     pre[index] = NULL_CHAR;
-    assert_exit(pre);
+
     return pre;
 }
 
