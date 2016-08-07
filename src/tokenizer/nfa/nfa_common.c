@@ -48,7 +48,7 @@ nfa_label_obtain(void)
 static inline void
 nfa_label_cleanup(void)
 {
-    nfa_status_lalel = 0;
+    nfa_status_lalel = 1;
 }
 
 static inline s_fa_status_t *

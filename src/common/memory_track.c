@@ -5,6 +5,17 @@ memory_track_malloc(uint32 size)
     return malloc(size);
 }
 
+void *
+memory_track_realloc(void *ptr, uint32 size)
+{
+    if (!ptr) {
+        return NULL;
+    } else {
+        realloc_cnt++;
+        return realloc(ptr, size);
+    }
+}
+
 void
 memory_track_free(void *ptr)
 {
@@ -15,7 +26,8 @@ memory_track_free(void *ptr)
 void
 memory_track_counters_print(void)
 {
-    dp_printf("Malloc counters: %d\n", malloc_cnt);
-    dp_printf("Free   counters: %d\n", free_cnt);
+    dp_printf("Malloc  counters: %d\n", malloc_cnt);
+    dp_printf("Realloc counters: %d\n", realloc_cnt);
+    dp_printf("Free    counters: %d\n", free_cnt);
 }
 

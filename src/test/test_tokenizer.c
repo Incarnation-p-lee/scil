@@ -63,6 +63,20 @@ test_tokenizer_nfa_engine_advance(void)
     assert_caution(!nfa_engine_pattern_match_p(nfa, "abcabcabcea"));
     assert_caution(nfa_engine_pattern_match_p(nfa, "abcabcabce"));
     nfa_engine_destroy(nfa);
+
+    nfa = nfa_engine_create("((abcd)+efghi)?(acde+)+");
+    assert_caution(!nfa_engine_pattern_match_p(nfa, ""));
+    assert_caution(nfa_engine_pattern_match_p(nfa, "acde"));
+    assert_caution(nfa_engine_pattern_match_p(nfa, "acdeeacdeee"));
+    assert_caution(!nfa_engine_pattern_match_p(nfa, "acdea"));
+    assert_caution(nfa_engine_pattern_match_p(nfa, "abcdabcdefghiacde"));
+    assert_caution(!nfa_engine_pattern_match_p(nfa, "abcdefghia"));
+    assert_caution(!nfa_engine_pattern_match_p(nfa, "abcddefghiacdeee"));
+    assert_caution(!nfa_engine_pattern_match_p(nfa, "abcdabcdefghiaa"));
+    assert_caution(nfa_engine_pattern_match_p(nfa, "abcdabcdabcdabcdefghiacdeacde"));
+    assert_caution(nfa_engine_pattern_match_p(nfa, "acdeeeeeeeeeee"));
+    assert_caution(!nfa_engine_pattern_match_p(nfa, "abcdabcdabcdefghiacda"));
+    nfa_engine_destroy(nfa);
 }
 
 static inline void

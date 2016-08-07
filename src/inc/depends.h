@@ -30,9 +30,11 @@
 
 #if defined DEBUG
     #define dp_malloc          memory_track_malloc
+    #define dp_realloc         memory_track_realloc
     #define dp_free            memory_track_free
 #else
     #define dp_malloc          malloc
+    #define dp_realloc         realloc
     #define dp_free            free
 #endif
 

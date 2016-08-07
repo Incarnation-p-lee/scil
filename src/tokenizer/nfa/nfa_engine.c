@@ -111,6 +111,7 @@ nfa_engine_re_to_rp_top_priority_1(s_array_stack_t *stack_opt,
 	    while (!nfa_char_bracket_left_p(array_stack_top(stack_opt))) {
                 array_stack_push(stack_data, array_stack_pop(stack_opt));
             }
+            array_stack_pop(stack_opt);
             break;
         default:
             assert_exit(false);
@@ -189,9 +190,9 @@ nfa_engine_re_to_rp_final(char *re, uint32 size,
     assert_exit(stack);
 
     stack_size = array_stack_size(stack);
+
     if (size <= stack_size) {
-        re[0] = NULL_CHAR;
-        assert_exit(false);
+        assert_exit(size > stack_size);
     } else {
         re[stack_size] = NULL_CHAR;
         do {
@@ -240,15 +241,16 @@ nfa_engine_re_to_rp_operator(s_array_stack_t *stack_data,
  * re means Regular Expression
  * rp means Reverse Polish Expression
  */
-static inline void
-nfa_engine_re_to_rp(char *rp, uint32 size, char *re)
+static inline char *
+nfa_engine_re_to_rp(char *pre_re)
 {
-    char *c;
+    uint32 size;
+    char *c, *rp;
     s_array_stack_t *stack_opt, *stack_data;
 
-    assert_exit(re && rp);
+    assert_exit(pre_re);
 
-    c = re;
+    c = pre_re;
     stack_opt = array_stack_create();
     stack_data = array_stack_create();
 
@@ -267,11 +269,17 @@ nfa_engine_re_to_rp(char *rp, uint32 size, char *re)
         array_stack_push(stack_data, array_stack_pop(stack_opt));
     }
 
+    size = dp_strlen(pre_re) + 1;
+    rp = dp_malloc(sizeof(char) * size);
+    assert_exit(size > array_stack_size(stack_data));
+
     nfa_engine_re_to_rp_final(rp, size, stack_data);
     assert_exit(nfa_engine_reverse_polish_legal_p(rp));
 
     array_stack_destroy(&stack_opt);
     array_stack_destroy(&stack_data);
+
+    return rp;
 }
 
 static inline void
@@ -308,6 +316,7 @@ nfa_engine_create_i(char *rp)
     nfa = NULL;
     c = rp;
     stack = array_stack_create();
+    nfa_label_cleanup();
 
     while (*c) {
         if (dp_isalnum(*c) || '_' == *c) {
@@ -348,29 +357,34 @@ nfa_engine_re_and_needed_p(char last, char c)
 /*
  * re means Regular Expression
  */
-static inline void
-nfa_engine_re_complete(char *pre, uint32 size, char *re)
+static inline char *
+nfa_engine_re_preprocessing(char *re)
 {
-    char last;
-    uint32 index;
+    char last, *pre;
+    uint32 index, pre_size;
 
-    assert_exit(pre && re && size);
+    assert_exit(re);
 
     index = 0;
     last = NULL_CHAR;
+    pre_size = dp_strlen(re) * 2 + NFA_RE_SIZE_MIN;
+    pre = dp_malloc(pre_size);
+
     while (*re) {
         if (nfa_engine_re_and_needed_p(last, *re)) {
             pre[index++] = NFA_SUBSET_AND;
         }
         pre[index++] = last = *re++;
+
+        if (index + 3 >= pre_size) {
+            pre_size = pre_size * 2;
+            pre = dp_realloc(pre, sizeof(char) * pre_size);
+        }
     }
 
-    if (index >= size) {
-        pre[0] = NULL_CHAR;
-        assert_exit(false);
-    } else {
-        pre[index] = NULL_CHAR;
-    }
+    pre[index] = NULL_CHAR;
+    assert_exit(pre);
+    return pre;
 }
 
 static inline void
@@ -397,23 +411,17 @@ nfa_engine_re_copy(s_nfa_t *nfa, char *re)
 s_nfa_t *
 nfa_engine_create(char *re)
 {
-    uint32 size;
-    char *pre, *rp;
     s_nfa_t *nfa;
+    char *pre, *rp;
 
     assert_exit(re);
 
-    size = 2 * dp_strlen(re);
-    pre = dp_malloc(size);
-    rp = dp_malloc(size);
-
-    nfa_engine_re_complete(pre, size, re);
-    nfa_engine_re_to_rp(rp, size, pre);
+    pre = nfa_engine_re_preprocessing(re);
+    rp = nfa_engine_re_to_rp(pre);
+    dp_free(pre);
 
     nfa = nfa_engine_create_i(rp);
     nfa_engine_re_copy(nfa, re);
-
-    dp_free(pre);
     dp_free(rp);
 
     NFA_ENGINE_GRAPH_PRINT(nfa);
