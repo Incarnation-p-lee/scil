@@ -2,6 +2,7 @@
 #include "finite_automata.h"
 
 #include "nfa.h"
+#include "regular.h"
 #include "nfa_declaration.h"
 
 #if defined DEBUG

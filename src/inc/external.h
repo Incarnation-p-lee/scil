@@ -4,7 +4,14 @@
 #define HAVE_DEFINED_EXTERNAL_H
 
 extern bool nfa_engine_pattern_match_p(s_nfa_t *nfa, char *pn);
-extern s_nfa_t * nfa_engine_create(char *re);
+extern bool regular_data_p(char c);
+extern bool regular_opt_binary_p(char c);
+extern bool regular_opt_bracket_left_p(char *c);
+extern bool regular_opt_bracket_p(char c);
+extern bool regular_opt_p(char c);
+extern bool regular_opt_unary_p(char c);
+extern char * regular_convert_to_reverse_polish(char *re);
+extern s_nfa_t * nfa_engine_create(char *regular);
 extern void * memory_track_malloc(uint32 size);
 extern void * memory_track_realloc(void *ptr, uint32 size);
 extern void assert_print_caution(char *msg, const char *fname, const char *func, uint32 line);

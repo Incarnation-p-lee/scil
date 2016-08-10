@@ -13,6 +13,7 @@
 
 #define dp_memset              memset
 #define dp_isalnum             isalnum
+#define dp_isdigit             isdigit
 #define dp_printf              printf
 #define dp_strlen              strlen
 #define dp_isalpha             isalpha

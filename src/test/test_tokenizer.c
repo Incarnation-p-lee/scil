@@ -44,6 +44,15 @@ test_tokenizer_nfa_engine_basic(void)
     assert_caution(!nfa_engine_pattern_match_p(nfa, "ab"));
     assert_caution(!nfa_engine_pattern_match_p(nfa, "aaaaaaa"));
     nfa_engine_destroy(nfa);
+
+    nfa = nfa_engine_create("[a-g]+");
+    assert_caution(!nfa_engine_pattern_match_p(nfa, ""));
+    assert_caution(nfa_engine_pattern_match_p(nfa, "a"));
+    assert_caution(nfa_engine_pattern_match_p(nfa, "b"));
+    assert_caution(!nfa_engine_pattern_match_p(nfa, "h"));
+    assert_caution(nfa_engine_pattern_match_p(nfa, "abcdefg"));
+    assert_caution(!nfa_engine_pattern_match_p(nfa, "abcdeffgh"));
+    nfa_engine_destroy(nfa);
 }
 
 static inline void
