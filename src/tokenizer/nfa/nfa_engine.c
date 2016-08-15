@@ -196,24 +196,46 @@ nfa_status_destroy_dfs(s_fa_status_t *status, s_open_addressing_hash_t *hash)
     }
 }
 
-void
-nfa_engine_destroy(s_nfa_t *nfa)
+static inline void
+nfa_engine_destroy_final(s_nfa_t *nfa)
+{
+    assert_exit(nfa);
+    assert_exit(NULL == nfa->start && NULL == nfa->terminal);
+
+    if (nfa->re) {
+        dp_free(nfa->re);
+    }
+
+    dp_free(nfa);
+}
+
+static inline void
+nfa_engine_destroy_i(s_nfa_t *nfa)
 {
     s_open_addressing_hash_t *hash;
 
+    assert_exit(nfa_engine_structure_legal_p(nfa));
+    assert_exit(nfa_engine_graph_legal_p(nfa));
+
+    NFA_ENGINE_DESTROY_PRINT(nfa);
+
+    hash = open_addressing_hash_create(NFA_LABEL_HASH_SIZE);
+    nfa_status_destroy_dfs(nfa->start, hash);
+    open_addressing_hash_destroy(&hash);
+
+    nfa->start = nfa->terminal = NULL;
+    nfa_engine_destroy_final(nfa);
+}
+
+void
+nfa_engine_destroy(s_nfa_t *nfa)
+{
     if (!nfa_engine_structure_legal_p(nfa)) {
         return;
     } else if (!nfa_engine_graph_legal_p(nfa)) {
         return;
     } else {
-        NFA_ENGINE_DESTROY_PRINT(nfa);
-
-        hash = open_addressing_hash_create(NFA_LABEL_HASH_SIZE);
-        nfa_status_destroy_dfs(nfa->start, hash);
-        open_addressing_hash_destroy(&hash);
-
-        dp_free(nfa->re);
-        dp_free(nfa);
+        nfa_engine_destroy_i(nfa);
     }
 }
 
@@ -270,9 +292,7 @@ nfa_engine_pattern_match_setup(s_array_queue_t *master, s_nfa_t *nfa)
         edge = nfa_edge_next(edge);
     } while (edge_head != edge);
 
-    if (array_queue_empty_p(master)) {
-        array_queue_enter(master, nfa->start);
-    }
+    array_queue_enter(master, nfa->start);
 }
 
 static inline bool

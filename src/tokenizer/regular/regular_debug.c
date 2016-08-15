@@ -54,3 +54,30 @@ regular_reverse_polish_legal_p(char *polish)
     return is_legal;
 }
 
+static inline void
+regular_range_expand_print(char *regular)
+{
+    assert_exit(regular);
+
+    log_print("<After regular expression range expand>\n");
+    log_print("    '%s'\n\n", regular);
+}
+
+static inline void
+regular_opt_and_insert_print(char *regular)
+{
+    assert_exit(regular);
+
+    log_print("<After regular expression opt and insert>\n");
+    log_print("    '%s'\n\n", regular);
+}
+
+static inline void
+regular_convert_to_reverse_polish_print(char *regular)
+{
+    assert_exit(regular);
+
+    log_print("<After regular expression convert to reverse polish>\n");
+    log_print("    '%s'\n\n", regular);
+}
+

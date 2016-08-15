@@ -24,6 +24,8 @@ static inline uint32 nfa_label_obtain(void);
 static inline void nfa_edge_map_destroy(s_nfa_edge_map_t *map);
 static inline void nfa_engine_array_queue_swap(s_array_queue_t **a, s_array_queue_t **b);
 static inline void nfa_engine_create_operator(s_array_stack_t *stack, char c);
+static inline void nfa_engine_destroy_final(s_nfa_t *nfa);
+static inline void nfa_engine_destroy_i(s_nfa_t *nfa);
 static inline void nfa_engine_destroy_print(s_nfa_t *nfa);
 static inline void nfa_engine_graph_dfs_print(s_fa_status_t *status, s_open_addressing_hash_t *hash);
 static inline void nfa_engine_graph_print(s_nfa_t *nfa);

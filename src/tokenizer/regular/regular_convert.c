@@ -247,7 +247,7 @@ regular_convert_to_reverse_polish(char *re)
 
     assert_exit(re);
 
-    normal = regular_expression_normalize(re);
+    normal = regular_normalize(re);
     stack_opt = array_stack_create();
     stack_data = array_stack_create();
 
@@ -274,7 +274,7 @@ regular_convert_to_reverse_polish(char *re)
     array_stack_destroy(&stack_opt);
     array_stack_destroy(&stack_data);
 
+    REGULAR_CVT_TO_REVERSE_POLISH_PRINT(polish);
     return polish;
 }
-
 

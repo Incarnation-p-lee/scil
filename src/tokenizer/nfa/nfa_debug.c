@@ -54,7 +54,7 @@ nfa_engine_destroy_print(s_nfa_t *nfa)
 {
     assert_exit(nfa_engine_structure_legal_p(nfa));
 
-    log_print("\n=====> DESTROY NFA engine '%s'\n", nfa->re);
+    log_print("\n=====> DESTROY NFA engine '%s'\n\n", nfa->re);
 }
 
 static inline void

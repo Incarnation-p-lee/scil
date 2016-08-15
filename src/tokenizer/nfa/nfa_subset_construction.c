@@ -15,6 +15,7 @@ nfa_subset_rule_basic(char c)
     nfa = dp_malloc(sizeof(s_nfa_t));
     nfa->start = status;
     nfa->terminal = next;
+    nfa->re = NULL;
 
     return nfa;
 }
@@ -37,25 +38,14 @@ nfa_status_structure_legal_p(s_fa_status_t *status)
 static inline void
 nfa_subset_rule_induction_or(s_nfa_t *s, s_nfa_t *t)
 {
-    s_fa_status_t *start;
-    s_fa_status_t *terminal;
+    assert_exit(nfa_engine_structure_legal_p(s));
+    assert_exit(nfa_engine_structure_legal_p(t));
 
-    if (s && t) {
-        start = nfa_status_create();
-        terminal = nfa_status_create();
+    nfa_status_edge_chain(s->start, NULL_CHAR, t->start);
+    nfa_status_edge_chain(t->terminal, NULL_CHAR, s->terminal);
 
-        nfa_status_edge_chain(start, NULL_CHAR, s->start);
-        nfa_status_edge_chain(start, NULL_CHAR, t->start);
-
-        nfa_status_edge_chain(s->terminal, NULL_CHAR, terminal);
-        nfa_status_edge_chain(t->terminal, NULL_CHAR, terminal);
-
-        s->start = start;
-        s->terminal = terminal;
-
-        t->start = t->terminal = NULL;
-        dp_free(t);
-    }
+    t->start = t->terminal = NULL;
+    nfa_engine_destroy_final(t);
 }
 
 static inline void
@@ -125,14 +115,16 @@ nfa_subset_rule_induction_unary(s_array_stack_t *stack, e_regular_meta_opt_t opt
 static inline void
 nfa_subset_rule_induction_and(s_nfa_t *s, s_nfa_t *t)
 {
-    assert_exit(s && t);
+    assert_exit(nfa_engine_structure_legal_p(s));
+    assert_exit(nfa_engine_structure_legal_p(t));
 
     nfa_status_terminal_merge(s->terminal, t->start);
     s->terminal = t->terminal;
 
     t->start = t->terminal = NULL;
-    dp_free(t);
+    nfa_engine_destroy_final(t);
 }
+
 
 /*
  * RE: a*
@@ -143,18 +135,18 @@ nfa_subset_rule_induction_star(s_nfa_t *s)
     s_fa_status_t *start;
     s_fa_status_t *terminal;
 
-    if (s) {
-        start = nfa_status_create();
-        terminal = nfa_status_create();
+    assert_exit(nfa_engine_structure_legal_p(s));
 
-        nfa_status_edge_chain(s->terminal, NULL_CHAR, s->start);
-        nfa_status_edge_chain(start, NULL_CHAR, terminal);
-        nfa_status_edge_chain(start, NULL_CHAR, s->start);
-        nfa_status_edge_chain(s->terminal, NULL_CHAR, terminal);
+    start = nfa_status_create();
+    terminal = nfa_status_create();
 
-        s->start = start;
-        s->terminal = terminal;
-    }
+    nfa_status_edge_chain(s->terminal, NULL_CHAR, s->start);
+    nfa_status_edge_chain(start, NULL_CHAR, terminal);
+    nfa_status_edge_chain(start, NULL_CHAR, s->start);
+    nfa_status_edge_chain(s->terminal, NULL_CHAR, terminal);
+
+    s->start = start;
+    s->terminal = terminal;
 }
 
 /*
@@ -166,17 +158,17 @@ nfa_subset_rule_induction_plus(s_nfa_t *s)
     s_fa_status_t *start;
     s_fa_status_t *terminal;
 
-    if (s) {
-        start = nfa_status_create();
-        terminal = nfa_status_create();
+    assert_exit(nfa_engine_structure_legal_p(s));
 
-        nfa_status_edge_chain(s->terminal, NULL_CHAR, s->start);
-        nfa_status_edge_chain(start, NULL_CHAR, s->start);
-        nfa_status_edge_chain(s->terminal, NULL_CHAR, terminal);
+    start = nfa_status_create();
+    terminal = nfa_status_create();
 
-        s->start = start;
-        s->terminal = terminal;
-    }
+    nfa_status_edge_chain(s->terminal, NULL_CHAR, s->start);
+    nfa_status_edge_chain(start, NULL_CHAR, s->start);
+    nfa_status_edge_chain(s->terminal, NULL_CHAR, terminal);
+
+    s->start = start;
+    s->terminal = terminal;
 }
 
 /*
@@ -188,16 +180,16 @@ nfa_subset_rule_induction_question(s_nfa_t *s)
     s_fa_status_t *start;
     s_fa_status_t *terminal;
 
-    if (s) {
-        start = nfa_status_create();
-        terminal = nfa_status_create();
+    assert_exit(nfa_engine_structure_legal_p(s));
 
-        nfa_status_edge_chain(start, NULL_CHAR, terminal);
-        nfa_status_edge_chain(start, NULL_CHAR, s->start);
-        nfa_status_edge_chain(s->terminal, NULL_CHAR, terminal);
+    start = nfa_status_create();
+    terminal = nfa_status_create();
 
-        s->start = start;
-        s->terminal = terminal;
-    }
+    nfa_status_edge_chain(start, NULL_CHAR, terminal);
+    nfa_status_edge_chain(start, NULL_CHAR, s->start);
+    nfa_status_edge_chain(s->terminal, NULL_CHAR, terminal);
+
+    s->start = start;
+    s->terminal = terminal;
 }
 

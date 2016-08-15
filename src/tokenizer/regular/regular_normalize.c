@@ -1,13 +1,13 @@
 static inline char *
-regular_expression_normalize(char *re)
+regular_normalize(char *re)
 {
     char *normal, *expand;
 
     if (!re) {
         return NULL;
     } else {
-        expand = regular_expression_range_expand(re);
-        normal = regular_expression_opt_and_insert(expand);
+        expand = regular_range_expand(re);
+        normal = regular_opt_and_insert(expand);
 
         dp_free(expand);
         return normal;
@@ -18,7 +18,7 @@ regular_expression_normalize(char *re)
  * Convert RE [A-Z] to (A|B|C|...|Z)
  */
 static inline char *
-regular_expression_range_expand(char *re)
+regular_range_expand(char *re)
 {
     char *expand, *c;
     uint32 size, i, exp;
@@ -63,11 +63,13 @@ regular_expression_range_expand(char *re)
     }
 
     expand[i] = NULL_CHAR;
+    REGULAR_RANG_EXPAND_PRINT(expand);
+
     return expand;
 }
 
 static inline bool
-regular_expression_opt_and_needed_p(char last, char c)
+regular_opt_and_needed_p(char last, char c)
 {
     if ((regular_opt_unary_p(last) && c == RE_M_OPT_BKT_L)
         || (regular_data_p(last) && RE_M_OPT_BKT_L == c)
@@ -84,7 +86,7 @@ regular_expression_opt_and_needed_p(char last, char c)
  * Convert RE abc => a&b&c
  */
 static inline char *
-regular_expression_opt_and_insert(char *re)
+regular_opt_and_insert(char *re)
 {
     uint32 index, size;
     char last, *insert, *c;
@@ -98,7 +100,7 @@ regular_expression_opt_and_insert(char *re)
     index = 0;
     last = NULL_CHAR;
     while (*c) {
-        if (regular_expression_opt_and_needed_p(last, *c)) {
+        if (regular_opt_and_needed_p(last, *c)) {
             insert[index++] = RE_M_OPT_AND;
         }
         insert[index++] = last = *c++;
@@ -110,6 +112,7 @@ regular_expression_opt_and_insert(char *re)
     }
 
     insert[index] = NULL_CHAR;
+    REGULAR_OPT_AND_INSERT_PRINT(insert);
     return insert;
 }
 
