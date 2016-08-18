@@ -8,7 +8,7 @@ nfa_engine_graph_print_status(s_fa_status_t *status)
     assert_exit(nfa_status_structure_legal_p(status));
 
     if (!status->adj_list) {
-        scil_log_print("    Status %#x [%d] *TERMINAL* \n", status, status->label);
+        scil_log_print("    Status %p [%d] *TERMINAL* \n", status, status->label);
     } else {
         edge_idx = 0;
         edge = edge_head = status->adj_list;
@@ -16,8 +16,8 @@ nfa_engine_graph_print_status(s_fa_status_t *status)
 
         do {
             tmp = NULL_CHAR == edge->c ? STAR_CHAR : edge->c;
-            scil_log_print("        |-edges %02u: c = %c label = %03d succ = %03d\n",
-                edge_idx++, tmp, edge->label, edge->succ->label);
+            scil_log_print("        |-edges %02u [label %03d]: c = '%c' => succ = %p\n",
+                edge_idx++, edge->label, tmp, edge->succ);
             edge = nfa_edge_next(edge);
         } while (edge_head != edge);
     }
