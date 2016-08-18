@@ -26,8 +26,16 @@ memory_track_free(void *ptr)
 void
 memory_track_counters_print(void)
 {
-    dp_printf("Malloc  counters: %d\n", malloc_cnt);
-    dp_printf("Realloc counters: %d\n", realloc_cnt);
-    dp_printf("Free    counters: %d\n", free_cnt);
+    dp_printf("  >> SCIL Memory Usage Summary <<\n");
+    dp_printf("    . Malloc  %10d\n", malloc_cnt);
+    dp_printf("    . Realloc %10d\n", realloc_cnt);
+    dp_printf("    . Free    %10d\n", free_cnt);
+    dp_printf("  >> Memory End <<\n\n");
+
+    if (free_cnt != malloc_cnt) {
+        dp_printf("Memory leak at dp_malloc %10d <=> dp_free %10d\n",
+            malloc_cnt, free_cnt);
+        dp_exit(1);
+    }
 }
 

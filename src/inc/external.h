@@ -6,8 +6,9 @@
 extern bool nfa_engine_pattern_match_p(s_nfa_t *nfa, char *pn);
 extern bool regular_data_p(char c);
 extern bool regular_opt_binary_p(char c);
-extern bool regular_opt_bracket_left_p(char *c);
+extern bool regular_opt_bracket_left_p(char c);
 extern bool regular_opt_bracket_p(char c);
+extern bool regular_opt_bracket_right_p(char c);
 extern bool regular_opt_p(char c);
 extern bool regular_opt_unary_p(char c);
 extern char * regular_convert_to_reverse_polish(char *re);
@@ -16,12 +17,12 @@ extern void * memory_track_malloc(uint32 size);
 extern void * memory_track_realloc(void *ptr, uint32 size);
 extern void assert_print_caution(char *msg, const char *fname, const char *func, uint32 line);
 extern void assert_print_exit(char *msg, const char *fname,const char *func, uint32 line);
-extern void log_close(void);
-extern void log_initial(void);
-extern void log_print(const char *format, ...);
 extern void memory_track_counters_print(void);
 extern void memory_track_free(void *ptr);
 extern void nfa_engine_destroy(s_nfa_t *nfa);
+extern void scil_log_close(void);
+extern void scil_log_initial(void);
+extern void scil_log_print(const char *format, ...);
 extern void test_main(void);
 
 #endif

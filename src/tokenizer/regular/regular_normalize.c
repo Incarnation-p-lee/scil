@@ -71,9 +71,10 @@ regular_range_expand(char *re)
 static inline bool
 regular_opt_and_needed_p(char last, char c)
 {
-    if ((regular_opt_unary_p(last) && c == RE_M_OPT_BKT_L)
-        || (regular_data_p(last) && RE_M_OPT_BKT_L == c)
-        || (last == RE_M_OPT_BKT_R && regular_data_p(c))
+    if ((regular_opt_unary_p(last) && regular_opt_bracket_left_p(c))
+        || (regular_data_p(last) && regular_opt_bracket_left_p(c))
+        || (regular_opt_bracket_right_p(last) && regular_opt_bracket_left_p(c))
+        || (regular_opt_bracket_right_p(last) && regular_data_p(c))
         || (regular_opt_unary_p(last) && regular_data_p(c))
         || (regular_data_p(last) && regular_data_p(c))) {
         return true;

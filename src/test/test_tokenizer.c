@@ -86,6 +86,19 @@ test_tokenizer_nfa_engine_advance(void)
     assert_caution(nfa_engine_pattern_match_p(nfa, "acdeeeeeeeeeee"));
     assert_caution(!nfa_engine_pattern_match_p(nfa, "abcdabcdabcdefghiacda"));
     nfa_engine_destroy(nfa);
+
+    nfa = nfa_engine_create("[A-Za-z_][A-Za-z_0-9]*");
+    assert_caution(!nfa_engine_pattern_match_p(nfa, ""));
+    assert_caution(!nfa_engine_pattern_match_p(nfa, "0scil_log_initial"));
+    assert_caution(nfa_engine_pattern_match_p(nfa, "__scil_log_initial__"));
+    assert_caution(nfa_engine_pattern_match_p(nfa, "__FUNCTION_TIME_O2__"));
+    assert_caution(nfa_engine_pattern_match_p(nfa, "______________"));
+    assert_caution(nfa_engine_pattern_match_p(nfa, "_01234567890__"));
+    assert_caution(nfa_engine_pattern_match_p(nfa, "abcedefghids__"));
+    assert_caution(!nfa_engine_pattern_match_p(nfa, "___=xefghids__"));
+    assert_caution(!nfa_engine_pattern_match_p(nfa, "_logile_name+__"));
+    assert_caution(nfa_engine_pattern_match_p(nfa, "test_tokenizer_nfa_engin__"));
+    nfa_engine_destroy(nfa);
 }
 
 static inline void

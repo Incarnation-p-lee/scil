@@ -1,17 +1,17 @@
 void
-log_initial(void)
+scil_log_initial(void)
 {
     if (!log_file) {
-        log_file = dp_fopen(log_file_name, "w");
+        log_file = dp_fopen(logfile_name, "w");
         if (!log_file) {
-            dp_printf("Failed to create log file %s.\n", log_file_name);
+            dp_printf("Failed to create log file %s.\n", logfile_name);
             dp_exit(1);
         }
     }
 }
 
 void
-log_close(void)
+scil_log_close(void)
 {
     if (log_file) {
         dp_fclose(log_file);
@@ -19,7 +19,7 @@ log_close(void)
 }
 
 void
-log_print(const char *format, ...)
+scil_log_print(const char *format, ...)
 {
     dp_va_list vl;
 

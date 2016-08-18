@@ -3,15 +3,17 @@
 sint32
 main(sint32 argc, char **argv)
 {
-    log_initial();
+    scil_log_initial();
+    libds_log_file_create();
 
     test_main();
 
     memory_cache_cleanup();
     memory_track_counters_print();
-    log_close();
+
+    libds_log_file_close();
+    scil_log_close();
 
     return 0;
 }
-
 

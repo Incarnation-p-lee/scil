@@ -6,8 +6,9 @@
 
 bool regular_data_p(char c);
 bool regular_opt_binary_p(char c);
-bool regular_opt_bracket_left_p(char *c);
+bool regular_opt_bracket_left_p(char c);
 bool regular_opt_bracket_p(char c);
+bool regular_opt_bracket_right_p(char c);
 bool regular_opt_p(char c);
 bool regular_opt_unary_p(char c);
 char * regular_convert_to_reverse_polish(char *re);

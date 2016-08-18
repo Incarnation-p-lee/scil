@@ -9,11 +9,19 @@ regular_data_p(char c)
 }
 
 bool
-regular_opt_bracket_left_p(char *c)
+regular_opt_bracket_left_p(char c)
 {
-    assert_exit(c);
+    if (RE_M_OPT_BKT_L == c) {
+        return true;
+    } else {
+        return false;
+    }
+}
 
-    if (RE_M_OPT_BKT_L == *c) {
+bool
+regular_opt_bracket_right_p(char c)
+{
+    if (RE_M_OPT_BKT_R == c) {
         return true;
     } else {
         return false;
@@ -92,6 +100,8 @@ static inline void
 regular_convert_to_reverse_polish_priority_1(s_array_stack_t *stack_opt,
     s_array_stack_t *stack_data, char *c)
 {
+    char *tmp;
+
     assert_exit(c && stack_opt && stack_data);
     assert_exit(regular_stack_top_p(stack_opt, RE_M_OPT_STAR)
         || regular_stack_top_p(stack_opt, RE_M_OPT_PLUS)
@@ -107,8 +117,10 @@ regular_convert_to_reverse_polish_priority_1(s_array_stack_t *stack_opt,
             array_stack_push(stack_opt, c);
             break;
         case RE_M_OPT_BKT_R:
-	    while (!regular_opt_bracket_left_p(array_stack_top(stack_opt))) {
+            tmp = array_stack_top(stack_opt);
+	    while (!regular_opt_bracket_left_p(*tmp)) {
                 array_stack_push(stack_data, array_stack_pop(stack_opt));
+                tmp = array_stack_top(stack_opt);
             }
             array_stack_pop(stack_opt);
             break;
@@ -122,6 +134,8 @@ static inline void
 regular_convert_to_reverse_polish_priority_2(s_array_stack_t *stack_opt,
     s_array_stack_t *stack_data, char *c)
 {
+    char *tmp;
+
     assert_exit(c && stack_opt && stack_data);
     assert_exit(regular_stack_top_p(stack_opt, RE_M_OPT_AND));
 
@@ -137,8 +151,10 @@ regular_convert_to_reverse_polish_priority_2(s_array_stack_t *stack_opt,
             array_stack_push(stack_opt, c);
             break;
         case RE_M_OPT_BKT_R:
-	    while (!regular_opt_bracket_left_p(array_stack_top(stack_opt))) {
+            tmp = array_stack_top(stack_opt);
+	    while (!regular_opt_bracket_left_p(*tmp)) {
                 array_stack_push(stack_data, array_stack_pop(stack_opt));
+                tmp = array_stack_top(stack_opt);
             }
             array_stack_pop(stack_opt);
             break;
@@ -152,6 +168,7 @@ static inline void
 regular_convert_to_reverse_polish_priority_3(s_array_stack_t *stack_opt,
     s_array_stack_t *stack_data, char *c)
 {
+    char *tmp;
     assert_exit(c && stack_opt && stack_data);
     assert_exit(regular_stack_top_p(stack_opt, RE_M_OPT_OR));
 
@@ -167,8 +184,10 @@ regular_convert_to_reverse_polish_priority_3(s_array_stack_t *stack_opt,
             array_stack_push(stack_opt, c);
             break;
         case RE_M_OPT_BKT_R:
-	    while (!regular_opt_bracket_left_p(array_stack_top(stack_opt))) {
+            tmp = array_stack_top(stack_opt);
+	    while (!regular_opt_bracket_left_p(*tmp)) {
                 array_stack_push(stack_data, array_stack_pop(stack_opt));
+                tmp = array_stack_top(stack_opt);
             }
             array_stack_pop(stack_opt);
             break;

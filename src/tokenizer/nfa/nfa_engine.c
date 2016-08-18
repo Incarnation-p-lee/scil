@@ -24,13 +24,14 @@ nfa_engine_graph_dfs_reached_p(s_nfa_t *nfa,
     s_fa_status_t *succ;
 
     assert_exit(hash);
-    assert_exit(status);
+    assert_exit(nfa_status_structure_legal_p(status));
     assert_exit(nfa_engine_structure_legal_p(nfa));
 
     key = (void *)(ptr_t)status->label;
+    assert_exit(PTR_INVALID != open_addressing_hash_find(hash, key));
 
     if (!open_addressing_hash_find(hash, key)) {
-        open_addressing_hash_insert(&hash, key);
+        open_addressing_hash_insert(hash, key);
         if (status == nfa->terminal) {
             return true;
         }
@@ -171,12 +172,13 @@ nfa_status_destroy_dfs(s_fa_status_t *status, s_open_addressing_hash_t *hash)
     s_fa_edge_t *edge_head;
     s_fa_edge_t *edge_next;
 
-    assert_exit(status);
+    assert_exit(nfa_status_structure_legal_p(status));
 
     key = (void *)(ptr_t)status->label;
+    assert_exit(PTR_INVALID != open_addressing_hash_find(hash, key));
 
     if (!open_addressing_hash_find(hash, key)) {
-        open_addressing_hash_insert(&hash, key);
+        open_addressing_hash_insert(hash, key);
 
         if (status->adj_list) {
             edge = edge_head = status->adj_list;

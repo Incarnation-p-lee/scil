@@ -3,8 +3,8 @@
 #ifndef LOG_DECLARATION_H
 #define LOG_DECLARATION_H
 
-void log_close(void);
-void log_initial(void);
-void log_print(const char *format, ...);
+void scil_log_close(void);
+void scil_log_initial(void);
+void scil_log_print(const char *format, ...);
 
 #endif
