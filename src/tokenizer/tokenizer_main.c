@@ -5,7 +5,8 @@ tokenizer_process_file(char *filename)
 
     if (filename) {
         aim = tokenizer_aim_open(filename);
-        return (void *)aim;
+        tokenizer_aim_close(aim);
+        return NULL;
     } else {
         scil_log_print_and_exit("Attempt to access NULL pointer.\n");
         return NULL;
