@@ -14,11 +14,14 @@
 #define dp_memset              memset
 #define dp_isalnum             isalnum
 #define dp_isdigit             isdigit
+#define dp_isspace             isspace
 #define dp_printf              printf
+#define dp_feof                feof
 #define dp_strlen              strlen
 #define dp_isalpha             isalpha
 #define dp_fopen               fopen
 #define dp_fclose              fclose
+#define dp_fread               fread
 #define dp_exit                exit
 #define dp_vfprintf            vfprintf
 #define dp_sprintf             sprintf
@@ -28,6 +31,7 @@
 #define dp_fflush              fflush
 #define dp_memcpy              memcpy
 #define dp_strlen              strlen
+#define dp_strcpy              strcpy
 
 #if defined DEBUG
     #define dp_malloc          memory_track_malloc
@@ -43,8 +47,9 @@
 #include "data_structure_interface.h"
 #include "define.h"
 #include "finite_automata.h"
-#include "external.h"
+#include "token.h"
 
+#include "external.h"
 
 #endif
 

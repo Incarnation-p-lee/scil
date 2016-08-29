@@ -31,3 +31,21 @@ scil_log_print(const char *format, ...)
     }
 }
 
+void
+scil_log_print_and_exit(const char *format, ...)
+{
+    dp_va_list vl;
+
+    if (format) {
+        dp_va_start(vl, format);
+        dp_vfprintf(log_file, format, vl);
+        dp_fflush(log_file);
+        dp_va_end(vl);
+
+        libds_log_file_close();
+        scil_log_close();
+        memory_cache_cleanup();
+        dp_exit(1);
+    }
+}
+

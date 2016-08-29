@@ -6,5 +6,6 @@
 void scil_log_close(void);
 void scil_log_initial(void);
 void scil_log_print(const char *format, ...);
+void scil_log_print_and_exit(const char *format, ...);
 
 #endif
