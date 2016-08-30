@@ -5,6 +5,11 @@ tokenizer_process_file(char *filename)
 
     if (filename) {
         aim = tokenizer_aim_open(filename);
+
+        while (tokenizer_aim_fill_secondary_buffer_p(aim)) {
+            ;
+        }
+
         tokenizer_aim_close(aim);
         return NULL;
     } else {

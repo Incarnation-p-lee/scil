@@ -41,8 +41,9 @@ tokenizer_aim_close(s_tokenizer_aim_t *aim)
 
     TOKENIZER_AIM_CLOSE_PRINT(aim->fname);
 
-    dp_fclose(aim->fd);
+    dp_free(aim->secondary);
     dp_free(aim->primary);
+    dp_fclose(aim->fd);
     dp_free(aim);
 }
 
@@ -190,7 +191,7 @@ tokenizer_aim_skip_single_comment(s_tokenizer_aim_t *aim, uint32 index)
     return i + 1;
 }
 
-static inline void
+static inline uint32
 tokenizer_io_secondary_buffer_resume(s_io_buffer_t *secondary)
 {
     uint32 index, k;
@@ -204,9 +205,10 @@ tokenizer_io_secondary_buffer_resume(s_io_buffer_t *secondary)
     }
 
     assert_exit(index <= READ_BUF_SIZE);
-
     secondary->buf[k] = NULL_CHAR;
     secondary->size = k;
+
+    return k;
 }
 
 /*
@@ -223,15 +225,14 @@ tokenizer_aim_fill_secondary_buffer_p(s_tokenizer_aim_t *aim)
 
     assert_exit(tokenizer_aim_structure_legal_p(aim));
 
-    index = 0;
     primary = aim->primary;
     secondary = aim->secondary;
-    tokenizer_io_secondary_buffer_resume(secondary);
+    index = tokenizer_io_secondary_buffer_resume(secondary);
 
-    while (tokenizer_aim_fill_buffer_p(aim)) {
+    while (tokenizer_aim_fill_primary_buffer_p(aim)) {
         k = primary->index;
         buf = primary->buf;
-        while (tokenizer_io_buffer_reach_limit_p(primary)) {
+        while (!tokenizer_io_buffer_reach_limit_p(primary)) {
             if (dp_isspace(buf[k])) {
                 k++;
                 size = index;
@@ -246,6 +247,7 @@ tokenizer_aim_fill_secondary_buffer_p(s_tokenizer_aim_t *aim)
                 secondary->buf[index] = NULL_CHAR;
                 secondary->size = size;
 
+                TOKENIZER_IO_BUFFER_PRINT(aim->secondary);
                 return true;
             }
 
@@ -259,6 +261,8 @@ tokenizer_aim_fill_secondary_buffer_p(s_tokenizer_aim_t *aim)
         assert_exit(READ_BUF_SIZE >= index);
         secondary->buf[index] = NULL_CHAR;
         secondary->size = size;
+
+        TOKENIZER_IO_BUFFER_PRINT(aim->secondary);
         return true;
     }
 }
@@ -285,16 +289,16 @@ tokenizer_aim_fill_primary_buffer_p(s_tokenizer_aim_t *aim)
 
     assert_exit(tokenizer_aim_structure_legal_p(aim));
 
-    if (dp_feof(aim->fd)) {
-        return false;
-    } else if (!tokenizer_io_buffer_reach_limit_p(aim->primary)) {
+    if (!tokenizer_io_buffer_reach_limit_p(aim->primary)) {
         return true;
+    } else if (dp_feof(aim->fd)) {
+        return false;
     } else {
         aim->primary->index = offset = 0;
         rest = READ_BUF_SIZE;
 
         while (rest != 0 && !dp_feof(aim->fd)) {
-            len = dp_fread(aim->primary->buf + offset, rest, 1, aim->fd);
+            len = dp_fread(aim->primary->buf + offset, 1, rest, aim->fd);
             assert_exit(len <= rest);
             offset += len;
             rest -= len;

@@ -6,6 +6,7 @@
 #define READ_ELE_SIZE          64
 #define TAIL_BUF_SIZE          128
 #define INDEX_INVALID          0xffffffffu
+#define BUF_PRINT_LEN          80
 
 typedef enum lexeme          e_lexeme_t;
 typedef struct tokenizer_aim s_tokenizer_aim_t;
@@ -42,9 +43,11 @@ struct io_buffer {
 #if defined DEBUG
     #define TOKENIZER_AIM_OPEN_PRINT(x)  tokenizer_aim_open_print(x)
     #define TOKENIZER_AIM_CLOSE_PRINT(x) tokenizer_aim_close_print(x)
+    #define TOKENIZER_IO_BUFFER_PRINT(x) tokenizer_io_buffer_print(x)
 #else
     #define TOKENIZER_AIM_OPEN_PRINT(x)
     #define TOKENIZER_AIM_CLOSE_PRINT(x)
+    #define TOKENIZER_IO_BUFFER_PRINT(x)
 #endif
 
 #endif

@@ -18,9 +18,10 @@ static inline s_io_buffer_t * tokenizer_aim_open_buffer_create(void);
 static inline s_tokenizer_aim_t * tokenizer_aim_open(char *fname);
 static inline uint32 tokenizer_aim_skip_multiple_comment(s_tokenizer_aim_t *aim, uint32 index);
 static inline uint32 tokenizer_aim_skip_single_comment(s_tokenizer_aim_t *aim, uint32 index);
+static inline uint32 tokenizer_io_secondary_buffer_resume(s_io_buffer_t *secondary);
 static inline void tokenizer_aim_close(s_tokenizer_aim_t *aim);
-static inline void tokenizer_io_secondary_buffer_resume(s_io_buffer_t *secondary);
 static void tokenizer_aim_close_print(char *fname);
 static void tokenizer_aim_open_print(char *fname);
+static void tokenizer_io_buffer_print(s_io_buffer_t *buffer);
 
 #endif
