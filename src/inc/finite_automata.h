@@ -5,7 +5,7 @@
 #define STAR_CHAR              '*'
 #define SLASH_CHAR             '/'
 #define NLINE_CHAR             '\n'
-#define SENTINEL_CHAR          ((char)3)
+#define SENTINEL_CHAR          ((char)0x20)
 
 typedef struct fa        s_nfa_t;
 typedef struct fa        s_dfa_t;

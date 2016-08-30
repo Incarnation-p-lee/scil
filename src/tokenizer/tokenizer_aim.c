@@ -218,13 +218,14 @@ tokenizer_io_secondary_buffer_resume(s_io_buffer_t *secondary)
 static inline bool
 tokenizer_aim_fill_secondary_buffer_p(s_tokenizer_aim_t *aim)
 {
-    char *buf;
+    char *buf, last;
     uint32 index, k, size;
     s_io_buffer_t *primary;
     s_io_buffer_t *secondary;
 
     assert_exit(tokenizer_aim_structure_legal_p(aim));
 
+    last = NULL_CHAR;
     primary = aim->primary;
     secondary = aim->secondary;
     index = tokenizer_io_secondary_buffer_resume(secondary);
@@ -234,21 +235,21 @@ tokenizer_aim_fill_secondary_buffer_p(s_tokenizer_aim_t *aim)
         buf = primary->buf;
         while (!tokenizer_io_buffer_reach_limit_p(primary)) {
             if (dp_isspace(buf[k])) {
-                k++;
+                last = buf[k++];
                 size = index;
             } else if (tokenizer_char_single_comment_p(buf + k)) {
                 k = tokenizer_aim_skip_single_comment(aim, k);
             } else if (tokenizer_char_multiple_comment_head_p(buf + k)) {
                 k = tokenizer_aim_skip_multiple_comment(aim, k);
             } else if (index < READ_BUF_SIZE) {
+                if (dp_isspace(last)) {
+                    secondary->buf[index++] = SENTINEL_CHAR;
+                }
+                last = buf[k];
                 secondary->buf[index++] = buf[k++];
             } else {
                 assert_exit(READ_BUF_SIZE == index);
-                secondary->buf[index] = NULL_CHAR;
-                secondary->size = size;
-
-                TOKENIZER_IO_BUFFER_PRINT(aim->secondary);
-                return true;
+                goto SUCCESS_DONE;
             }
 
             primary->index = k;
@@ -259,6 +260,7 @@ tokenizer_aim_fill_secondary_buffer_p(s_tokenizer_aim_t *aim)
         return false;
     } else {
         assert_exit(READ_BUF_SIZE >= index);
+SUCCESS_DONE:
         secondary->buf[index] = NULL_CHAR;
         secondary->size = size;
 
