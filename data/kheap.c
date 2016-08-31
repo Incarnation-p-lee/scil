@@ -674,6 +674,7 @@ kheap_resize(s_kheap_t *heap, uint32 new_size)
 void *
 kmalloc(uint32 sz)
 {
+    kprintf("We    are in kmalloc\n");
     return kmalloc_int(sz, false, NULL);
 }
 

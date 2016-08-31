@@ -7,8 +7,10 @@
 s_token_t * tokenizer_process_file(char *filename);
 static inline bool tokenizer_aim_fill_buffer_p(s_tokenizer_aim_t *aim);
 static inline bool tokenizer_aim_fill_primary_buffer_p(s_tokenizer_aim_t *aim);
+static inline bool tokenizer_aim_fill_secondary_buffer_final_p(s_tokenizer_aim_t *aim, uint32 index);
 static inline bool tokenizer_aim_fill_secondary_buffer_p(s_tokenizer_aim_t *aim);
 static inline bool tokenizer_aim_structure_legal_p(s_tokenizer_aim_t *aim);
+static inline bool tokenizer_char_double_quote_p(char *buf);
 static inline bool tokenizer_char_multiple_comment_head_p(char *buf);
 static inline bool tokenizer_char_multiple_comment_tail_p(char *buf);
 static inline bool tokenizer_char_single_comment_p(char *buf);

@@ -6,6 +6,7 @@
 #define SLASH_CHAR             '/'
 #define NLINE_CHAR             '\n'
 #define SENTINEL_CHAR          ((char)0x20)
+#define DOUBLE_QUOTE_CHAR      ((char)0x22)
 
 typedef struct fa        s_nfa_t;
 typedef struct fa        s_dfa_t;

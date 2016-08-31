@@ -84,6 +84,18 @@ tokenizer_aim_fill_buffer_p(s_tokenizer_aim_t *aim)
 }
 
 static inline bool
+tokenizer_char_double_quote_p(char *buf)
+{
+    assert_exit(buf);
+
+    if (DOUBLE_QUOTE_CHAR == buf[0]) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+static inline bool
 tokenizer_char_single_comment_p(char *buf)
 {
     assert_exit(buf);
@@ -211,6 +223,23 @@ tokenizer_io_secondary_buffer_resume(s_io_buffer_t *secondary)
     return k;
 }
 
+static inline bool
+tokenizer_aim_fill_secondary_buffer_final_p(s_tokenizer_aim_t *aim, uint32 index)
+{
+    assert_exit(tokenizer_aim_structure_legal_p(aim));
+
+    if (0 == index) {
+        return false;
+    } else {
+        assert_exit(READ_BUF_SIZE >= index);
+
+        aim->secondary->buf[index] = NULL_CHAR;
+        TOKENIZER_IO_BUFFER_PRINT(aim->secondary);
+
+        return true;
+    }
+}
+
 /*
  * Secondary buffer will delete space and comments
  * From primary -> secondary buffer
@@ -218,13 +247,14 @@ tokenizer_io_secondary_buffer_resume(s_io_buffer_t *secondary)
 static inline bool
 tokenizer_aim_fill_secondary_buffer_p(s_tokenizer_aim_t *aim)
 {
+    bool is_string;
     char *buf, last;
-    uint32 index, k, size;
-    s_io_buffer_t *primary;
-    s_io_buffer_t *secondary;
+    uint32 index, k;
+    s_io_buffer_t *primary, *secondary;
 
     assert_exit(tokenizer_aim_structure_legal_p(aim));
 
+    is_string = false;
     last = NULL_CHAR;
     primary = aim->primary;
     secondary = aim->secondary;
@@ -234,39 +264,32 @@ tokenizer_aim_fill_secondary_buffer_p(s_tokenizer_aim_t *aim)
         k = primary->index;
         buf = primary->buf;
         while (!tokenizer_io_buffer_reach_limit_p(primary)) {
-            if (dp_isspace(buf[k])) {
+            if (tokenizer_char_double_quote_p(buf + k)) {
+                is_string = !is_string;
+                secondary->buf[index++] = buf[k++];
+            } else if (is_string) {
+                secondary->buf[index++] = buf[k++];
+            } else if (dp_isspace(buf[k])) {
                 last = buf[k++];
-                size = index;
+                secondary->size = index;
             } else if (tokenizer_char_single_comment_p(buf + k)) {
                 k = tokenizer_aim_skip_single_comment(aim, k);
             } else if (tokenizer_char_multiple_comment_head_p(buf + k)) {
                 k = tokenizer_aim_skip_multiple_comment(aim, k);
-            } else if (index < READ_BUF_SIZE) {
+            } else if (index < READ_BUF_SIZE - 1) {  // index may add twice
                 if (dp_isspace(last)) {
                     secondary->buf[index++] = SENTINEL_CHAR;
                 }
-                last = buf[k];
-                secondary->buf[index++] = buf[k++];
+                secondary->buf[index++] = last = buf[k++];
             } else {
-                assert_exit(READ_BUF_SIZE == index);
-                goto SUCCESS_DONE;
+                goto FILL_DONE;
             }
-
             primary->index = k;
         }
     }
 
-    if (0 == index) {
-        return false;
-    } else {
-        assert_exit(READ_BUF_SIZE >= index);
-SUCCESS_DONE:
-        secondary->buf[index] = NULL_CHAR;
-        secondary->size = size;
-
-        TOKENIZER_IO_BUFFER_PRINT(aim->secondary);
-        return true;
-    }
+FILL_DONE:
+    return tokenizer_aim_fill_secondary_buffer_final_p(aim, index);
 }
 
 static inline bool
