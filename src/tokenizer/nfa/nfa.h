@@ -4,7 +4,8 @@
 #include "finite_automata.h"
 
 #define NFA_LABEL_HASH_SIZE    127
-#define RE_EXPAND_MIN        8
+#define RE_EXPAND_MIN          8
+#define NFA_UNMATCHED_SIZE     0
 
 struct nfa_edge_map {
     char    c;

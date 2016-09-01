@@ -14,6 +14,7 @@ extern bool regular_opt_unary_p(char c);
 extern char * regular_convert_to_reverse_polish(char *re);
 extern s_nfa_t * nfa_engine_create(char *regular);
 extern s_token_t * tokenizer_process_file(char *filename);
+extern uint32 nfa_engine_token_match(s_nfa_t *nfa, char *pn, const char sentinel);
 extern void * memory_track_malloc(uint32 size);
 extern void * memory_track_realloc(void *ptr, uint32 size);
 extern void assert_print_caution(char *msg, const char *fname, const char *func, uint32 line);

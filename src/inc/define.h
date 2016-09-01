@@ -3,6 +3,7 @@
 
 #define true                   1
 #define false                  0
+#define PTR_SIZE_OF(e, s)      ((uint32)(e - s) + 1)
 
 #define PTR_SENTINEL           (void *)0xA5
 #define TO_STRING(x)           (#x)

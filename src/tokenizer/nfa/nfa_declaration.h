@@ -9,9 +9,9 @@ s_nfa_t * nfa_engine_create(char *regular);
 static inline bool nfa_char_alnum_underline_p(char c);
 static inline bool nfa_engine_graph_dfs_reached_p(s_nfa_t *nfa, s_open_addressing_hash_t *hash, s_fa_status_t *status);
 static inline bool nfa_engine_graph_legal_p(s_nfa_t *nfa);
-static inline bool nfa_engine_pattern_match_final_p(s_array_queue_t *master);
 static inline bool nfa_engine_pattern_match_ip(s_nfa_t *nfa, char *pn);
 static inline bool nfa_engine_structure_legal_p(s_nfa_t *nfa);
+static inline bool nfa_engine_terminal_reached_p(s_array_queue_t *master);
 static inline bool nfa_status_structure_legal_p(s_fa_status_t *status);
 static inline bool nfa_status_terminal_p(s_fa_status_t *status);
 static inline s_fa_edge_t * nfa_edge_next(s_fa_edge_t *edge);
@@ -20,6 +20,7 @@ static inline s_nfa_edge_map_t * nfa_edge_map_create(char c, s_nfa_t *nfa);
 static inline s_nfa_t * nfa_edge_map_nfa_obtain(s_nfa_edge_map_t *map);
 static inline s_nfa_t * nfa_engine_create_i(char *polish);
 static inline s_nfa_t * nfa_subset_rule_basic(char c);
+static inline uint32 nfa_engine_token_match_i(s_nfa_t *nfa, char *pn, const char sentinel);
 static inline uint32 nfa_label_obtain(void);
 static inline void nfa_edge_map_destroy(s_nfa_edge_map_t *map);
 static inline void nfa_engine_array_queue_swap(s_array_queue_t **a, s_array_queue_t **b);
@@ -44,6 +45,7 @@ static inline void nfa_subset_rule_induction_plus(s_nfa_t *s);
 static inline void nfa_subset_rule_induction_question(s_nfa_t *s);
 static inline void nfa_subset_rule_induction_star(s_nfa_t *s);
 static inline void nfa_subset_rule_induction_unary(s_array_stack_t *stack, e_regular_meta_opt_t opt);
+uint32 nfa_engine_token_match(s_nfa_t *nfa, char *pn, const char sentinel);
 void nfa_engine_destroy(s_nfa_t *nfa);
 
 #endif

@@ -252,7 +252,7 @@ nfa_engine_array_queue_swap(s_array_queue_t **a, s_array_queue_t **b)
 }
 
 static inline bool
-nfa_engine_pattern_match_final_p(s_array_queue_t *master)
+nfa_engine_terminal_reached_p(s_array_queue_t *master)
 {
     s_fa_status_t *status;
     s_fa_edge_t *edge, *edge_head;
@@ -334,7 +334,7 @@ nfa_engine_pattern_match_ip(s_nfa_t *nfa, char *pn)
         c++;
     }
 
-    matched = nfa_engine_pattern_match_final_p(master);
+    matched = nfa_engine_terminal_reached_p(master);
     array_queue_destroy(&master);
     array_queue_destroy(&slave);
 
@@ -354,4 +354,71 @@ nfa_engine_pattern_match_p(s_nfa_t *nfa, char *pn)
         return nfa_engine_pattern_match_ip(nfa, pn);
     }
 }
+
+static inline uint32
+nfa_engine_token_match_i(s_nfa_t *nfa, char *pn, const char sentinel)
+{
+    char *c;
+    uint32 token_size;
+    s_fa_status_t *status;
+    s_array_queue_t *master, *slave;
+    s_fa_edge_t *edge, *edge_head;
+
+    assert_exit(pn);
+    assert_exit(nfa_engine_graph_legal_p(nfa));
+    assert_exit(nfa_engine_structure_legal_p(nfa));
+
+    c = pn;
+    slave = array_queue_create();
+    master = array_queue_create();
+    nfa_engine_pattern_match_setup(master, nfa);
+
+    while (*c && sentinel != *c) {
+        while (!array_queue_empty_p(master)) {
+            status = array_queue_leave(master);
+            if (status->adj_list) {
+                edge = edge_head = status->adj_list;
+                do {
+                    if (*c == edge->c) {
+                        array_queue_enter(slave, edge->succ);
+                    } else if (NULL_CHAR == edge->c) {
+                        array_queue_enter(master, edge->succ);
+                    }
+                    edge = nfa_edge_next(edge);
+                } while (edge_head != edge);
+            } else {
+                token_size = PTR_SIZE_OF(c, pn);
+                goto MATCH_DONE;
+            }
+        }
+        nfa_engine_array_queue_swap(&master, &slave);
+        c++;
+    }
+
+    if (nfa_engine_terminal_reached_p(master)) {
+        token_size = PTR_SIZE_OF(c, pn);
+    } else {
+        token_size = NFA_UNMATCHED_SIZE;
+    }
+
+MATCH_DONE:
+    array_queue_destroy(&master);
+    array_queue_destroy(&slave);
+    return token_size;
+}
+
+uint32
+nfa_engine_token_match(s_nfa_t *nfa, char *pn, const char sentinel)
+{
+    if (!pn) {
+        return NFA_UNMATCHED_SIZE;
+    } else if (!nfa_engine_structure_legal_p(nfa)) {
+        return NFA_UNMATCHED_SIZE;
+    } else if (!nfa_engine_graph_legal_p(nfa)) {
+        return NFA_UNMATCHED_SIZE;
+    } else {
+        return nfa_engine_token_match_i(nfa, pn, sentinel);
+    }
+}
+
 
