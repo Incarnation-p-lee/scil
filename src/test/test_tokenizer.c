@@ -112,6 +112,6 @@ static inline void
 test_tokenizer_main(void)
 {
     test_tokenizer_nfa_engine();
-    tokenizer_process_file(TOKEN_AIM_DATA_FILE);
+    tokenizer_file_process(TOKEN_AIM_DATA_FILE);
 }
 

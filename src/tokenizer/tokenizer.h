@@ -8,23 +8,21 @@
 #define INDEX_INVALID          0xffffffffu
 #define BUF_PRINT_LEN          80
 
-typedef enum lexeme          e_lexeme_t;
-typedef struct tokenizer_aim s_tokenizer_aim_t;
-typedef struct io_buffer     s_io_buffer_t;
+// Language C regular expression
+#define LANG_C_RE_IDTR         "[A-Za-z_][a-zA-Z0-9_]*"
+#define LANG_C_RE_OPTR         ""
+#define LANG_C_RE_CNST         "[0-9]+|"
+#define LANG_C_RE_PCTT         "[,;]"
 
-enum lexeme {
-    LEX_KWRD,  // keyword
-    LEX_OPTR,  // operator
-    LEX_IDTR,  // identifier
-    LEX_CNST,  // constant
-    LEX_PCTT,  // punctuation
-};
+typedef struct tokenizer_aim   s_tokenizer_aim_t;
+typedef struct io_buffer       s_io_buffer_t;
+typedef struct token_language  s_token_language_t;
 
 struct tokenizer_aim {
-    FILE            *fd;
-    s_io_buffer_t   *primary;
-    s_io_buffer_t   *secondary;
-    char            fname[FILENAME_LEN_MAX];
+    FILE          *fd;
+    s_io_buffer_t *primary;
+    s_io_buffer_t *secondary;
+    char          fname[FILENAME_LEN_MAX];
 };
 
 /*
@@ -38,6 +36,13 @@ struct io_buffer {
         uint32 size;   // For secondary buf
     };
     char   buf[READ_BUF_SIZE + 1];
+};
+
+struct token_language {
+    s_nfa_t *operator;
+    s_nfa_t *identifier;
+    s_nfa_t *constant;
+    s_nfa_t *punctuation;
 };
 
 #if defined DEBUG

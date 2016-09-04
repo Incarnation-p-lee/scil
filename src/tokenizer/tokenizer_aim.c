@@ -161,7 +161,6 @@ tokenizer_aim_skip_multiple_comment(s_tokenizer_aim_t *aim, uint32 index)
                     i = aim->primary->index;
                 } else {
                     scil_log_print_and_exit("Unmatched multiple comments pair.\n");
-                    return INDEX_INVALID;
                 }
             } else {
                 i++;

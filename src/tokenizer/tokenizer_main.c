@@ -1,46 +1,50 @@
 s_token_t *
-tokenizer_process_file(char *filename)
+tokenizer_main(char *file)
 {
-    if (!filename) {
-        scil_log_print_and_exit("Attempt to access NULL pointer.\n");
-        return NULL;
-    } else {
-        return tokenizer_process_file_i(filename);
-    }
+    s_token_language_t *lang;
+
+    lang = tokenizer_language_init(TK_LANG_C);
+    tokenizer_language_c_destroy(lang);
+
+    return NULL;
 }
 
-static inline s_token_t *
-tokenizer_process_file_i(char *filename)
+static inline s_token_language_t *
+tokenizer_language_init(e_token_language_t lang_type)
 {
-    s_token_t *token_head;
-    s_tokenizer_aim_t *aim;
+    s_token_language_t *lang;
 
-    assert_exit(filename);
-
-    token_head = dp_malloc(sizeof(s_token_t));
-    aim = tokenizer_aim_open(filename);
-
-    while (tokenizer_aim_fill_secondary_buffer_p(aim)) {
-        tokenizer_process_io_buffer(aim->secondary, token_head);
+    lang = NULL;
+    switch (lang_type) {
+        case TK_LANG_C:
+            lang = tokenizer_language_c_init();
+            break;
+        default:
+            assert_exit(false);
+            break;
     }
 
-    tokenizer_aim_close(aim);
-
-    return token_head;
+    return lang;
 }
 
-static inline void
-tokenizer_process_io_buffer(s_io_buffer_t *buffer, s_token_t *token)
+static inline s_token_language_t *
+tokenizer_language_c_init(void)
 {
-    uint32 i;
-    uint32 limit;
+    s_token_language_t *language;
 
-    assert_exit(token);
-    assert_exit(tokenizer_io_buffer_structure_legal_p(buffer));
+    language = dp_malloc(sizeof(*language));
 
-    i = 0;
-    limit = buffer->size;
-    while (i < limit) {
-    }
+    language->identifier = nfa_engine_create(LANG_C_RE_IDTR);
+
+    return language;
+}
+
+static void
+tokenizer_language_c_destroy(s_token_language_t *lang)
+{
+    assert_exit(lang);
+
+    nfa_engine_destroy(lang->identifier);
+    dp_free(lang);
 }
 
