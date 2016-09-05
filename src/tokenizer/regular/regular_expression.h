@@ -1,6 +1,9 @@
 #ifndef REGULAR_EXPRESSION_H
 #define REGULAR_EXPRESSION_H
 
+#define TRANS_MASK             ((char)0x80)
+#define TRANS_UNMASK           (char)(~TRANS_MASK)
+
 #if defined DEBUG
     #define REGULAR_RANG_EXPAND_PRINT(x)           regular_range_expand_print(x)
     #define REGULAR_OPT_AND_INSERT_PRINT(x)        regular_opt_and_insert_print(x)

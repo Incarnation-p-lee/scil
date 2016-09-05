@@ -3,6 +3,10 @@
 
 #define RE_EXPAND_MIN          8
 
+/*
+ * Use char ` as the translate prefix for meta char
+ * Such as `* match *
+ */
 enum regular_meta_opt {
     RE_M_OPT_BKT_L  = '(', // left bracket
     RE_M_OPT_BKT_R  = ')', // right bracket
@@ -14,6 +18,7 @@ enum regular_meta_opt {
     RE_M_OPT_MBKT_L = '[',
     RE_M_OPT_MBKT_R = ']',
     RE_M_OPT_CNNT   = '-',
+    RE_M_OPT_TRANS  = '`',
 };
 
 typedef enum regular_meta_opt e_regular_meta_opt_t;

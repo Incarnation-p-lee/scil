@@ -16,7 +16,7 @@ static inline bool nfa_status_structure_legal_p(s_fa_status_t *status);
 static inline bool nfa_status_terminal_p(s_fa_status_t *status);
 static inline s_fa_edge_t * nfa_edge_next(s_fa_edge_t *edge);
 static inline s_fa_status_t * nfa_status_create(void);
-static inline s_nfa_edge_map_t * nfa_edge_map_create(char c, s_nfa_t *nfa);
+static inline s_nfa_edge_map_t * nfa_edge_map_create(char c);
 static inline s_nfa_t * nfa_edge_map_nfa_obtain(s_nfa_edge_map_t *map);
 static inline s_nfa_t * nfa_engine_create_i(char *polish);
 static inline s_nfa_t * nfa_subset_rule_basic(char c);

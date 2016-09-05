@@ -4,6 +4,8 @@
 #define REGULAR_DECLARATION_H
 
 
+bool regular_char_meta_p(char c);
+bool regular_char_translated_p(char c);
 bool regular_data_p(char c);
 bool regular_opt_binary_p(char c);
 bool regular_opt_bracket_left_p(char c);
@@ -12,6 +14,7 @@ bool regular_opt_bracket_right_p(char c);
 bool regular_opt_p(char c);
 bool regular_opt_unary_p(char c);
 char * regular_convert_to_reverse_polish(char *re);
+char regular_char_translate_resume(char c);
 static inline bool regular_opt_and_needed_p(char last, char c);
 static inline bool regular_reverse_polish_legal_p(char *polish);
 static inline bool regular_stack_top_p(s_array_stack_t *stack, char expected);

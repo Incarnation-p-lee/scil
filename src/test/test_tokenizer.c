@@ -1,6 +1,7 @@
 static inline void
 test_tokenizer_nfa_engine_basic(void)
 {
+    TEST_ISOLATOR;
     s_nfa_t *nfa;
 
     nfa = nfa_engine_create("a|b");
@@ -56,8 +57,34 @@ test_tokenizer_nfa_engine_basic(void)
 }
 
 static inline void
+test_tokenizer_nfa_engine_translate(void)
+{
+    TEST_ISOLATOR;
+    s_nfa_t *nfa;
+
+    nfa = nfa_engine_create("abcde");
+    assert_caution(!nfa_engine_pattern_match_p(nfa, "abcd"));
+    assert_caution(nfa_engine_pattern_match_p(nfa, "abcde"));
+    nfa_engine_destroy(nfa);
+
+    nfa = nfa_engine_create("`[");
+    assert_caution(!nfa_engine_pattern_match_p(nfa, ""));
+    assert_caution(nfa_engine_pattern_match_p(nfa, "["));
+    assert_caution(!nfa_engine_pattern_match_p(nfa, "``"));
+    nfa_engine_destroy(nfa);
+
+    nfa = nfa_engine_create("`*`+`?");
+    assert_caution(!nfa_engine_pattern_match_p(nfa, "*"));
+    assert_caution(nfa_engine_pattern_match_p(nfa, "*+?"));
+    assert_caution(!nfa_engine_pattern_match_p(nfa, "`*`+`?"));
+    nfa_engine_destroy(nfa);
+}
+
+
+static inline void
 test_tokenizer_nfa_engine_advance(void)
 {
+    TEST_ISOLATOR;
     s_nfa_t *nfa;
 
     nfa = nfa_engine_create("(abc)+(b|e)?");
@@ -105,6 +132,7 @@ static inline void
 test_tokenizer_nfa_engine(void)
 {
     test_tokenizer_nfa_engine_basic();
+    test_tokenizer_nfa_engine_translate();
     test_tokenizer_nfa_engine_advance();
 }
 
@@ -112,6 +140,7 @@ static inline void
 test_tokenizer_main(void)
 {
     test_tokenizer_nfa_engine();
+    TEST_ISOLATOR;
     tokenizer_file_process(TOKEN_AIM_DATA_FILE);
 }
 

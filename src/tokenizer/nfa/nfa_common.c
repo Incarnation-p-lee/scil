@@ -1,11 +1,11 @@
 static inline s_nfa_edge_map_t *
-nfa_edge_map_create(char c, s_nfa_t *nfa)
+nfa_edge_map_create(char c)
 {
     s_nfa_edge_map_t *map;
 
     map = dp_malloc(sizeof(*map));
     map->c = c;
-    map->nfa = nfa;
+    map->nfa = nfa_subset_rule_basic(c);
 
     return map;
 }
@@ -102,7 +102,7 @@ nfa_status_edge_chain(s_fa_status_t *status, char c, s_fa_status_t *succ)
 static inline bool
 nfa_char_alnum_underline_p(char c)
 {
-    if (isalnum(c) || '_' == c) {
+    if (dp_isalnum(c) || '_' == c) {
         return true;
     } else {
         return false;

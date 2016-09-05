@@ -1,7 +1,46 @@
 bool
+regular_char_translated_p(char c)
+{
+    if (TRANS_MASK == (c & TRANS_MASK)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+char
+regular_char_translate_resume(char c)
+{
+    assert_exit(regular_char_translated_p(c));
+    assert_exit(regular_char_meta_p(c & TRANS_UNMASK));
+
+    return c & TRANS_UNMASK;
+}
+
+bool
+regular_char_meta_p(char c)
+{
+    if (RE_M_OPT_BKT_L == c || RE_M_OPT_BKT_R == c) {
+        return true;
+    } else if (RE_M_OPT_MBKT_L == c || RE_M_OPT_MBKT_R == c) {
+        return true;
+    } else if (RE_M_OPT_AND == c || RE_M_OPT_OR == c) {
+        return true;
+    } else if (RE_M_OPT_STAR == c || RE_M_OPT_PLUS == c || RE_M_OPT_QUST == c) {
+        return true;
+    } else if (RE_M_OPT_CNNT ==c) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool
 regular_data_p(char c)
 {
     if (dp_isalpha(c) || dp_isdigit(c) || '_' == c) {
+        return true;
+    } else if (regular_char_translated_p(c)) {
         return true;
     } else {
         return false;
@@ -273,6 +312,9 @@ regular_convert_to_reverse_polish(char *re)
     c = normal;
     while (*c) {
         if (regular_data_p(*c)) {
+            array_stack_push(stack_data, c);
+        } else if (regular_char_translated_p(*c)) {
+            array_stack_push(stack_data, c++);
             array_stack_push(stack_data, c);
         } else if (array_stack_empty_p(stack_opt) || RE_M_OPT_BKT_L == *c) {
             array_stack_push(stack_opt, c);

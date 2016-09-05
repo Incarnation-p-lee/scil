@@ -32,12 +32,16 @@ regular_range_expand(char *re)
     expand = dp_malloc(sizeof(char) * size);
 
     while (*c) {
-        if (RE_M_OPT_MBKT_L != *c) {
+        if (RE_M_OPT_TRANS == *c) {
+            assert_exit(regular_char_meta_p(c[1]));
+            expand[i++] = c[1] | TRANS_MASK;
+            c++;
+        } else if (RE_M_OPT_MBKT_L != *c) {
             expand[i++] = *c;
         } else {
             c++;                                     /* [A */
             expand[i++] = RE_M_OPT_BKT_L;
-            while (RE_M_OPT_MBKT_R != *c) {
+            while (RE_M_OPT_MBKT_R != *c && *c) {
                 advanced = c[1];
                 if (RE_M_OPT_CNNT != advanced) {
                     expand[i++] = *c;

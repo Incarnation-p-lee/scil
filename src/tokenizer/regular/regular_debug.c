@@ -30,6 +30,10 @@ regular_reverse_polish_legal_p(char *polish)
     while (*c) {
         if (regular_data_p(*c)) {
             array_stack_push(stack, &tmp);
+        } else if (regular_char_translated_p(*c)) {
+            assert_exit(regular_char_meta_p(c[1]));
+            array_stack_push(stack, &tmp);
+            c++;
         } else if (regular_opt_binary_p(*c)) {
             array_stack_pop(stack);
             array_stack_pop(stack);
@@ -57,27 +61,66 @@ regular_reverse_polish_legal_p(char *polish)
 static inline void
 regular_range_expand_print(char *regular)
 {
+    char *c, tmp;
+
     assert_exit(regular);
 
-    scil_log_print("<After regular expression range expand>\n");
-    scil_log_print("    '%s'\n\n", regular);
+    scil_log_print("<After regular expression range expand>\n    '");
+
+    c = regular;
+    while (*c) {
+        tmp = *c++;
+        if (tmp & TRANS_MASK) {
+            tmp = tmp & TRANS_UNMASK;
+            scil_log_print("`");
+        }
+        scil_log_print("%c", tmp);
+    }
+
+    scil_log_print("'\n\n");
 }
 
 static inline void
 regular_opt_and_insert_print(char *regular)
 {
+    char *c, tmp;
+
     assert_exit(regular);
 
-    scil_log_print("<After regular expression opt and insert>\n");
-    scil_log_print("    '%s'\n\n", regular);
+    scil_log_print("<After regular expression opt and insert>\n    '");
+
+    c = regular;
+    while (*c) {
+        tmp = *c++;
+        if (tmp & TRANS_MASK) {
+            tmp = tmp & TRANS_UNMASK;
+            scil_log_print("`");
+        }
+        scil_log_print("%c", tmp);
+    }
+
+    scil_log_print("'\n\n");
 }
 
 static inline void
 regular_convert_to_reverse_polish_print(char *regular)
 {
+    char *c, tmp;
+
     assert_exit(regular);
 
-    scil_log_print("<After regular expression convert to reverse polish>\n");
-    scil_log_print("    '%s'\n\n", regular);
+    scil_log_print("<After regular expression convert to reverse polish>\n    '");
+
+    c = regular;
+    while (*c) {
+        tmp = *c++;
+        if (tmp & TRANS_MASK) {
+            tmp = tmp & TRANS_UNMASK;
+            scil_log_print("`");
+        }
+        scil_log_print("%c", tmp);
+    }
+
+    scil_log_print("'\n\n");
 }
 
