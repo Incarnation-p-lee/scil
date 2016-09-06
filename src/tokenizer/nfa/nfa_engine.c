@@ -90,7 +90,7 @@ nfa_engine_create_operator(s_array_stack_t *stack, char c)
 static inline s_nfa_t *
 nfa_engine_create_i(char *polish)
 {
-    char *c, tmp;
+    char *c;
     s_nfa_t *nfa;
     s_nfa_edge_map_t *map;
     s_array_stack_t *stack;
@@ -103,12 +103,8 @@ nfa_engine_create_i(char *polish)
     nfa_label_cleanup();
 
     while (*c) {
-        if (nfa_char_alnum_underline_p(*c)) {
+        if (regular_char_data_p(*c)) {
             map = nfa_edge_map_create(*c);
-            array_stack_push(stack, map);
-        } else if (regular_char_translated_p(*c)) {
-            tmp = regular_char_translate_resume(*c);
-            map = nfa_edge_map_create(tmp);
             array_stack_push(stack, map);
         } else {
             nfa_engine_create_operator(stack, *c);

@@ -6,7 +6,6 @@
 
 bool nfa_engine_pattern_match_p(s_nfa_t *nfa, char *pn);
 s_nfa_t * nfa_engine_create(char *regular);
-static inline bool nfa_char_alnum_underline_p(char c);
 static inline bool nfa_engine_graph_dfs_reached_p(s_nfa_t *nfa, s_open_addressing_hash_t *hash, s_fa_status_t *status);
 static inline bool nfa_engine_graph_legal_p(s_nfa_t *nfa);
 static inline bool nfa_engine_pattern_match_ip(s_nfa_t *nfa, char *pn);

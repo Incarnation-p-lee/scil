@@ -78,6 +78,13 @@ test_tokenizer_nfa_engine_translate(void)
     assert_caution(nfa_engine_pattern_match_p(nfa, "*+?"));
     assert_caution(!nfa_engine_pattern_match_p(nfa, "`*`+`?"));
     nfa_engine_destroy(nfa);
+
+    nfa = nfa_engine_create("`(|`)");
+    assert_caution(!nfa_engine_pattern_match_p(nfa, "*"));
+    assert_caution(!nfa_engine_pattern_match_p(nfa, "()"));
+    assert_caution(nfa_engine_pattern_match_p(nfa, "("));
+    assert_caution(nfa_engine_pattern_match_p(nfa, ")"));
+    nfa_engine_destroy(nfa);
 }
 
 
@@ -140,7 +147,6 @@ static inline void
 test_tokenizer_main(void)
 {
     test_tokenizer_nfa_engine();
-    TEST_ISOLATOR;
     tokenizer_file_process(TOKEN_AIM_DATA_FILE);
 }
 

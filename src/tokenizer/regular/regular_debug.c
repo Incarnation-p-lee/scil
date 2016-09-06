@@ -28,7 +28,7 @@ regular_reverse_polish_legal_p(char *polish)
     stack = array_stack_create();
 
     while (*c) {
-        if (regular_data_p(*c)) {
+        if (regular_char_data_p(*c)) {
             array_stack_push(stack, &tmp);
         } else if (regular_char_translated_p(*c)) {
             assert_exit(regular_char_meta_p(c[1]));

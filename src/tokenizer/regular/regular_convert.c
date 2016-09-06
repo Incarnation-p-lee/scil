@@ -36,7 +36,7 @@ regular_char_meta_p(char c)
 }
 
 bool
-regular_data_p(char c)
+regular_char_data_p(char c)
 {
     if (dp_isalpha(c) || dp_isdigit(c) || '_' == c) {
         return true;
@@ -311,7 +311,7 @@ regular_convert_to_reverse_polish(char *re)
 
     c = normal;
     while (*c) {
-        if (regular_data_p(*c)) {
+        if (regular_char_data_p(*c)) {
             array_stack_push(stack_data, c);
         } else if (regular_char_translated_p(*c)) {
             array_stack_push(stack_data, c++);

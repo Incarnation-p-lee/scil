@@ -76,11 +76,11 @@ static inline bool
 regular_opt_and_needed_p(char last, char c)
 {
     if ((regular_opt_unary_p(last) && regular_opt_bracket_left_p(c))
-        || (regular_data_p(last) && regular_opt_bracket_left_p(c))
+        || (regular_char_data_p(last) && regular_opt_bracket_left_p(c))
         || (regular_opt_bracket_right_p(last) && regular_opt_bracket_left_p(c))
-        || (regular_opt_bracket_right_p(last) && regular_data_p(c))
-        || (regular_opt_unary_p(last) && regular_data_p(c))
-        || (regular_data_p(last) && regular_data_p(c))) {
+        || (regular_opt_bracket_right_p(last) && regular_char_data_p(c))
+        || (regular_opt_unary_p(last) && regular_char_data_p(c))
+        || (regular_char_data_p(last) && regular_char_data_p(c))) {
         return true;
     } else {
         return false;

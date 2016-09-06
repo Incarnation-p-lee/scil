@@ -3,6 +3,10 @@ nfa_edge_map_create(char c)
 {
     s_nfa_edge_map_t *map;
 
+    if (regular_char_translated_p(c)) {
+        c = regular_char_translate_resume(c);
+    }
+
     map = dp_malloc(sizeof(*map));
     map->c = c;
     map->nfa = nfa_subset_rule_basic(c);
@@ -96,16 +100,6 @@ nfa_status_edge_chain(s_fa_status_t *status, char c, s_fa_status_t *succ)
         doubly_linked_list_insert_before(&status->adj_list->list, &edge->list);
     } else {
         status->adj_list = edge;
-    }
-}
-
-static inline bool
-nfa_char_alnum_underline_p(char c)
-{
-    if (dp_isalnum(c) || '_' == c) {
-        return true;
-    } else {
-        return false;
     }
 }
 

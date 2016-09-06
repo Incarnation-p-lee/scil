@@ -4,9 +4,9 @@
 #define HAVE_DEFINED_EXTERNAL_H
 
 extern bool nfa_engine_pattern_match_p(s_nfa_t *nfa, char *pn);
+extern bool regular_char_data_p(char c);
 extern bool regular_char_meta_p(char c);
 extern bool regular_char_translated_p(char c);
-extern bool regular_data_p(char c);
 extern bool regular_opt_binary_p(char c);
 extern bool regular_opt_bracket_left_p(char c);
 extern bool regular_opt_bracket_p(char c);
