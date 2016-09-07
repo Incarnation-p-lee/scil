@@ -35,6 +35,9 @@ tokenizer_language_c_init(void)
     language = dp_malloc(sizeof(*language));
 
     language->identifier = nfa_engine_create(LANG_C_RE_IDTR);
+    language->operator = nfa_engine_create(LANG_C_RE_OPTR);
+    language->constant = nfa_engine_create(LANG_C_RE_CNST);
+    language->punctuation = nfa_engine_create(LANG_C_RE_PCTT);
 
     return language;
 }
@@ -45,6 +48,9 @@ tokenizer_language_c_destroy(s_token_language_t *lang)
     assert_exit(lang);
 
     nfa_engine_destroy(lang->identifier);
+    nfa_engine_destroy(lang->operator);
+    nfa_engine_destroy(lang->constant);
+    nfa_engine_destroy(lang->punctuation);
     dp_free(lang);
 }
 

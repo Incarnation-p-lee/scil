@@ -38,9 +38,12 @@ regular_char_meta_p(char c)
 bool
 regular_char_data_p(char c)
 {
-    if (dp_isalpha(c) || dp_isdigit(c) || '_' == c) {
+    if (dp_isalpha(c) || dp_isdigit(c)) {
         return true;
     } else if (regular_char_translated_p(c)) {
+        return true;
+    } else if (D_QUOTE_CHAR == c || POUND_CHAR == c || B_SLASH_CHAR == c
+        || PERCENT_CHAR == c || SPACE_CHAR == c || UDRLINE_CHAR == c) {
         return true;
     } else {
         return false;

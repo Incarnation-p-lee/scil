@@ -62,6 +62,13 @@ test_tokenizer_nfa_engine_translate(void)
     TEST_ISOLATOR;
     s_nfa_t *nfa;
 
+    nfa = nfa_engine_create("\"[a-zA-Z %#0-9\\]+\"");
+    assert_caution(nfa_engine_pattern_match_p(nfa, "\"abcd\""));
+    assert_caution(nfa_engine_pattern_match_p(nfa, "\"We    are in kmalloc\\n\""));
+    assert_caution(!nfa_engine_pattern_match_p(nfa, "\"We_   are in kmalloc\""));
+    nfa_engine_destroy(nfa);
+
+
     nfa = nfa_engine_create("abcde");
     assert_caution(!nfa_engine_pattern_match_p(nfa, "abcd"));
     assert_caution(nfa_engine_pattern_match_p(nfa, "abcde"));

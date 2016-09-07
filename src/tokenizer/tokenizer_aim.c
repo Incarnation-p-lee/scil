@@ -88,7 +88,7 @@ tokenizer_char_double_quote_p(char *buf)
 {
     assert_exit(buf);
 
-    if (DOUBLE_QUOTE_CHAR == buf[0]) {
+    if (D_QUOTE_CHAR == buf[0]) {
         return true;
     } else {
         return false;

@@ -10,9 +10,9 @@
 
 // Language C regular expression
 #define LANG_C_RE_IDTR         "[A-Za-z_][a-zA-Z0-9_]*"
-#define LANG_C_RE_OPTR         ""
-#define LANG_C_RE_CNST         "[0-9]+|"
-#define LANG_C_RE_PCTT         "[,;]"
+#define LANG_C_RE_OPTR         "`+|`*|`?|-|/|=|>|<|~|^|%|!|&|."
+#define LANG_C_RE_CNST         "[0-9]+"
+#define LANG_C_RE_PCTT         "`[`],;`(`){}"
 
 typedef struct tokenizer_aim   s_tokenizer_aim_t;
 typedef struct io_buffer       s_io_buffer_t;

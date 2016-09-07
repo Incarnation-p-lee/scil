@@ -6,7 +6,13 @@
 #define SLASH_CHAR             '/'
 #define NLINE_CHAR             '\n'
 #define SENTINEL_CHAR          ((char)0x20)
-#define DOUBLE_QUOTE_CHAR      ((char)0x22)
+#define D_QUOTE_CHAR           ((char)0x22)     // double quote
+#define POUND_CHAR             '#'
+#define PERCENT_CHAR           '%'
+#define SPACE_CHAR             ' '
+#define UDRLINE_CHAR           '_'
+#define B_SLASH_CHAR           ((char)0x5c)     // back slash
+#define MARK_CHAR              ((char)0xa4)
 
 typedef struct fa        s_nfa_t;
 typedef struct fa        s_dfa_t;

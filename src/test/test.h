@@ -3,7 +3,6 @@
 
 #define TOKEN_AIM_DATA_FILE    "./data/kheap.c"
 
-
 #if 0
     #define TEST_ISOLATOR          return
 #else
