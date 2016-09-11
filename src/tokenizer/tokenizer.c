@@ -8,7 +8,8 @@
     #include "tokenizer_debug.c"
 #endif
 
+#include "token_lang.c"
 #include "tokenizer_aim.c"
 #include "tokenizer_file.c"
-#include "tokenizer_main.c"
+#include "tokenizer_lang.c"
 

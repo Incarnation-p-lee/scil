@@ -5,7 +5,7 @@
 
 #define NFA_LABEL_HASH_SIZE    127
 #define RE_EXPAND_MIN          8
-#define NFA_UNMATCHED_SIZE     0
+#define SZ_UNMATCH             -1
 
 struct nfa_edge_map {
     char    c;

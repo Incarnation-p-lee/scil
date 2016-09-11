@@ -5,7 +5,8 @@
 #define STAR_CHAR              '*'
 #define SLASH_CHAR             '/'
 #define NLINE_CHAR             '\n'
-#define SENTINEL_CHAR          ((char)0x20)
+#define SPACE_CHAR             ' '
+#define SENTINEL_CHAR          SPACE_CHAR
 #define D_QUOTE_CHAR           ((char)0x22)     // double quote
 #define POUND_CHAR             '#'
 #define PERCENT_CHAR           '%'

@@ -10,13 +10,13 @@
 
 // Language C regular expression
 #define LANG_C_RE_IDTR         "[A-Za-z_][a-zA-Z0-9_]*"
-#define LANG_C_RE_OPTR         "`+|`*|`?|-|/|=|>|<|~|^|%|!|&|."
-#define LANG_C_RE_CNST         "[0-9]+"
+#define LANG_C_RE_OPTR         "`+|`*|`?|-|/|`||~|^|%|!|&|.|:|=|>|<"
+#define LANG_C_RE_CNST         "[0-9]+|\"[a-zA-Z0-9_ #%]+\""
 #define LANG_C_RE_PCTT         "`[`],;`(`){}"
 
 typedef struct tokenizer_aim   s_tokenizer_aim_t;
 typedef struct io_buffer       s_io_buffer_t;
-typedef struct token_language  s_token_language_t;
+typedef struct token_lang  s_token_lang_t;
 
 struct tokenizer_aim {
     FILE          *fd;
@@ -38,11 +38,12 @@ struct io_buffer {
     char   buf[READ_BUF_SIZE + 1];
 };
 
-struct token_language {
-    s_nfa_t *operator;
-    s_nfa_t *identifier;
-    s_nfa_t *constant;
-    s_nfa_t *punctuation;
+struct token_lang {
+    e_token_lang_t type;
+    s_nfa_t            *operator;
+    s_nfa_t            *identifier;
+    s_nfa_t            *constant;
+    s_nfa_t            *punctuation;
 };
 
 #if defined DEBUG

@@ -398,7 +398,7 @@ nfa_engine_token_match_i(s_nfa_t *nfa, char *pn, const char sentinel)
     if (nfa_engine_terminal_reached_p(master)) {
         token_size = PTR_SIZE_OF(c, pn);
     } else {
-        token_size = NFA_UNMATCHED_SIZE;
+        token_size = SZ_UNMATCH;
     }
 
 MATCH_DONE:
@@ -411,11 +411,11 @@ uint32
 nfa_engine_token_match(s_nfa_t *nfa, char *pn, const char sentinel)
 {
     if (!pn) {
-        return NFA_UNMATCHED_SIZE;
+        return SZ_UNMATCH;
     } else if (!nfa_engine_structure_legal_p(nfa)) {
-        return NFA_UNMATCHED_SIZE;
+        return SZ_UNMATCH;
     } else if (!nfa_engine_graph_legal_p(nfa)) {
-        return NFA_UNMATCHED_SIZE;
+        return SZ_UNMATCH;
     } else {
         return nfa_engine_token_match_i(nfa, pn, sentinel);
     }
