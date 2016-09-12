@@ -2,11 +2,11 @@
 #define HAVE_DEFINED_FINITE_AUTOMATA_H
 
 #define NULL_CHAR              ((char)0)
+#define PTR_CHAR               '.'
 #define STAR_CHAR              '*'
 #define SLASH_CHAR             '/'
 #define NLINE_CHAR             '\n'
 #define SPACE_CHAR             ' '
-#define SENTINEL_CHAR          SPACE_CHAR
 #define D_QUOTE_CHAR           ((char)0x22)     // double quote
 #define POUND_CHAR             '#'
 #define PERCENT_CHAR           '%'
@@ -14,6 +14,9 @@
 #define UDRLINE_CHAR           '_'
 #define B_SLASH_CHAR           ((char)0x5c)     // back slash
 #define MARK_CHAR              ((char)0xa4)
+
+#define SENTINEL_CHAR          SPACE_CHAR
+#define SPLIT_CHAR             PTR_CHAR
 
 typedef struct fa        s_nfa_t;
 typedef struct fa        s_dfa_t;

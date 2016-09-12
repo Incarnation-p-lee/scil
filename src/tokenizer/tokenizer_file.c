@@ -20,7 +20,7 @@ tokenizer_file_process_i(char *filename)
 
     assert_exit(filename);
 
-    lang = tokenizer_lang_create(TK_LANG_C);
+    lang = tokenizer_lang_create(filename);
     aim = tokenizer_aim_open(filename);
 
     token_head = dp_malloc(sizeof(s_token_t));
@@ -55,5 +55,12 @@ tokenizer_file_process_io_buffer(s_io_buffer_t *buffer, s_token_t *token_head,
     while (c < limit + buffer->buf) {
         n = nfa_engine_token_match(lang->operator, c, SENTINEL_CHAR);
     }
+}
+
+static inline uint32
+token_lang_match_operator(s_token_lang_t *lang, s_token_t *token_head, char *buf)
+{
+
+
 }
 

@@ -5,9 +5,10 @@
 #define TK_OPTR_SZ               8
 #define TK_OPTR_DUAL(x, y)       (((x) << TK_OPTR_SZ) + (y))
 #define TK_OPTR_TRIPLE(x, y, z)  ((TK_OPTR_DUAL(x, y) << TK_OPTR_SZ) + (z))
+#define TK_LANG_DUAL(x, y)       TK_OPTR_DUAL(x, y)
 
 typedef enum lexeme              e_lexeme_t;
-typedef enum token_lang          e_token_lang_t;
+typedef enum token_lang_type     e_token_lang_type_t;
 typedef enum token_lang_c_optr   e_token_lang_c_optr_t;
 typedef struct token             s_token_t;
 typedef struct token_c_optr      s_token_c_optr_t;
@@ -57,11 +58,10 @@ enum token_lang_c_optr {
     TK_OPTR_SHTE_R  = TK_OPTR_TRIPLE(TK_OPTR_GT, TK_OPTR_GT, TK_OPTR_EQ), // >>=
 };
 
-enum token_lang {
-    TK_LANG_C    = 1,
+enum token_lang_type {
+    TK_LANG_C    = 'c',
+    TK_LANG_CPP  = TK_OPTR_TRIPLE('c', 'p', 'p'),
 
-    TK_LANG_FISRT = TK_LANG_C,
-    TK_LANG_LAST  = TK_LANG_C,
 };
 
 

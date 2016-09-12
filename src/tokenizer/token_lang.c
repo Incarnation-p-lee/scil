@@ -1,1 +1,1 @@
-#include "token_lang_c.c"
+#include "token_lang_type_c.c"

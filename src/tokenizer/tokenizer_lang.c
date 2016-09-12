@@ -1,11 +1,37 @@
-static inline s_token_lang_t *
-tokenizer_lang_create(e_token_lang_t lang_type)
+static inline bool
+tokenizer_lang_type_legal_p(e_token_lang_type_t lang_type)
 {
+    switch (lang_type) {
+        case TK_LANG_C:
+        case TK_LANG_CPP:
+            return true;
+        default:
+            return false;
+    }
+}
+
+static inline s_token_lang__t *
+tokenizer_lang_create(char *filename)
+{
+    char *c;
     s_token_lang_t *lang;
+    e_token_lang_type_t type;
+
+    assert_exit(filename);
+
+    c = dp_strrchr(filename, SPLIT_CHAR);
+    c++;
+
+    type = (e_token_lang_type_t)*c++;
+    while (*c) {
+        type = TK_OPTR_DUAL(type, (e_token_lang_type_t)*c++);
+    }
+    assert_exit(tokenizer_lang_type_legal_p(type));
 
     lang = dp_malloc(sizeof(*lang));
-    lang->type = lang_type;
-    tokenizer_lang_nfa_init(lang_type);
+    lang->type = type;
+    lang->sentinel = SENTINEL_CHAR;
+    tokenizer_lang_nfa_init(lang);
 
     return lang;
 }
@@ -44,7 +70,7 @@ tokenizer_lang_nfa_init(s_token_lang_t *lang)
 
     switch (lang->type) {
         case TK_LANG_C:
-            lang = tokenizer_lang_c_init(lang);
+            tokenizer_lang_c_init(lang);
             break;
         default:
             assert_exit(false);

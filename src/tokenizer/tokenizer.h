@@ -16,7 +16,7 @@
 
 typedef struct tokenizer_aim   s_tokenizer_aim_t;
 typedef struct io_buffer       s_io_buffer_t;
-typedef struct token_lang  s_token_lang_t;
+typedef struct token_lang      s_token_lang_t;
 
 struct tokenizer_aim {
     FILE          *fd;
@@ -39,11 +39,12 @@ struct io_buffer {
 };
 
 struct token_lang {
-    e_token_lang_t type;
-    s_nfa_t            *operator;
-    s_nfa_t            *identifier;
-    s_nfa_t            *constant;
-    s_nfa_t            *punctuation;
+    char                sentinel;
+    e_token_lang_type_t type;
+    s_nfa_t             *operator;
+    s_nfa_t             *identifier;
+    s_nfa_t             *constant;
+    s_nfa_t             *punctuation;
 };
 
 #if defined DEBUG
