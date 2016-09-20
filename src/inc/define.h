@@ -9,6 +9,7 @@
 #define TO_STRING(x)           (#x)
 #define CONTAINS_OF(addr, type, member) \
                                (void *)((ptr_t)(addr) - (ptr_t)(&((type *)0)->member))
+#define ARRAY_SIZE_OF(y)       (sizeof(y) / sizeof(y[0]))
 
 #define assert_caution(exp)    do {                                                                  \
                                    if (!(exp)) {                                                     \

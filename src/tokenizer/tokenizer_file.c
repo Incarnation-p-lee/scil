@@ -16,7 +16,7 @@ tokenizer_file_process_i(char *filename)
 {
     s_token_t *token_head;
     s_tokenizer_aim_t *aim;
-    s_token_lang_t *lang;
+    s_tokenizer_lang_t *lang;
 
     assert_exit(filename);
 
@@ -38,7 +38,7 @@ tokenizer_file_process_i(char *filename)
 
 static inline void
 tokenizer_file_process_io_buffer(s_io_buffer_t *buffer, s_token_t *token_head,
-    s_token_lang_t *lang)
+    s_tokenizer_lang_t *lang)
 {
     char *c;
     uint32 limit, n;
@@ -53,14 +53,25 @@ tokenizer_file_process_io_buffer(s_io_buffer_t *buffer, s_token_t *token_head,
     limit = buffer->size;
 
     while (c < limit + buffer->buf) {
-        n = nfa_engine_token_match(lang->operator, c, SENTINEL_CHAR);
+        n = token_lang_match_operator(lang->operator, token_head, c);
+        c += n;
+        n = token_lang_match_identifer(lang->operator, token_head, c);
     }
 }
 
 static inline uint32
-token_lang_match_operator(s_token_lang_t *lang, s_token_t *token_head, char *buf)
+token_lang_match_operator(s_tokenizer_lang_t *lang, s_token_t *token_head, char *buf)
 {
+    assert_exit(buf);
+    assert_exit(tokenizer_lang_structure_legal_p(lang));
+    assert_exit(token_structure_legal_p(token_head));
 
-
+    switch (lang->type) {
+        case TK_LANG_C:
+            return token_lang_c_match_operator(lang->operator, token_head, buf);
+        default:
+            assert_exit(false);
+            return 0;
+    }
 }
 

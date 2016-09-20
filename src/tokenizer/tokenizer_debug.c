@@ -45,3 +45,11 @@ tokenizer_io_buffer_print(s_io_buffer_t *buffer)
     scil_log_print("]\n<End of Print IO buffer>\n\n");
 }
 
+static inline void
+token_lang_c_keyword_trie_legal_p(s_token_lang_c_keyword_t *keyword_trie)
+{
+    char **tmp;
+
+
+}
+

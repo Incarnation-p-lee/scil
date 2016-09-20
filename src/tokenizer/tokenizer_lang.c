@@ -10,11 +10,11 @@ tokenizer_lang_type_legal_p(e_token_lang_type_t lang_type)
     }
 }
 
-static inline s_token_lang__t *
+static inline s_tokenizer_lang_t *
 tokenizer_lang_create(char *filename)
 {
     char *c;
-    s_token_lang_t *lang;
+    s_tokenizer_lang_t *lang;
     e_token_lang_type_t type;
 
     assert_exit(filename);
@@ -30,14 +30,13 @@ tokenizer_lang_create(char *filename)
 
     lang = dp_malloc(sizeof(*lang));
     lang->type = type;
-    lang->sentinel = SENTINEL_CHAR;
-    tokenizer_lang_nfa_init(lang);
+    tokenizer_lang_init(lang);
 
     return lang;
 }
 
 static inline bool
-tokenizer_lang_structure_legal_p(s_token_lang_t *lang)
+tokenizer_lang_structure_legal_p(s_tokenizer_lang_t *lang)
 {
     if (!lang) {
         return false;
@@ -52,7 +51,40 @@ tokenizer_lang_structure_legal_p(s_token_lang_t *lang)
 }
 
 static inline void
-tokenizer_lang_destroy(s_token_lang_t *lang)
+tokenizer_lang_destroy(s_tokenizer_lang_t *lang)
+{
+    assert_exit(tokenizer_lang_structure_legal_p(lang));
+
+    switch (lang->type) {
+        case TK_LANG_C:
+            tokenizer_lang_c_destroy(lang);
+        default:
+            assert_exit(false);
+            break;
+    }
+}
+
+static inline void
+tokenizer_lang_c_destroy(s_tokenizer_lang_t *lang)
+{
+    assert_exit(tokenizer_lang_structure_legal_p(lang));
+
+    tokenizer_lang_c_nfa_engine_destroy(lang);
+    tokenizer_lang_c_keyword_trie_destroy(lang);
+
+    dp_free(lang);
+}
+
+static inline void
+tokenizer_lang_c_keyword_trie_destroy(s_tokenizer_lang_t *lang)
+{
+    assert_exit(lang);
+
+    token_lang_c_keyword_trie_destroy(lang->keyword_trie);
+}
+
+static inline void
+tokenizer_lang_c_nfa_engine_destroy(s_tokenizer_lang_t *lang)
 {
     assert_exit(lang);
 
@@ -60,11 +92,10 @@ tokenizer_lang_destroy(s_token_lang_t *lang)
     nfa_engine_destroy(lang->operator);
     nfa_engine_destroy(lang->constant);
     nfa_engine_destroy(lang->punctuation);
-    dp_free(lang);
 }
 
 static inline void
-tokenizer_lang_nfa_init(s_token_lang_t *lang)
+tokenizer_lang_init(s_tokenizer_lang_t *lang)
 {
     assert_exit(lang);
 
@@ -79,7 +110,16 @@ tokenizer_lang_nfa_init(s_token_lang_t *lang)
 }
 
 static inline void
-tokenizer_lang_c_init(s_token_lang_t *lang)
+tokenizer_lang_c_init(s_tokenizer_lang_t *lang)
+{
+    assert_exit(lang);
+
+    tokenizer_lang_c_nfa_engine_init(lang);
+    tokenizer_lang_c_keyword_trie_init(lang);
+}
+
+static inline void
+tokenizer_lang_c_nfa_engine_init(s_tokenizer_lang_t *lang)
 {
     assert_exit(lang);
 
@@ -87,5 +127,13 @@ tokenizer_lang_c_init(s_token_lang_t *lang)
     lang->operator = nfa_engine_create(LANG_C_RE_OPTR);
     lang->constant = nfa_engine_create(LANG_C_RE_CNST);
     lang->punctuation = nfa_engine_create(LANG_C_RE_PCTT);
+}
+
+static inline void
+tokenizer_lang_c_keyword_trie_init(s_tokenizer_lang_t *lang)
+{
+    assert_exit(lang);
+
+    lang->keyword_trie = token_lang_c_keyword_trie_create();
 }
 

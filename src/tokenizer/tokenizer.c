@@ -2,6 +2,7 @@
 #include "finite_automata.h"
 
 #include "tokenizer.h"
+#include "token_lang.h"
 #include "tokenizer_declaration.h"
 
 #if defined DEBUG

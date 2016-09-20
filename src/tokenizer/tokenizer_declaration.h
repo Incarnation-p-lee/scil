@@ -18,8 +18,8 @@ static inline bool tokenizer_char_single_comment_p(char *buf);
 static inline bool tokenizer_io_buffer_reach_limit_p(s_io_buffer_t *buffer);
 static inline bool tokenizer_io_buffer_structure_legal_p(s_io_buffer_t *buf);
 static inline s_io_buffer_t * tokenizer_aim_open_buffer_create(void);
-static inline s_token_lang_type_t * tokenizer_lang_c_init(void);
-static inline s_token_lang_type_t * tokenizer_lang_init(e_token_lang_type_t lang_type);
+static inline s_tokenizer_lang_type_t * tokenizer_lang_c_init(void);
+static inline s_tokenizer_lang_type_t * tokenizer_lang_init(e_token_lang_type_t lang_type);
 static inline s_token_t * tokenizer_file_process_i(char *filename);
 static inline s_tokenizer_aim_t * tokenizer_aim_open(char *fname);
 static inline uint32 tokenizer_aim_skip_multiple_comment(s_tokenizer_aim_t *aim, uint32 index);
@@ -30,6 +30,6 @@ static inline void tokenizer_file_process_io_buffer(s_io_buffer_t *buffer, s_tok
 static void tokenizer_aim_close_print(char *fname);
 static void tokenizer_aim_open_print(char *fname);
 static void tokenizer_io_buffer_print(s_io_buffer_t *buffer);
-static void tokenizer_lang_c_destroy(s_token_lang_type_t *lang);
+static void tokenizer_lang_c_destroy(s_tokenizer_lang_type_t *lang);
 
 #endif

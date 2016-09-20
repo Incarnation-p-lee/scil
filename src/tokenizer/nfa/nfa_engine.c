@@ -356,7 +356,7 @@ nfa_engine_pattern_match_p(s_nfa_t *nfa, char *pn)
 }
 
 static inline uint32
-nfa_engine_token_match_i(s_nfa_t *nfa, char *pn, const char sentinel)
+nfa_engine_token_match_i(s_nfa_t *nfa, char *pn)
 {
     char *c;
     uint32 token_size;
@@ -373,7 +373,7 @@ nfa_engine_token_match_i(s_nfa_t *nfa, char *pn, const char sentinel)
     master = array_queue_create();
     nfa_engine_pattern_match_setup(master, nfa);
 
-    while (*c && sentinel != *c) {
+    while (*c && SENTINEL_CHAR != *c) {
         while (!array_queue_empty_p(master)) {
             status = array_queue_leave(master);
             if (status->adj_list) {
@@ -408,7 +408,7 @@ MATCH_DONE:
 }
 
 uint32
-nfa_engine_token_match(s_nfa_t *nfa, char *pn, const char sentinel)
+nfa_engine_token_match(s_nfa_t *nfa, char *pn)
 {
     if (!pn) {
         return SZ_UNMATCH;
@@ -417,7 +417,7 @@ nfa_engine_token_match(s_nfa_t *nfa, char *pn, const char sentinel)
     } else if (!nfa_engine_graph_legal_p(nfa)) {
         return SZ_UNMATCH;
     } else {
-        return nfa_engine_token_match_i(nfa, pn, sentinel);
+        return nfa_engine_token_match_i(nfa, pn);
     }
 }
 
