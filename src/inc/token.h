@@ -14,6 +14,7 @@ typedef enum token_low_letter          e_token_low_letter_t;
 typedef struct token                   s_token_t;
 typedef struct token_lang_c_optr       s_token_lang_c_optr_t;
 typedef struct token_lang_c_idtr       s_token_lang_c_idtr_t;
+typedef struct token_lang_c_cnst       s_token_lang_c_cnst_t;
 
 enum lexeme {
     LEX_HEAD,
@@ -109,45 +110,45 @@ static const char *lang_c_keyword[] = {
 };
 
 enum token_lang_c_keyword_type {
-    TK_IDTR_C_ASM,
-    TK_IDTR_C_AUTO,
-    TK_IDTR_C_BREAK,
-    TK_IDTR_C_CASE,
-    TK_IDTR_C_CHAR,
-    TK_IDTR_C_CONST,
-    TK_IDTR_C_CONTINUE,
-    TK_IDTR_C_DEFAULT,
-    TK_IDTR_C_DOUBLE,
-    TK_IDTR_C_DO,
-    TK_IDTR_C_ELSE,
-    TK_IDTR_C_ENUM,
-    TK_IDTR_C_EXTERN,
-    TK_IDTR_C_FLOAT,
-    TK_IDTR_C_FOR,
-    TK_IDTR_C_GOTO,
-    TK_IDTR_C_IF,
-    TK_IDTR_C_INLINE,
-    TK_IDTR_C_INT,
-    TK_IDTR_C_LONG,
-    TK_IDTR_C_REGISTER,
-    TK_IDTR_C_RESTRICT,
-    TK_IDTR_C_RETURN,
-    TK_IDTR_C_SHORT,
-    TK_IDTR_C_SIGNED,
-    TK_IDTR_C_SIZEOF,
-    TK_IDTR_C_STATIC,
-    TK_IDTR_C_STRUCT,
-    TK_IDTR_C_SWITCH,
-    TK_IDTR_C_TYPEDEF,
-    TK_IDTR_C_UNION,
-    TK_IDTR_C_UNSIGNED,
-    TK_IDTR_C_VOID,
-    TK_IDTR_C_VOLATILE,
-    TK_IDTR_C_WHILE,
-    TK_IDTR_C_NONE,
+    TK_C_IDTR_ASM,
+    TK_C_IDTR_AUTO,
+    TK_C_IDTR_BREAK,
+    TK_C_IDTR_CASE,
+    TK_C_IDTR_CHAR,
+    TK_C_IDTR_CONST,
+    TK_C_IDTR_CONTINUE,
+    TK_C_IDTR_DEFAULT,
+    TK_C_IDTR_DOUBLE,
+    TK_C_IDTR_DO,
+    TK_C_IDTR_ELSE,
+    TK_C_IDTR_ENUM,
+    TK_C_IDTR_EXTERN,
+    TK_C_IDTR_FLOAT,
+    TK_C_IDTR_FOR,
+    TK_C_IDTR_GOTO,
+    TK_C_IDTR_IF,
+    TK_C_IDTR_INLINE,
+    TK_C_IDTR_INT,
+    TK_C_IDTR_LONG,
+    TK_C_IDTR_REGISTER,
+    TK_C_IDTR_RESTRICT,
+    TK_C_IDTR_RETURN,
+    TK_C_IDTR_SHORT,
+    TK_C_IDTR_SIGNED,
+    TK_C_IDTR_SIZEOF,
+    TK_C_IDTR_STATIC,
+    TK_C_IDTR_STRUCT,
+    TK_C_IDTR_SWITCH,
+    TK_C_IDTR_TYPEDEF,
+    TK_C_IDTR_UNION,
+    TK_C_IDTR_UNSIGNED,
+    TK_C_IDTR_VOID,
+    TK_C_IDTR_VOLATILE,
+    TK_C_IDTR_WHILE,
+    TK_C_IDTR_NONE,
 
-    TK_IDTR_C_FIRST = TK_IDTR_C_ASM,
-    TK_IDTR_C_LAST  = TK_IDTR_C_NONE,
+    TK_C_IDTR_FIRST = TK_C_IDTR_ASM,
+    TK_C_IDTR_LAST  = TK_C_IDTR_NONE,
 };
 
 struct token_lang_c_optr {
@@ -160,6 +161,9 @@ struct token_lang_c_idtr {
         e_token_lang_c_keyword_type_t type;
         char *name;
     };
+};
+
+enum token_lang_c_cnst_type {
 };
 
 struct token_lang_c_cnst {

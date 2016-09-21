@@ -49,7 +49,7 @@ token_lang_c_keyword_seek(s_token_lang_c_keyword_t *keyword_trie, s_token_t *tok
     data = token->data;
     type = token_lang_c_keyword_match(keyword_tire, data->name);
 
-    if (TK_IDTR_C_NONE != type) {
+    if (TK_C_IDTR_NONE != type) {
         dp_free(data->name);
 
         data->is_keyword = true;
@@ -291,7 +291,7 @@ token_lang_c_keyword_to_type(char **keyword)
 
     type = (e_token_lang_c_keyword_type_t)(keyword - (char **)lang_c_keyword);
 
-    assert_exit(TK_IDTR_C_FIRST <= type && TK_IDTR_C_LAST > type);
+    assert_exit(TK_C_IDTR_FIRST <= type && TK_C_IDTR_LAST > type);
     return type;
 }
 
@@ -302,7 +302,7 @@ token_lang_c_keyword_structure_legal_p(s_token_lang_c_keyword_t *node)
         return false;
     } else if (NULL_CHAR != node->c && !regular_char_data_p(node->c)) {
         return false;
-    } else if (TK_IDTR_C_FIRST > node->type || TK_IDTR_C_LAST < node->type) {
+    } else if (TK_C_IDTR_FIRST > node->type || TK_C_IDTR_LAST < node->type) {
         return false;
     } else {
         return true;
@@ -318,7 +318,7 @@ token_lang_c_keyword_trie_node_create(char c)
 
     node = dp_malloc(sizeof(*node));
     node->c = c;
-    node->type = TK_IDTR_C_NONE;
+    node->type = TK_C_IDTR_NONE;
     dp_memset(node->children, 0, sizeof(node->children));
 
     assert_exit(token_lang_c_keyword_structure_legal_p(node));
@@ -434,14 +434,14 @@ token_lang_c_keyword_match(s_token_lang_c_keyword_t *keyword_trie,
         assert_exit(child <= root->children + TOKEN_LANG_SUB_SIZE);
 
         if (!*child) {
-            return TK_IDTR_C_NONE;
+            return TK_C_IDTR_NONE;
         }
     }
 
     if (!token_lang_c_keyword_trie_node_leaf_p(*child)) {
-        return TK_IDTR_C_NONE;
+        return TK_C_IDTR_NONE;
     } else {
-        assert_exit(TK_IDTR_C_NONE != (*child)->type);
+        assert_exit(TK_C_IDTR_NONE != (*child)->type);
         return (*child)->type;
     }
 }
