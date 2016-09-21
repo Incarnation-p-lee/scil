@@ -162,6 +162,11 @@ struct token_lang_c_idtr {
     };
 };
 
+struct token_lang_c_cnst {
+
+
+};
+
 
 #endif
 

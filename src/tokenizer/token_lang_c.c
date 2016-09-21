@@ -1,5 +1,5 @@
 static inline uint32
-token_lang_c_match_operator(s_nfa_engine_t *nfa, s_token_t *token_head, char *buf)
+token_lang_c_operator_match(s_nfa_engine_t *nfa, s_token_t *token_head, char *buf)
 {
     uint32 retval;
     s_token_lang_c_optr_t *data;
@@ -22,7 +22,7 @@ token_lang_c_match_operator(s_nfa_engine_t *nfa, s_token_t *token_head, char *bu
             token = token_lang_c_optr_create(tmp);
             token_insert_before(token_head, token);
         } else {
-            token_last = token_list_last_node(token_head);
+            token_last = token_list_previous_node(token_head);
             optr_last = token_lang_c_optr_type_get(token_last);
 
             if (token_lang_c_optr_consist_of_p(optr_last, optr)) {
@@ -37,13 +37,32 @@ token_lang_c_match_operator(s_nfa_engine_t *nfa, s_token_t *token_head, char *bu
     }
 }
 
+static inline void
+token_lang_c_keyword_seek(s_token_lang_c_keyword_t *keyword_trie, s_token_t *token)
+{
+    s_token_lang_c_idtr_t *data;
+    e_token_lang_c_keyword_type_t type;
+
+    assert_exit(token_structure_legal_p(token));
+    assert_exit(token_lang_c_keyword_structure_legal_p(keyword_trie));
+
+    data = token->data;
+    type = token_lang_c_keyword_match(keyword_tire, data->name);
+
+    if (TK_IDTR_C_NONE != type) {
+        dp_free(data->name);
+
+        data->is_keyword = true;
+        data->type = type;
+    }
+}
+
 static inline uint32
-token_lang_c_match_identifier(s_nfa_engine_t *nfa, s_token_t *token_head, char *buf)
+token_lang_c_identifier_match(s_nfa_engine_t *nfa, s_token_t *token_head, char *buf)
 {
     char **k;
     uint32 retval;
     s_token_t *token;
-    s_token_lang_c_idtr_t *data;
 
     assert_exit(buf);
     assert_exit(nfa_engine_structure_legal_p(nfa));
@@ -55,23 +74,19 @@ token_lang_c_match_identifier(s_nfa_engine_t *nfa, s_token_t *token_head, char *
         return 0;
     } else {
         token = token_lang_c_idtr_create(buf, retval);
-        data = token->data;
-
-        // Trie ?
-        k = lang_c_keyword;
-        while (k < lang_c_keyword + ARRAY_SIZE_OF(lang_c_keyword)) {
-            if (0 == dp_strcmp(k[0], data->name)) {
-                data->is_keyword = true;
-                dp_free(data->name);
-                data->type = (e_token_lang_c_idtr_t)(k - lang_c_keyword);
-                break;
-            }
-            k++;
-        }
+        token_insert_before(token_head, token);
 
         return retval;
     }
 }
+
+static inline uint32
+token_lang_c_constant_match(s_nfa_engine_t *nfa, s_token_t *token_head, char *buf)
+{
+
+
+}
+
 
 static inline bool
 token_lang_c_optr_consist_of_p(e_token_lang_c_optr_t prefix,
@@ -324,6 +339,7 @@ token_lang_c_keyword_trie_create(void)
         tmp++;
     }
 
+    assert_exit(token_lang_c_keyword_trie_legal_p(keyword_root));
     return keyword_root;
 }
 
@@ -394,7 +410,7 @@ token_lang_c_keyword_trie_node_leaf_p(s_token_lang_c_keyword_t *node)
 }
 
 static inline e_token_lang_c_keyword_type_t
-token_lang_c_keyword_trie_type_match(s_token_lang_c_keyword_t *keyword_trie,
+token_lang_c_keyword_match(s_token_lang_c_keyword_t *keyword_trie,
     char *idtr)
 {
     char *c;

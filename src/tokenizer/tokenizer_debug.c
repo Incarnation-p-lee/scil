@@ -49,7 +49,20 @@ static inline void
 token_lang_c_keyword_trie_legal_p(s_token_lang_c_keyword_t *keyword_trie)
 {
     char **tmp;
+    s_token_lang_c_keyword_t *root;
 
+    assert_exit(token_lang_c_keyword_structure_legal_p(keyword_trie));
 
+    root = keyword_trie;
+    tmp = lang_c_keyword;
+
+    while (tmp < lang_c_keyword + ARRAY_SIZE_OF(lang_c_keyword)) {
+        if (TK_IDTR_C_NONE == token_lang_c_keyword_match(root, *tmp)) {
+            return false;
+        }
+        tmp++;
+    }
+
+    return true;
 }
 

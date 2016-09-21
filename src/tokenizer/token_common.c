@@ -13,11 +13,11 @@ token_structure_legal_p(s_token_t *token)
 }
 
 static inline s_token_t *
-token_list_last_node(s_token_t *token_head)
+token_list_previous_node(s_token_t *token)
 {
-    assert_exit(token_structure_legal_p(token_had));
+    assert_exit(token_structure_legal_p(token));
 
-    return CONTAINS_OF(&token_head->list.previous, s_token_t, list);
+    return CONTAINS_OF(&token->list.previous, s_token_t, list);
 }
 
 static inline void
