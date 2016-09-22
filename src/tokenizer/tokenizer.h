@@ -21,7 +21,7 @@ typedef enum tokenizer_lang_type e_tokenizer_lang_type_t;
 
 enum tokenizer_lang_type {
     TK_LANG_C    = 'c',
-    TK_LANG_CPP  = TK_OPTR_TRIPLE('c', 'p', 'p'),
+    TK_LANG_CPP  = TK_C_OPTR_TRIPLE('c', 'p', 'p'),
 
 };
 

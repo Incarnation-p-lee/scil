@@ -24,7 +24,7 @@ tokenizer_lang_create(char *filename)
 
     type = (e_token_lang_type_t)*c++;
     while (*c) {
-        type = TK_OPTR_DUAL(type, (e_token_lang_type_t)*c++);
+        type = TK_C_OPTR_DUAL(type, (e_token_lang_type_t)*c++);
     }
     assert_exit(tokenizer_lang_type_legal_p(type));
 

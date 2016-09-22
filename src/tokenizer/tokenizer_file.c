@@ -56,6 +56,7 @@ tokenizer_file_process_io_buffer(s_io_buffer_t *buffer, s_token_t *token_head,
         c += token_lang_operator_match(lang->operator, token_head, c);
         c += token_lang_identifer_match(lang->operator, token_head, c);
         c += token_lang_constant_match(lang->constant, token_head, c);
+        c += token_lang_punctuation_match(lang->punctuation, token_head, c);
     }
 }
 
@@ -87,7 +88,7 @@ token_lang_identifer_match(s_tokenizer_lang_t *lang, s_token_t *token_head, char
 
     switch (lang->type) {
         case TK_LANG_C:
-            n = token_lang_c_identifier_match(lang->operator, token_head, buf);
+            n = token_lang_c_identifier_match(lang->identifier, token_head, buf);
             if (n) {
                 token = token_list_previous_node(token_head);
                 token_lang_c_keyword_seek(lang->keyword_trie, token);
@@ -103,14 +104,29 @@ token_lang_identifer_match(s_tokenizer_lang_t *lang, s_token_t *token_head, char
 static inline uint32
 token_lang_constant_match(s_tokenizer_lang_t *lang, s_token_t *token_head, char *buf)
 {
-
     assert_exit(buf);
     assert_exit(tokenizer_lang_structure_legal_p(lang));
     assert_exit(token_structure_legal_p(token_head));
 
     switch (lang->type) {
         case TK_LANG_C:
-            return token_lang_c_constant_match(lang->operator, token_head, buf);
+            return token_lang_c_constant_match(lang->constant, token_head, buf);
+        default:
+            assert_exit(false);
+            return 0;
+    }
+}
+
+static inline uint32
+token_lang_punctuation_match(s_tokenizer_lang_t *lang, s_token_t *token_head, char *buf)
+{
+    assert_exit(buf);
+    assert_exit(tokenizer_lang_structure_legal_p(lang));
+    assert_exit(token_structure_legal_p(token_head));
+
+    switch (lang->type) {
+        case TK_LANG_C:
+            return token_lang_c_punctuation_match(lang->operator, token_head, buf);
         default:
             assert_exit(false);
             return 0;
