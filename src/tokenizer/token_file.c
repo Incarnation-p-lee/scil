@@ -1,18 +1,70 @@
-s_token_t *
-tokenizer_file_process(char *filename)
+s_token_file_t *
+token_file_list_process(char **file_list, uint32_t count)
 {
-    if (!filename) {
-        scil_log_print_and_exit("Attempt to access NULL pointer.\n");
+    char **fname;
+    s_token_file_t *token_file_head, *token_file;
+
+    if (!file_list || !count) {
         return PTR_INVALID;
     } else {
-        s_token_t * tk = tokenizer_file_process_i(filename);
-        dp_free(tk);
-        return NULL;
+        token_file_head = dp_malloc(sizeof(*token_file_head));
+        token_file_head->filename = token_file_head->token_head = NULL;
+        doubly_linked_list_initial(&token_file_head->list);
+
+        fname = file_list;
+        while (fname < file_list + count) {
+            token_file = token_file_process(*fname);
+            token_file_insert_before(&fake_head, token_file);
+            fname++;
+        }
+
+        return token_file_head;
     }
 }
 
+static inline bool
+token_file_structure_legal_p(s_token_file_t *token_file)
+{
+    if (!token_file) {
+        return false;
+    } else if (!token_file->filename) {
+        return false;
+    } else if (!token_file->token_head) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+static inline void
+token_file_insert_before(s_token_file_t *token_file, s_token_file_t *token_node)
+{
+    assert_exit(token_file_structure_legal_p(token_file));
+    assert_exit(token_file_structure_legal_p(token_node));
+
+    doubly_linked_list_insert_before(&token_file->list, &token_node->list);
+}
+
+static inline s_token_file_t *
+token_file_process(char *fname)
+{
+    uint32_t len;
+    s_token_file_t *token_file;
+
+    assert_exit(filename);
+
+    token_file = dp_malloc(sizeof(*token_file));
+
+    len = dp_strlen(fname) + 1;
+    token_file->filename = dp_malloc(len);
+    dp_strcpy(token_file->filename, fname);
+
+    token_file->token_head = token_file_process_i(fname);
+    return token_file;
+}
+
 static inline s_token_t *
-tokenizer_file_process_i(char *filename)
+token_file_process_i(char *filename)
 {
     s_token_t *token_head;
     s_tokenizer_aim_t *aim;

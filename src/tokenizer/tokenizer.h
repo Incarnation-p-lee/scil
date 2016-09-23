@@ -17,6 +17,7 @@
 typedef struct tokenizer_aim     s_tokenizer_aim_t;
 typedef struct io_buffer         s_io_buffer_t;
 typedef struct tokenizer_lang    s_tokenizer_lang_t;
+typedef struct token_file        s_token_file_t;
 typedef enum tokenizer_lang_type e_tokenizer_lang_type_t;
 
 enum tokenizer_lang_type {
@@ -41,8 +42,6 @@ struct tokenizer_lang {
     s_nfa_t                 *punctuation;
 };
 
-
-
 /*
  * Start indicate the read start index of buf
  * If start == READ_BUF_SIZE || NULL_CHAR == buf[start]
@@ -54,6 +53,12 @@ struct io_buffer {
         uint32 size;   // For secondary buf
     };
     char   buf[READ_BUF_SIZE + 1];
+};
+
+struct token_file {
+    char                   *filename;
+    s_token_t              *token_head;
+    s_doubly_linked_list_t list;
 };
 
 #if defined DEBUG
