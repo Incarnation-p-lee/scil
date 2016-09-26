@@ -1,6 +1,9 @@
 #include "depends.h"
 #include "finite_automata.h"
 
+#include "../tokenizer_define.h"
+#include "../tokenizer_external.h"
+
 #include "nfa.h"
 #include "regular.h"
 #include "nfa_declaration.h"

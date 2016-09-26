@@ -1,5 +1,5 @@
 void
-assert_print_exit(char *msg, const char *fname,const char *func,
+assert_print_exit(char *msg, const char *fname, const char *func,
     uint32 line)
 {
     assert_print_caution(msg, fname, func, line);

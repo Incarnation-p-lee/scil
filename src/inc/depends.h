@@ -32,6 +32,7 @@
 #define dp_memcpy              memcpy
 #define dp_strlen              strlen
 #define dp_strcpy              strcpy
+#define dp_strrchr             strrchr
 
 #if defined DEBUG
     #define dp_malloc          memory_track_malloc
@@ -47,7 +48,6 @@
 #include "data_structure_interface.h"
 #include "define.h"
 #include "finite_automata.h"
-#include "token.h"
 
 #include "external.h"
 

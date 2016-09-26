@@ -1,5 +1,5 @@
 s_token_file_t *
-token_file_list_process(char **file_list, uint32_t count)
+token_file_list_process(char **file_list, uint32 count)
 {
     char **fname;
     s_token_file_t *token_file_head, *token_file;
@@ -20,6 +20,32 @@ token_file_list_process(char **file_list, uint32_t count)
 
         return token_file_head;
     }
+}
+
+void
+token_file_list_destroy(s_token_file_t *token_file)
+{
+    s_token_file_t *tmp;
+    s_token_file_t *token_file_next;
+
+    if (token_file_structure_legal_p(token_file)) {
+        tmp = token_file;
+        do {
+            next = token_file_next(tmp);
+            token_file_node_destroy(tmp);
+            tmp = next;
+        } while (tmp != token_file);
+    }
+}
+
+static inline void
+token_file_node_destroy(s_token_file_t *token_file)
+{
+    assert_exit(token_file_structure_legal_p(token_file));
+
+    dp_free(token_file->filename);
+    dp_free(token_file->token_head);
+    dp_free(token_file);
 }
 
 static inline bool
@@ -43,6 +69,14 @@ token_file_insert_before(s_token_file_t *token_file, s_token_file_t *token_node)
     assert_exit(token_file_structure_legal_p(token_node));
 
     doubly_linked_list_insert_before(&token_file->list, &token_node->list);
+}
+
+static inline s_token_file_t *
+token_file_next(s_token_file_t *token_file)
+{
+    assert_exit(token_file_structure_legal_p(token_file));
+
+    return CONTAINS_OF(&token_file->list.next, s_token_file_t, list);
 }
 
 static inline s_token_file_t *
@@ -76,7 +110,7 @@ token_file_process_i(char *filename)
     aim = tokenizer_aim_open(filename);
 
     token_head = dp_malloc(sizeof(s_token_t));
-    token_head->type = LEX_HEAD;
+    token_head->type = TK_LEX_HEAD;
 
     while (tokenizer_aim_fill_secondary_buffer_p(aim)) {
         tokenizer_file_process_io_buffer(aim->secondary, token_head, lang);
@@ -143,7 +177,7 @@ token_lang_identifer_match(s_tokenizer_lang_t *lang, s_token_t *token_head, char
             n = token_lang_c_identifier_match(lang->identifier, token_head, buf);
             if (n) {
                 token = token_list_previous_node(token_head);
-                token_lang_c_keyword_seek(lang->keyword_trie, token);
+                token_language_c_keyword_seek(lang->keyword_trie, token);
             }
 
             return n;

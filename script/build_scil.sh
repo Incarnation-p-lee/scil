@@ -26,6 +26,12 @@ obj_dir=$base/output
 bin_dir=$obj_dir/out
 lib_dir=$base/lib
 
+external_file=$src_dir/inc/external.h
+external_module_list="$src_dir/common $src_dir/log"
+
+tokenizer_external_file=$src_dir/tokenizer/tokenizer_external.h
+tokenizer_external_module_list="$src_dir/tokenizer"
+
 #######################
 ## parameters handle ##
 #######################
@@ -72,7 +78,14 @@ mkdir -p $bin_dir
 ###########################################
 ## update some header files and makefile ##
 ###########################################
+echo "    Generate .. declarnation"
 perl script/generate_declaration.pl $src_dir $debug_mode
+echo "    Generate .. external"
+echo "    Generate .. $external_file"
+perl script/generate_external_declaration.pl $external_file $external_module_list
+echo "    Generate .. $tokenizer_external_file"
+perl script/generate_external_declaration.pl $tokenizer_external_file $tokenizer_external_module_list
+echo "    Makefile .. compile"
 perl script/produce_compile_makefile.pl $src_dir
 
 ####################################
@@ -96,12 +109,14 @@ function obj_compile() {
 ########################################
 ## compiling all other subdir .o file ##
 ########################################
-module_list=$(find src/ -type d | grep -v inc)
+module_list=$(find src/* -type d | grep -v inc)
 for var in ${module_list[@]}
 do
     echo "    Compile  .. $(basename $var)"
     obj_compile $var
 done
+
+exit 0
 
 ########################################################
 ## generate linking Makefile and link to final target ##
