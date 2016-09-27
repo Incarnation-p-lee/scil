@@ -47,8 +47,6 @@
 
 #include "data_structure_interface.h"
 #include "define.h"
-#include "finite_automata.h"
-
 #include "external.h"
 
 #endif

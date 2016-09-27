@@ -1,0 +1,6 @@
+#ifndef HAVE_DEFINED_TOKEN_DEFINE_H
+#define HAVE_DEFINED_TOKEN_DEFINE_H
+
+
+#endif
+

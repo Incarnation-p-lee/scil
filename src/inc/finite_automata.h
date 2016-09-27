@@ -18,10 +18,10 @@
 #define SENTINEL_CHAR          SPACE_CHAR
 #define SPLIT_CHAR             PTR_CHAR
 
-typedef struct fa        s_nfa_t;
-typedef struct fa        s_dfa_t;
-typedef struct fa_status s_fa_status_t;
-typedef struct fa_edge   s_fa_edge_t;
+typedef struct fa              s_nfa_t;
+typedef struct fa              s_dfa_t;
+typedef struct fa_status       s_fa_status_t;
+typedef struct fa_edge         s_fa_edge_t;
 
 struct fa {
     char          *re;

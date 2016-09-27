@@ -1,11 +1,14 @@
+/*
+ * *HACK* Included files order has dependency on types or macros.
+ */
 #include "depends.h"
 #include "finite_automata.h"
-
-#include "../tokenizer_define.h"
-#include "../tokenizer_external.h"
+#include "regular.h"
+#include "regular_external.h"
 
 #include "nfa.h"
-#include "regular.h"
+#include "nfa_data.h"
+#include "nfa_print.h"
 #include "nfa_declaration.h"
 
 #if defined DEBUG
@@ -16,5 +19,4 @@
 #include "nfa_subset_construction.c"
 #include "nfa_engine.c"
 #include "nfa_simplify.c"
-
 

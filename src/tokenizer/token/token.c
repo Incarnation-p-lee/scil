@@ -1,11 +1,10 @@
+/*
+ * *HACK* Included files order has dependency on types or macros.
+ */
 #include "depends.h"
-
-#include "../tokenizer_define.h"
-#include "../tokenizer_external.h"
-
 #include "token.h"
+
 #include "token_data.h"
-#include "token_language.h"
 #include "token_declaration.h"
 
 #include "token_common.c"

@@ -133,10 +133,10 @@ tokenizer_language_c_nfa_engine_init(s_tokenizer_language_t *lang)
 {
     assert_exit(lang);
 
-    lang->identifier = nfa_engine_create(LANG_C_RE_IDTR);
-    lang->operator = nfa_engine_create(LANG_C_RE_OPTR);
-    lang->constant = nfa_engine_create(LANG_C_RE_CNST);
-    lang->punctuation = nfa_engine_create(LANG_C_RE_PCTT);
+    lang->identifier = nfa_engine_create(LANGUAGE_C_RE_IDTR);
+    lang->operator = nfa_engine_create(LANGUAGE_C_RE_OPTR);
+    lang->constant = nfa_engine_create(LANGUAGE_C_RE_CNST);
+    lang->punctuation = nfa_engine_create(LANGUAGE_C_RE_PCTT);
 }
 
 static inline void
