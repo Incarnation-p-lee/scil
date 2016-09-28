@@ -44,7 +44,6 @@
     #define dp_free            free
 #endif
 
-
 #include "data_structure_interface.h"
 #include "define.h"
 #include "external.h"

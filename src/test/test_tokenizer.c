@@ -142,18 +142,11 @@ test_tokenizer_nfa_engine_advance(void)
     nfa_engine_destroy(nfa);
 }
 
-static inline void
+void
 test_tokenizer_nfa_engine(void)
 {
     test_tokenizer_nfa_engine_basic();
     test_tokenizer_nfa_engine_translate();
     test_tokenizer_nfa_engine_advance();
-}
-
-static inline void
-test_tokenizer_main(void)
-{
-    test_tokenizer_nfa_engine();
-    tokenizer_file_list_process(&TOKEN_AIM_DATA_FILE, 1);
 }
 

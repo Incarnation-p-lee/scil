@@ -11,7 +11,6 @@
 
 typedef enum token_lexeme            e_token_lexeme_t;
 typedef struct token                 s_token_t;
-typedef struct token_file            s_token_file_t;
 
 enum token_lexeme {
     TK_LEX_HEAD,
@@ -25,12 +24,6 @@ enum token_lexeme {
 struct token {
     e_token_lexeme_t       type;
     void                   *data;
-    s_doubly_linked_list_t list;
-};
-
-struct token_file {
-    char                   *filename;
-    s_token_t              *token_head;
     s_doubly_linked_list_t list;
 };
 

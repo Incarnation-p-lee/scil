@@ -273,7 +273,7 @@ token_language_c_optr_type_set(s_token_t *token, e_token_language_c_optr_type_t 
 }
 
 static inline bool
-token_language_c_pctt_type_p(e_token_language_c_cptt_t type)
+token_language_c_pctt_type_p(e_token_language_c_pctt_type_t type)
 {
     switch (type) {
         case TK_C_PCTT_COMMA:
@@ -378,14 +378,14 @@ token_language_c_pctt_create(char c)
     return token;
 }
 
-static inline e_token_language_c_keyword_type_t
+static inline e_token_language_c_kywd_type_t
 token_language_c_keyword_to_type(char **keyword)
 {
-    e_token_language_c_keyword_type_t type;
+    e_token_language_c_kywd_type_t type;
 
     assert_exit(keyword);
 
-    type = (e_token_language_c_keyword_type_t)(keyword - (char **)token_language_c_keywords);
+    type = (e_token_language_c_kywd_type_t)(keyword - (char **)token_language_c_keywords);
 
     assert_exit(TK_C_IDTR_FIRST <= type && TK_C_IDTR_LAST > type);
     return type;
@@ -505,7 +505,7 @@ token_language_c_keyword_trie_node_leaf_p(s_token_language_c_kywd_t *node)
     return NULL == node->children[0];
 }
 
-static inline e_token_language_c_keyword_type_t
+static inline e_token_language_c_kywd_type_t
 token_language_c_keyword_match(s_token_language_c_kywd_t *keyword_trie,
     char *idtr)
 {

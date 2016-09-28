@@ -8,6 +8,5 @@
 #include "token_declaration.h"
 
 #include "token_common.c"
-#include "token_file.c"
 #include "token_language_c.c"
 

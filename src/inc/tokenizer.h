@@ -13,6 +13,7 @@
 typedef struct tokenizer_aim         s_tokenizer_aim_t;
 typedef struct io_buffer             s_io_buffer_t;
 typedef struct tokenizer_language    s_tokenizer_language_t;
+typedef struct tokenizer_file_list   s_tokenizer_file_list_t;
 typedef enum tokenizer_language_type e_tokenizer_language_type_t;
 
 enum tokenizer_language_type {
@@ -35,6 +36,12 @@ struct tokenizer_language {
     s_nfa_t                    *identifier;
     s_nfa_t                    *constant;
     s_nfa_t                    *punctuation;
+};
+
+struct tokenizer_file_list {
+    char                   *filename;
+    s_token_t              *token_head;
+    s_doubly_linked_list_t list;
 };
 
 /*

@@ -4,11 +4,9 @@
 #define TEST_DECLARATION_H
 
 
-static inline void test_tokenizer_main(void);
-static inline void test_tokenizer_nfa_engine(void);
 static inline void test_tokenizer_nfa_engine_advance(void);
 static inline void test_tokenizer_nfa_engine_basic(void);
 static inline void test_tokenizer_nfa_engine_translate(void);
-void test_main(void);
+void test_tokenizer_nfa_engine(void);
 
 #endif

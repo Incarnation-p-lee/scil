@@ -77,7 +77,6 @@ perl script/generate_declaration.pl $src_dir $debug_mode
 
 external_file=$src_dir/inc/external.h
 external_module_list="$src_dir/common $src_dir/log"
-echo "    Generate .. external"
 echo "    Generate .. $external_file"
 perl script/generate_external_declaration.pl $external_file $external_module_list
 
@@ -90,6 +89,16 @@ regular_external_file=$src_dir/inc/regular_external.h
 regular_external_module_list="$src_dir/regular"
 echo "    Generate .. $regular_external_file"
 perl script/generate_external_declaration.pl $regular_external_file $regular_external_module_list
+
+token_external_file=$src_dir/inc/token_external.h
+token_external_module_list="$src_dir/tokenizer/token"
+echo "    Generate .. $token_external_file"
+perl script/generate_external_declaration.pl $token_external_file $token_external_module_list
+
+nfa_external_file=$src_dir/inc/nfa_external.h
+nfa_external_module_list="$src_dir/finite_automata/nfa"
+echo "    Generate .. $nfa_external_file"
+perl script/generate_external_declaration.pl $nfa_external_file $nfa_external_module_list
 
 
 #######################
