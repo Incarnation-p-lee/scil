@@ -4,10 +4,10 @@
 #define HAVE_DEFINED_EXTERNAL_H_tokenizer_
 
 extern s_token_language_c_kywd_t * token_language_c_keyword_trie_create(void);
-extern s_tokenizer_file_list_t * tokenizer_file_list_list_process(char **file_list, uint32 count);
+extern s_tokenizer_file_list_t * tokenizer_file_list_process(char **file_list, uint32 count);
 extern sint32 main(sint32 argc, char **argv);
 extern void token_language_c_keyword_trie_destroy(s_token_language_c_kywd_t *keyword_trie);
-extern void tokenizer_file_list_destroy(s_tokenizer_file_list_t *tokenizer_file_list);
+extern void tokenizer_file_list_destroy(s_tokenizer_file_list_t *tkz_file_list);
 
 #endif
 

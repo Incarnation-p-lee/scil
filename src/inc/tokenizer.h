@@ -10,23 +10,22 @@
 #define INDEX_INVALID                0xffffffffu
 #define BUF_PRINT_LEN                80
 
-typedef struct tokenizer_aim         s_tokenizer_aim_t;
+typedef struct tokenizer_io_buffer   s_tokenizer_io_buffer_t;
 typedef struct io_buffer             s_io_buffer_t;
 typedef struct tokenizer_language    s_tokenizer_language_t;
 typedef struct tokenizer_file_list   s_tokenizer_file_list_t;
 typedef enum tokenizer_language_type e_tokenizer_language_type_t;
 
 enum tokenizer_language_type {
-    TK_LANG_C    = 'c',
-    TK_LANG_CPP  = TK_C_OPTR_TRIPLE('c', 'p', 'p'),
+    TK_LANG_C   = 'c',
+    TK_LANG_CPP = TK_C_OPTR_TRIPLE('c', 'p', 'p'),
 
 };
 
-struct tokenizer_aim {
+struct tokenizer_io_buffer {
     FILE          *fd;
     s_io_buffer_t *primary;
     s_io_buffer_t *secondary;
-    char          fname[FILENAME_LEN_MAX];
 };
 
 struct tokenizer_language {
@@ -39,9 +38,9 @@ struct tokenizer_language {
 };
 
 struct tokenizer_file_list {
-    char                   *filename;
-    s_token_t              *token_head;
-    s_doubly_linked_list_t list;
+    char                    *filename;
+    s_token_t               *token_list;
+    s_doubly_linked_list_t  list;
 };
 
 /*

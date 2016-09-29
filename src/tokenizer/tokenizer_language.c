@@ -147,3 +147,83 @@ tokenizer_language_c_keyword_trie_init(s_tokenizer_language_t *lang)
     lang->keyword_trie = token_language_c_keyword_trie_create();
 }
 
+static inline uint32
+tokenizer_language_operator_match(s_tokenizer_language_t *tkz_language,
+    s_token_t *token_head, char *buf)
+{
+    assert_exit(buf);
+    assert_exit(token_structure_legal_p(token_head));
+    assert_exit(tokenizer_language_structure_legal_p(tkz_language));
+
+    switch (tkz_language->type) {
+        case TK_LANG_C:
+            return token_language_c_operator_match(tkz_language->operator, token_head, buf);
+        default:
+            assert_exit(false);
+            return 0;
+    }
+}
+
+static inline uint32
+tokenizer_lang_identifer_match(s_tokenizer_language_t *tkz_language,
+    s_token_t *token_head, char *buf)
+{
+    uint32 n;
+    s_token_t *token;
+
+    assert_exit(buf);
+    assert_exit(token_structure_legal_p(token_head));
+    assert_exit(tokenizer_language_structure_legal_p(tkz_language));
+
+    switch (tkz_language->type) {
+        case TK_LANG_C:
+            n = token_lang_c_identifier_match(tkz_language->identifier,
+                token_head, buf);
+            if (n) {
+                token = token_list_previous_node(token_head);
+                token_language_c_keyword_seek(lang->keyword_trie, token);
+            }
+
+            return n;
+        default:
+            assert_exit(false);
+            return 0;
+    }
+}
+
+static inline uint32
+tokenizer_lang_constant_match(s_tokenizer_language_t *tkz_language,
+    s_token_t *token_head, char *buf)
+{
+    assert_exit(buf);
+    assert_exit(token_structure_legal_p(token_head));
+    assert_exit(tokenizer_language_structure_legal_p(tkz_language));
+
+    switch (tkz_language->type) {
+        case TK_LANG_C:
+            return token_lang_c_constant_match(tkz_language->constant,
+                token_head, buf);
+        default:
+            assert_exit(false);
+            return 0;
+    }
+}
+
+static inline uint32
+token_lang_punctuation_match(s_tokenizer_language_t *tkz_language,
+    s_token_t *token_head, char *buf)
+{
+    assert_exit(buf);
+    assert_exit(token_structure_legal_p(token_head));
+    assert_exit(tokenizer_language_structure_legal_p(tkz_language));
+
+    switch (tkz_language->type) {
+        case TK_LANG_C:
+            return token_lang_c_punctuation_match(tkz_language->operator,
+                token_head, buf);
+        default:
+            assert_exit(false);
+            return 0;
+    }
+}
+

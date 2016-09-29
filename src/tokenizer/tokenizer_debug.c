@@ -1,5 +1,5 @@
 static void
-tokenizer_aim_open_print(char *fname)
+tokenizer_file_open_print(char *fname)
 {
     assert_exit(fname);
 
@@ -7,7 +7,7 @@ tokenizer_aim_open_print(char *fname)
 }
 
 static void
-tokenizer_aim_close_print(char *fname)
+tokenizer_file_close_print(char *fname)
 {
     assert_exit(fname);
 
@@ -15,13 +15,13 @@ tokenizer_aim_close_print(char *fname)
 }
 
 static void
-tokenizer_io_buffer_print(s_io_buffer_t *buffer)
+io_buffer_print(s_io_buffer_t *buffer)
 {
     uint32 i;
     uint32 k;
     char *buf;
 
-    assert_exit(tokenizer_io_buffer_structure_legal_p(buffer));
+    assert_exit(io_buffer_structure_legal_p(buffer));
 
     i = k = 0;
     buf = buffer->buf;

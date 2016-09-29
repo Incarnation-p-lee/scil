@@ -1,5 +1,5 @@
 static inline s_io_buffer_t *
-tokenizer_aim_open_buffer_create(void)
+tokenizer_io_buffer_open_buffer_create(void)
 {
     s_io_buffer_t *buf;
 
@@ -11,10 +11,10 @@ tokenizer_aim_open_buffer_create(void)
     return buf;
 }
 
-static inline s_tokenizer_aim_t *
-tokenizer_aim_open(char *fname)
+static inline s_tokenizer_io_buffer_t *
+tokenizer_io_buffer_open(char *fname)
 {
-    s_tokenizer_aim_t *aim;
+    s_tokenizer_io_buffer_t *aim;
 
     assert_exit(fname);
 
@@ -28,16 +28,16 @@ tokenizer_aim_open(char *fname)
         TOKENIZER_AIM_OPEN_PRINT(fname);
     }
 
-    aim->primary = tokenizer_aim_open_buffer_create();
-    aim->secondary = tokenizer_aim_open_buffer_create();
+    aim->primary = tokenizer_io_buffer_open_buffer_create();
+    aim->secondary = tokenizer_io_buffer_open_buffer_create();
 
     return aim;
 }
 
 static inline void
-tokenizer_aim_close(s_tokenizer_aim_t *aim)
+tokenizer_io_buffer_close(s_tokenizer_io_buffer_t *aim)
 {
-    assert_exit(tokenizer_aim_structure_legal_p(aim));
+    assert_exit(tokenizer_io_buffer_structure_legal_p(aim));
 
     TOKENIZER_AIM_CLOSE_PRINT(aim->fname);
 
@@ -48,15 +48,15 @@ tokenizer_aim_close(s_tokenizer_aim_t *aim)
 }
 
 static inline bool
-tokenizer_aim_structure_legal_p(s_tokenizer_aim_t *aim)
+tokenizer_io_buffer_structure_legal_p(s_tokenizer_io_buffer_t *aim)
 {
     if (!aim) {
         return false;
     } else if (!aim->fd) {
         return false;
-    } else if (!tokenizer_io_buffer_structure_legal_p(aim->primary)) {
+    } else if (!io_buffer_structure_legal_p(aim->primary)) {
         return false;
-    } else if (!tokenizer_io_buffer_structure_legal_p(aim->secondary)) {
+    } else if (!io_buffer_structure_legal_p(aim->secondary)) {
         return false;
     } else {
         return true;
@@ -64,7 +64,7 @@ tokenizer_aim_structure_legal_p(s_tokenizer_aim_t *aim)
 }
 
 static inline bool
-tokenizer_io_buffer_structure_legal_p(s_io_buffer_t *buf)
+io_buffer_structure_legal_p(s_io_buffer_t *buf)
 {
     if (!buf) {
         return false;
@@ -76,13 +76,14 @@ tokenizer_io_buffer_structure_legal_p(s_io_buffer_t *buf)
 }
 
 static inline bool
-tokenizer_aim_fill_buffer_p(s_tokenizer_aim_t *aim)
+tokenizer_io_buffer_fill_buffer_p(s_tokenizer_io_buffer_t *aim)
 {
-    assert_exit(tokenizer_aim_structure_legal_p(aim));
+    assert_exit(tokenizer_io_buffer_structure_legal_p(aim));
 
-    return tokenizer_aim_fill_secondary_buffer_p(aim);
+    return tokenizer_io_buffer_fill_secondary_buffer_p(aim);
 }
 
+// TODO move to language
 static inline bool
 tokenizer_char_double_quote_p(char *buf)
 {
@@ -132,14 +133,14 @@ tokenizer_char_multiple_comment_tail_p(char *buf)
 }
 
 static inline uint32
-tokenizer_aim_skip_multiple_comment(s_tokenizer_aim_t *aim, uint32 index)
+tokenizer_io_buffer_skip_multiple_comment(s_tokenizer_io_buffer_t *aim, uint32 index)
 {
     uint32 i;
     char *buf;
     s_array_stack_t *stack;
 
     assert_exit(index < READ_BUF_SIZE);
-    assert_exit(tokenizer_aim_structure_legal_p(aim));
+    assert_exit(tokenizer_io_buffer_structure_legal_p(aim));
     assert_exit(tokenizer_char_multiple_comment_head_p(aim->primary->buf + index));
 
     i = index + 2;
@@ -157,7 +158,7 @@ tokenizer_aim_skip_multiple_comment(s_tokenizer_aim_t *aim, uint32 index)
         } else {
             aim->primary->index = i;
             if (tokenizer_io_buffer_reach_limit_p(aim->primary)) {
-                if (tokenizer_aim_fill_primary_buffer_p(aim)) {
+                if (tokenizer_io_buffer_fill_primary_buffer_p(aim)) {
                     i = aim->primary->index;
                 } else {
                     scil_log_print_and_exit("Unmatched multiple comments pair.\n");
@@ -173,13 +174,13 @@ tokenizer_aim_skip_multiple_comment(s_tokenizer_aim_t *aim, uint32 index)
 }
 
 static inline uint32
-tokenizer_aim_skip_single_comment(s_tokenizer_aim_t *aim, uint32 index)
+tokenizer_io_buffer_skip_single_comment(s_tokenizer_io_buffer_t *aim, uint32 index)
 {
     uint32 i;
     s_io_buffer_t *primary;
 
     assert_exit(index < READ_BUF_SIZE);
-    assert_exit(tokenizer_aim_structure_legal_p(aim));
+    assert_exit(tokenizer_io_buffer_structure_legal_p(aim));
     assert_exit(tokenizer_char_single_comment_p(aim->primary->buf + index));
 
     i = index;
@@ -188,7 +189,7 @@ tokenizer_aim_skip_single_comment(s_tokenizer_aim_t *aim, uint32 index)
     while (NLINE_CHAR != primary->buf[i]) {
         primary->index = i;
         if (tokenizer_io_buffer_reach_limit_p(primary)) {
-            if (tokenizer_aim_fill_primary_buffer_p(aim)) {
+            if (tokenizer_io_buffer_fill_primary_buffer_p(aim)) {
                 i = primary->index;
             } else {
                 return i;
@@ -223,9 +224,9 @@ tokenizer_io_secondary_buffer_resume(s_io_buffer_t *secondary)
 }
 
 static inline bool
-tokenizer_aim_fill_secondary_buffer_final_p(s_tokenizer_aim_t *aim, uint32 index)
+tokenizer_io_buffer_fill_secondary_buffer_final_p(s_tokenizer_io_buffer_t *aim, uint32 index)
 {
-    assert_exit(tokenizer_aim_structure_legal_p(aim));
+    assert_exit(tokenizer_io_buffer_structure_legal_p(aim));
 
     if (0 == index) {
         return false;
@@ -244,14 +245,14 @@ tokenizer_aim_fill_secondary_buffer_final_p(s_tokenizer_aim_t *aim, uint32 index
  * From primary -> secondary buffer
  */
 static inline bool
-tokenizer_aim_fill_secondary_buffer_p(s_tokenizer_aim_t *aim)
+tokenizer_io_buffer_fill_secondary_buffer_p(s_tokenizer_io_buffer_t *aim)
 {
     bool is_string;
     char *buf, last;
     uint32 index, k;
     s_io_buffer_t *primary, *secondary;
 
-    assert_exit(tokenizer_aim_structure_legal_p(aim));
+    assert_exit(tokenizer_io_buffer_structure_legal_p(aim));
 
     is_string = false;
     last = NULL_CHAR;
@@ -259,7 +260,7 @@ tokenizer_aim_fill_secondary_buffer_p(s_tokenizer_aim_t *aim)
     secondary = aim->secondary;
     index = tokenizer_io_secondary_buffer_resume(secondary);
 
-    while (tokenizer_aim_fill_primary_buffer_p(aim)) {
+    while (tokenizer_io_buffer_fill_primary_buffer_p(aim)) {
         k = primary->index;
         buf = primary->buf;
         while (!tokenizer_io_buffer_reach_limit_p(primary)) {
@@ -272,9 +273,9 @@ tokenizer_aim_fill_secondary_buffer_p(s_tokenizer_aim_t *aim)
                 last = buf[k++];
                 secondary->size = index;
             } else if (tokenizer_char_single_comment_p(buf + k)) {
-                k = tokenizer_aim_skip_single_comment(aim, k);
+                k = tokenizer_io_buffer_skip_single_comment(aim, k);
             } else if (tokenizer_char_multiple_comment_head_p(buf + k)) {
-                k = tokenizer_aim_skip_multiple_comment(aim, k);
+                k = tokenizer_io_buffer_skip_multiple_comment(aim, k);
             } else if (index < READ_BUF_SIZE - 1) {  // index may add twice
                 if (dp_isspace(last)) {
                     secondary->buf[index++] = SENTINEL_CHAR;
@@ -288,7 +289,7 @@ tokenizer_aim_fill_secondary_buffer_p(s_tokenizer_aim_t *aim)
     }
 
 FILL_DONE:
-    return tokenizer_aim_fill_secondary_buffer_final_p(aim, index);
+    return tokenizer_io_buffer_fill_secondary_buffer_final_p(aim, index);
 }
 
 static inline bool
@@ -305,13 +306,13 @@ tokenizer_io_buffer_reach_limit_p(s_io_buffer_t *buffer)
 }
 
 static inline bool
-tokenizer_aim_fill_primary_buffer_p(s_tokenizer_aim_t *aim)
+tokenizer_io_buffer_fill_primary_buffer_p(s_tokenizer_io_buffer_t *aim)
 {
     uint32 len;
     uint32 rest;
     uint32 offset;
 
-    assert_exit(tokenizer_aim_structure_legal_p(aim));
+    assert_exit(tokenizer_io_buffer_structure_legal_p(aim));
 
     if (!tokenizer_io_buffer_reach_limit_p(aim->primary)) {
         return true;

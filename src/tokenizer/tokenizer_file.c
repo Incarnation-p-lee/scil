@@ -2,60 +2,81 @@ s_tokenizer_file_list_t *
 tokenizer_file_list_process(char **file_list, uint32 count)
 {
     char **fname;
-    s_tokenizer_file_list_t *tkz_head, *tkz_node;
+    s_tokenizer_file_list_t tkz_file_fake, *tkz_file_node;
 
     if (!file_list || !count) {
         return PTR_INVALID;
     } else {
-        tokenizer_file_list_head = dp_malloc(sizeof(*tokenizer_file_list_head));
-        tokenizer_file_list_head->filename = tokenizer_file_list_head->token_head = NULL;
-        doubly_linked_list_initial(&tokenizer_file_list_head->list);
+        doubly_linked_list_initial(&tkz_file_fake->list);
 
         fname = file_list;
         while (fname < file_list + count) {
-            tokenizer_file_list = tokenizer_file_process(*fname);
-            tokenizer_file_list_insert_before(&fake_head, tokenizer_file_list);
+            tkz_file_node = tokenizer_file_list_create(*fname);
+            tkz_file_node->token_list = tokenizer_file_token_process(*fname);
+
+            tokenizer_file_list_insert_before(&tkz_file_fake, tkz_file_node);
             fname++;
         }
 
-        return tokenizer_file_list_head;
+        tkz_file_node = tokenizer_file_list_next(&tkz_file_fake);
+        tokenizer_file_list_remove(&tkz_file_fake);
+
+        return tkz_file_node;
     }
 }
 
-void
-tokenizer_file_list_destroy(s_tokenizer_file_list_t *tokenizer_file_list)
+static inline s_tokenizer_file_list_t *
+tokenizer_file_list_create(char *fname)
 {
-    s_tokenizer_file_list_t *tmp;
-    s_tokenizer_file_list_t *tokenizer_file_list_next;
+    uint32 len;
+    s_tokenizer_file_list_t *tkz_file_node;
 
-    if (tokenizer_file_list_structure_legal_p(tokenizer_file_list)) {
-        tmp = tokenizer_file_list;
+    assert_exit(fname);
+
+    tkz_file_head = dp_malloc(sizeof(*tkz_file_head));
+
+    len = dp_strlen(fname) + 1;
+    tkz_file_head->filename = dp_malloc(len);
+    dp_strcpy(tkz_file_node->filename, fname);
+
+    tkz_file_head->token_head = NULL;
+    doubly_linked_list_initial(&tkz_file_node->list);
+
+    return tkz_file_node;
+}
+
+void
+tokenizer_file_list_destroy(s_tokenizer_file_list_t *tkz_file_list)
+{
+    s_tokenizer_file_list_t *tkz_file_tmp;
+    s_tokenizer_file_list_t *tkz_file_next;
+
+    if (tokenizer_file_list_structure_legal_p(tkz_file_list)) {
+        tkz_file_tmp = tkz_file_list;
         do {
-            next = tokenizer_file_list_next(tmp);
-            tokenizer_file_list_node_destroy(tmp);
-            tmp = next;
-        } while (tmp != tokenizer_file_list);
+            tkz_file_next = tokenizer_file_list_next(tkz_file_tmp);
+            tokenizer_file_list_node_destroy(tkz_file_tmp);
+            tkz_file_tmp = tkz_file_next;
+        } while (tkz_file_tmp != tkz_file_list);
     }
 }
 
 static inline void
-tokenizer_file_list_node_destroy(s_tokenizer_file_list_t *tokenizer_file_list)
+tokenizer_file_list_node_destroy(s_tokenizer_file_list_t *tkz_file_node)
 {
-    assert_exit(tokenizer_file_list_structure_legal_p(tokenizer_file_list));
+    assert_exit(tokenizer_file_list_structure_legal_p(tkz_file_node));
 
-    dp_free(tokenizer_file_list->filename);
-    dp_free(tokenizer_file_list->token_head);
-    dp_free(tokenizer_file_list);
+    dp_free(tkz_file_node->filename);
+    dp_free(tkz_file_node->token_head);
+    dp_free(tkz_file_node);
 }
 
 static inline bool
-tokenizer_file_list_structure_legal_p(s_tokenizer_file_list_t *tokenizer_file_list)
+tokenizer_file_list_structure_legal_p(s_tokenizer_file_list_t *tkz_file_list)
 {
-    if (!tokenizer_file_list) {
+    if (!tkz_file_list) {
         return false;
-    } else if (!tokenizer_file_list->filename) {
-        return false;
-    } else if (!tokenizer_file_list->token_head) {
+    } else if (!tkz_file_list->filename) {
         return false;
     } else {
         return true;
@@ -63,159 +84,81 @@ tokenizer_file_list_structure_legal_p(s_tokenizer_file_list_t *tokenizer_file_li
 }
 
 static inline void
-tokenizer_file_list_insert_before(s_tokenizer_file_list_t *tokenizer_file_list, s_tokenizer_file_list_t *token_node)
+tokenizer_file_list_insert_before(s_tokenizer_file_list_t *tkz_file_list,
+    s_tokenizer_file_list_t *tkz_file_node)
 {
-    assert_exit(tokenizer_file_list_structure_legal_p(tokenizer_file_list));
-    assert_exit(tokenizer_file_list_structure_legal_p(token_node));
+    assert_exit(tokenizer_file_list_structure_legal_p(tkz_file_list));
+    assert_exit(tokenizer_file_list_structure_legal_p(tkz_file_node));
 
-    doubly_linked_list_insert_before(&tokenizer_file_list->list, &token_node->list);
+    doubly_linked_list_insert_before(&tkz_file_list->list, &tkz_file_node->list);
+}
+
+static inline void
+tokenizer_file_list_remove(s_tokenizer_file_list_t *tkz_file_list)
+{
+    s_doubly_linked_list_t *list_removed;
+
+    assert_exit(tokenizer_file_list_structure_legal_p(tkz_file_list));
+
+    list_removed = &tkz_file_list->list;
+    doubly_linked_list_remove(&list_removed);
 }
 
 static inline s_tokenizer_file_list_t *
-tokenizer_file_list_next(s_tokenizer_file_list_t *tokenizer_file_list)
+tokenizer_file_list_next(s_tokenizer_file_list_t *tkz_file_list)
 {
-    assert_exit(tokenizer_file_list_structure_legal_p(tokenizer_file_list));
+    assert_exit(tokenizer_file_list_structure_legal_p(tkz_file_list));
 
-    return CONTAINS_OF(&tokenizer_file_list->list.next, s_tokenizer_file_list_t, list);
-}
-
-static inline s_tokenizer_file_list_t *
-tokenizer_file_process(char *fname)
-{
-    uint32_t len;
-    s_tokenizer_file_list_t *tokenizer_file_list;
-
-    assert_exit(filename);
-
-    tokenizer_file_list = dp_malloc(sizeof(*tokenizer_file_list));
-
-    len = dp_strlen(fname) + 1;
-    tokenizer_file_list->filename = dp_malloc(len);
-    dp_strcpy(tokenizer_file_list->filename, fname);
-
-    tokenizer_file_list->token_head = tokenizer_file_list_process_i(fname);
-    return tokenizer_file_list;
+    return CONTAINS_OF(&tkz_file_list->list.next, s_tokenizer_file_list_t, list);
 }
 
 static inline s_token_t *
-tokenizer_file_list_process_i(char *filename)
+tokenizer_file_token_process(s_tokenizer_file_list_t *tkz_file_node)
 {
     s_token_t *token_head;
-    s_tokenizer_aim_t *aim;
-    s_tokenizer_language_t *lang;
+    s_tokenizer_language_t *tkz_language;
+    s_tokenizer_io_buffer_t *tkz_io_buffer;
 
-    assert_exit(filename);
+    assert_exit(tokenizer_file_list_structure_legal_p(tkz_file_node));
 
-    lang = tokenizer_lang_create(filename);
-    aim = tokenizer_aim_open(filename);
+    tkz_language = tokenizer_language_create(tkz_file_node->filename);
+    tkz_io_buffer = tokenizer_io_buffer_create(tkz_file_node->filename);
 
     token_head = dp_malloc(sizeof(s_token_t));
     token_head->type = TK_LEX_HEAD;
 
-    while (tokenizer_aim_fill_secondary_buffer_p(aim)) {
-        tokenizer_file_list_process_io_buffer(aim->secondary, token_head, lang);
+    while (tokenizer_io_buffer_fill_secondary_buffer_p(tkz_io_buffer)) {
+        tokenizer_file_io_buffer_process(tkz_io_buffer->secondary, tkz_language,
+            token_head);
     }
 
-    tokenizer_aim_close(aim);
-    tokenizer_lang_destroy(lang);
+    tokenizer_language_destroy(tkz_language);
+    tokenizer_io_buffer_destroy(tkz_io_buffer);
 
     return token_head;
 }
 
 static inline void
-tokenizer_file_list_process_io_buffer(s_io_buffer_t *buffer, s_token_t *token_head,
-    s_tokenizer_language_t *lang)
+tokenizer_file_io_buffer_process(s_io_buffer_t *io_buffer,
+    s_tokenizer_language_t *tkz_language, s_token_t *token_head)
 {
     char *c;
     uint32 limit, n;
     s_token_t *token;
 
     assert_exit(token_head);
-    assert_exit(tokenizer_lang_structure_legal_p(lang));
-    assert_exit(tokenizer_io_buffer_structure_legal_p(buffer));
+    assert_exit(tokenizer_language_structure_legal_p(tkz_language));
+    assert_exit(tokenizer_io_buffer_structure_legal_p(io_buffer));
 
     i = 0;
-    c = buffer->buf;
-    limit = buffer->size;
+    c = io_buffer->buf;
+    limit = io_buffer->size;
 
     while (c < limit + buffer->buf) {
-        c += token_lang_operator_match(lang->operator, token_head, c);
-        c += token_lang_identifer_match(lang->operator, token_head, c);
-        c += token_lang_constant_match(lang->constant, token_head, c);
-        c += token_lang_punctuation_match(lang->punctuation, token_head, c);
-    }
-}
-
-static inline uint32
-token_lang_operator_match(s_tokenizer_language_t *lang, s_token_t *token_head, char *buf)
-{
-    assert_exit(buf);
-    assert_exit(token_structure_legal_p(token_head));
-    assert_exit(tokenizer_lang_structure_legal_p(lang));
-
-    switch (lang->type) {
-        case TK_LANG_C:
-            return token_lang_c_operator_match(lang->operator, token_head, buf);
-        default:
-            assert_exit(false);
-            return 0;
-    }
-}
-
-static inline uint32
-token_lang_identifer_match(s_tokenizer_language_t *lang, s_token_t *token_head, char *buf)
-{
-    uint32 n;
-    s_token_t *token;
-
-    assert_exit(buf);
-    assert_exit(tokenizer_lang_structure_legal_p(lang));
-    assert_exit(token_structure_legal_p(token_head));
-
-    switch (lang->type) {
-        case TK_LANG_C:
-            n = token_lang_c_identifier_match(lang->identifier, token_head, buf);
-            if (n) {
-                token = token_list_previous_node(token_head);
-                token_language_c_keyword_seek(lang->keyword_trie, token);
-            }
-
-            return n;
-        default:
-            assert_exit(false);
-            return 0;
-    }
-}
-
-static inline uint32
-token_lang_constant_match(s_tokenizer_language_t *lang, s_token_t *token_head, char *buf)
-{
-    assert_exit(buf);
-    assert_exit(tokenizer_lang_structure_legal_p(lang));
-    assert_exit(token_structure_legal_p(token_head));
-
-    switch (lang->type) {
-        case TK_LANG_C:
-            return token_lang_c_constant_match(lang->constant, token_head, buf);
-        default:
-            assert_exit(false);
-            return 0;
-    }
-}
-
-static inline uint32
-token_lang_punctuation_match(s_tokenizer_language_t *lang, s_token_t *token_head, char *buf)
-{
-    assert_exit(buf);
-    assert_exit(tokenizer_lang_structure_legal_p(lang));
-    assert_exit(token_structure_legal_p(token_head));
-
-    switch (lang->type) {
-        case TK_LANG_C:
-            return token_lang_c_punctuation_match(lang->operator, token_head, buf);
-        default:
-            assert_exit(false);
-            return 0;
+        c += tokenizer_language_operator_match(tkz_language,    token_head, c);
+        c += tokenizer_language_identifer_match(tkz_language,   token_head, c);
+        c += tokenizer_language_constant_match(tkz_language,    token_head, c);
+        c += tokenizer_language_punctuation_match(tkz_language, token_head, c);
     }
 }
 
