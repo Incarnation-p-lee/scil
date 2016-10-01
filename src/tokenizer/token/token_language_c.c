@@ -1,139 +1,145 @@
-static inline uint32
-token_language_c_operator_match(s_nfa_engine_t *nfa, s_token_t *token_head, char *buf)
+uint32
+token_language_c_operator_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
 {
-    uint32 retval;
+    uint32 match_length;
     s_token_t *token, *token_last;
     s_token_language_c_optr_t *data;
-    e_token_language_c_optr_type_t optr_last, optr;
+    e_token_language_c_optr_type_t optr_type_last, optr_type;
 
-    assert_exit(buf);
-    assert_exit(nfa_engine_structure_legal_p(nfa));
-    assert_exit(token_structure_legal_p(token_head));
-
-    retval = nfa_engine_token_match(nfa, buf);
-
-    if (!retval) {
-        return 0;
+    if (!buf) {
+        return TK_LANG_UNMATCH;
+    } else if (!nfa_engine_structure_legal_p(nfa)) {
+        return TK_LANG_UNMATCH;
+    } else if (!token_structure_legal_p(token_head)) {
+        return TK_LANG_UNMATCH;
     } else {
-        assert_exit(retval <= 2);
-        optr = (e_token_language_c_optr_type_t)buf[0];
+        match_length = nfa_engine_token_match(nfa, buf);
+        assert_exit(match_length <= 2);
 
-        if (!token_operator_multi_p(tmp)) {
-            token = token_language_c_optr_create(tmp);
-            token_insert_before(token_head, token);
-        } else {
+        if (match_length) {
+            optr_type = (e_token_language_c_optr_type_t)buf[0];
             token_last = token_list_previous_node(token_head);
-            optr_last = token_language_c_optr_type_get(token_last);
+            optr_type_last = token_language_c_optr_type_get(token_last);
 
-            if (token_language_c_optr_consist_of_p(optr_last, optr)) {
-                token_language_c_optr_type_set(token_last, TK_C_OPTR_DUAL(optr_last, optr));
+            if (token_language_c_optr_consist_p(optr_type_last, optr_type)) {
+                optr_type = TK_C_OPTR_DUAL(optr_type_last, optr_type);
+                token_language_c_optr_type_set(token_last, optr_type);
             } else {
-                token = token_language_c_optr_create(tmp);
+                token = token_language_c_optr_create(optr_type);
                 token_insert_before(token_head, token);
             }
         }
-
-        return retval;
+        return match_length;
     }
 }
 
-static inline void
+uint32
+token_language_c_identifier_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
+{
+    uint32 match_length;
+    s_token_t *token;
+
+    if (!buf) {
+        return TK_LANG_UNMATCH;
+    } else if (!nfa_engine_structure_legal_p(nfa)) {
+        return TK_LANG_UNMATCH;
+    } else if (!token_structure_legal_p(token_head)) {
+        return TK_LANG_UNMATCH;
+    } else {
+        match_length = nfa_engine_token_match(nfa, buf);
+
+        if (match_length) {
+            token = token_language_c_idtr_create(buf, retval);
+            token_insert_before(token_head, token);
+        }
+
+        return match_length;
+    }
+}
+
+void
 token_language_c_keyword_seek(s_token_language_c_kywd_t *keyword_trie, s_token_t *token)
 {
-    s_token_language_c_idtr_t *data;
+    s_token_language_c_idtr_t *tk_idtr;
     e_token_language_c_kywd_type_t type;
 
-    assert_exit(token_structure_legal_p(token));
-    assert_exit(token_language_c_keyword_structure_legal_p(keyword_trie));
+    if (!token_structure_legal_p(token)) {
+        return;
+    } else if (!token_language_c_keyword_structure_legal_p(keyword_trie)) {
+        return;
+    } else {
+        tk_idtr = token->data;
+        type = token_language_c_keyword_match(keyword_tire, tk_idtr->name);
 
-    data = token->data;
-    type = token_language_c_keyword_match(keyword_tire, data->name);
+        if (TK_C_IDTR_NONE != type) {
+            dp_free(tk_idtr->name);
 
-    if (TK_C_IDTR_NONE != type) {
-        dp_free(data->name);
-
-        data->is_keyword = true;
-        data->type = type;
+            tk_idtr->is_keyword = true;
+            tk_idtr->type = type;
+            token->type = TK_LEX_KWRD;
+        }
     }
 }
 
-static inline uint32
-token_language_c_identifier_match(s_nfa_engine_t *nfa, s_token_t *token_head, char *buf)
+uint32
+token_language_c_constant_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
+{
+    s_token_t *token;
+    uint32 match_length;
+
+    if (!buf) {
+        return TK_LANG_UNMATCH;
+    } else if (!nfa_engine_structure_legal_p(nfa)) {
+        return TK_LANG_UNMATCH;
+    } else if (!token_structure_legal_p(token_head)) {
+        return TK_LANG_UNMATCH;
+    } else {
+        match_length = nfa_engine_token_match(nfa, buf);
+
+        if (match_length) {
+            token = token_language_c_cnst_create(buf, match_length);
+            token_insert_before(token_head, token);
+        }
+
+        return match_length;
+    }
+}
+
+uint32
+token_language_c_punctuation_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
 {
     uint32 retval;
     s_token_t *token;
 
-    assert_exit(buf);
-    assert_exit(nfa_engine_structure_legal_p(nfa));
-    assert_exit(token_structure_legal_p(token_head));
-
-    retval = nfa_engine_token_match(nfa, buf);
-
-    if (!retval) {
-        return 0;
+    if (!buf) {
+        return TK_LANG_UNMATCH;
+    } else if (!nfa_engine_structure_legal_p(nfa)) {
+        return TK_LANG_UNMATCH;
+    } else if (!token_structure_legal_p(token_head)) {
+        return TK_LANG_UNMATCH;
     } else {
-        token = token_language_c_idtr_create(buf, retval);
-        token_insert_before(token_head, token);
+        match_length = nfa_engine_token_match(nfa, buf);
 
-        return retval;
-    }
-}
+        if (match_length) {
+            assert_exit(2 >= match_length);
 
-static inline uint32
-token_language_c_constant_match(s_nfa_engine_t *nfa, s_token_t *token_head, char *buf)
-{
-    uint32 retval;
-    s_token_t *token;
+            token = token_language_c_pctt_create(buf[0]);
+            token_insert_before(token_head, token);
+        }
 
-    assert_exit(buf);
-    assert_exit(nfa_engine_structure_legal_p(nfa));
-    assert_exit(token_structure_legal_p(token_head));
-
-    retval = nfa_engine_token_match(nfa, buf);
-
-    if (!retval) {
-        return 0;
-    } else {
-        token = token_language_c_cnst_create(buf, retval);
-        token_insert_before(token_head, token);
-
-        return retval;
-    }
-}
-
-static inline uint32
-token_language_c_punctuation_match(s_nfa_engine_t *nfa, s_token_t *token_head, char *buf)
-{
-    uint32 retval;
-    s_token_t *token;
-
-    assert_exit(buf);
-    assert_exit(nfa_engine_structure_legal_p(nfa));
-    assert_exit(token_structure_legal_p(token_head));
-
-    retval = nfa_engine_token_match(nfa, buf);
-
-    if (!retval) {
-        return 0;
-    } else {
-        assert_exit(3 > retval);
-
-        token = token_language_c_pctt_create(buf[0]);
-        token_insert_before(token_head, token);
-
-        return retval;
+        return match_length;
     }
 }
 
 static inline bool
-token_language_c_optr_consist_of_p(e_token_language_c_optr_type_t prefix,
+token_language_c_optr_consist_p(e_token_language_c_optr_type_t prefix,
     e_token_language_c_optr_type_t suffix)
 {
     assert_exit(token_language_c_optr_type_p(prefix));
     assert_exit(token_language_c_optr_type_p(suffix));
 
     return token_language_c_optr_dual_consist_of_p(prefix, suffix)
-        || token_language_c_optr_triple_prefix(prefix, suffix);
+        || token_language_c_optr_triple_consist_of_p(prefix, suffix);
 }
 
 static inline bool
@@ -561,5 +567,52 @@ token_language_c_keyword_trie_legal_p(s_token_language_c_kywd_t *keyword_trie)
     }
 
     return true;
+}
+
+static inline void
+token_language_c_node_destroy(s_token_t *token_node)
+{
+     s_token_language_c_idtr_t *token_idtr;
+     s_token_language_c_idtr_t *token_cnst;
+
+     assert_exit(token_node);
+
+     switch (token_node->type) {
+         case TK_LEX_HEAD:
+         case TK_LEX_KWRD:
+         case TK_LEX_OPTR:
+         case TK_LEX_PCTT:
+             dp_free(token_node);
+             break;
+         case TK_LEX_IDTR:
+             token_idtr = token_node->data;
+             dp_free(token_idtr->name);
+             dp_free(token_node);
+             break;
+         case TK_LEX_CNST:
+             token_cnst = token_node->data;
+             dp_free(token_cnst->name);
+             dp_free(token_node);
+             break;
+         default:
+             assert_exit(false);
+             break;
+     }
+}
+
+void
+token_language_c_destroy(s_token_t *token_list)
+{
+    s_token_t *token_node;
+    s_token_t *token_next;
+
+    if (!token_structure_legal_p(token_list)) {
+        token_node = token_list;
+        do {
+            token_next = token_list_next_node_i(token_node);
+            token_language_c_node_destroy(token_node);
+            token_node = token_next;
+        } while (token_list != token_node);
+    }
 }
 

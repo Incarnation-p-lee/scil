@@ -17,6 +17,7 @@
 
 /* For Language C, 16 children size of keyword trie is enough */
 #define TK_KYWD_CHILD_MAX            16
+#define TK_LANG_UNMATCH             0
 
 typedef enum token_language_c_optr_type e_token_language_c_optr_type_t;
 typedef enum token_language_c_kywd_type e_token_language_c_kywd_type_t;
@@ -120,7 +121,7 @@ enum token_language_c_pctt_type {
     TK_C_PCTT_SEMICOLON = ';',
 };
 
-
+/* only used for tokenizer language for keyword trie */
 struct token_language_c_kywd {
     char                           c;
     e_token_language_c_kywd_type_t type;

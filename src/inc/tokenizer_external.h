@@ -3,9 +3,17 @@
 #ifndef HAVE_DEFINED_EXTERNAL_H_tokenizer_
 #define HAVE_DEFINED_EXTERNAL_H_tokenizer_
 
+extern bool token_structure_legal_p(s_token_t *token);
 extern s_token_language_c_kywd_t * token_language_c_keyword_trie_create(void);
+extern s_token_t * token_list_previous_node(s_token_t *token);
 extern s_tokenizer_file_list_t * tokenizer_file_list_process(char **file_list, uint32 count);
 extern sint32 main(sint32 argc, char **argv);
+extern uint32 token_language_c_constant_match(s_nfa_t *nfa, s_token_t *token_head, char *buf);
+extern uint32 token_language_c_identifier_match(s_nfa_t *nfa, s_token_t *token_head, char *buf);
+extern uint32 token_language_c_operator_match(s_nfa_t *nfa, s_token_t *token_head, char *buf);
+extern uint32 token_language_c_punctuation_match(s_nfa_t *nfa, s_token_t *token_head, char *buf);
+extern void token_language_c_destroy(s_token_t *token_list);
+extern void token_language_c_keyword_seek(s_token_language_c_kywd_t *keyword_trie, s_token_t *token);
 extern void token_language_c_keyword_trie_destroy(s_token_language_c_kywd_t *keyword_trie);
 extern void tokenizer_file_list_destroy(s_tokenizer_file_list_t *tkz_file_list);
 

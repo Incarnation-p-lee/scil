@@ -7,14 +7,6 @@ tokenizer_file_open_print(char *fname)
 }
 
 static void
-tokenizer_file_close_print(char *fname)
-{
-    assert_exit(fname);
-
-    scil_log_print("\n<Close source file %s>\n\n", fname);
-}
-
-static void
 io_buffer_print(s_io_buffer_t *buffer)
 {
     uint32 i;
