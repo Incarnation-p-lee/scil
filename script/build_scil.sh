@@ -22,8 +22,9 @@ fi
 
 base=$(pwd)
 src_dir=$base/src
-obj_dir=$base/output
-bin_dir=$obj_dir/out
+out_dir=$base/output
+obj_dir=$out_dir/obj
+bin_dir=$out_dir/out
 lib_dir=$base/lib
 
 #######################
@@ -62,11 +63,12 @@ done
 #############################
 ## create output directory ##
 #############################
-if [ -d $obj_dir ]
+if [ -d $out_dir ]
 then
-    rm -rf $obj_dir
-    echo "Remove last build directory $obj_dir"
+    rm -rf $out_dir
+    echo "Remove last build directory $out_dir"
 fi
+mkdir -p $obj_dir
 mkdir -p $bin_dir
 
 ###########################################
@@ -99,7 +101,6 @@ nfa_external_file=$src_dir/inc/nfa_external.h
 nfa_external_module_list="$src_dir/finite_automata/nfa"
 echo "    Generate .. $nfa_external_file"
 perl script/generate_external_declaration.pl $nfa_external_file $nfa_external_module_list
-
 
 #######################
 ## Generate Makefile ##
@@ -135,8 +136,6 @@ do
     obj_compile $var
 done
 
-exit 0
-
 ########################################################
 ## generate linking Makefile and link to final target ##
 ########################################################
@@ -144,7 +143,7 @@ echo "    Copy     .. Makefile"
 cp $src_dir/Makefile.in $obj_dir
 echo "    Copy     .. libds.a"
 cp $lib_dir/* $obj_dir
-perl script/produce_link_makefile.pl
+perl script/produce_link_makefile.pl $obj_dir
 echo "    Link     .. scil.elf"
 cd $obj_dir && make "ld_config=$ld_config" "ld_library=$ld_library" > $verbose
 
