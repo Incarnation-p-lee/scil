@@ -1,4 +1,4 @@
-static inline bool
+bool
 nfa_engine_structure_legal_p(s_nfa_t *nfa)
 {
     if (!nfa) {

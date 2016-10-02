@@ -3,7 +3,6 @@ token_language_c_operator_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
 {
     uint32 match_length;
     s_token_t *token, *token_last;
-    s_token_language_c_optr_t *data;
     e_token_language_c_optr_type_t optr_type_last, optr_type;
 
     if (!buf) {
@@ -26,7 +25,7 @@ token_language_c_operator_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
                 token_language_c_optr_type_set(token_last, optr_type);
             } else {
                 token = token_language_c_optr_create(optr_type);
-                token_insert_before(token_head, token);
+                token_list_insert_before(token_head, token);
             }
         }
         return match_length;
@@ -49,8 +48,8 @@ token_language_c_identifier_match(s_nfa_t *nfa, s_token_t *token_head, char *buf
         match_length = nfa_engine_token_match(nfa, buf);
 
         if (match_length) {
-            token = token_language_c_idtr_create(buf, retval);
-            token_insert_before(token_head, token);
+            token = token_language_c_idtr_create(buf, match_length);
+            token_list_insert_before(token_head, token);
         }
 
         return match_length;
@@ -69,7 +68,7 @@ token_language_c_keyword_seek(s_token_language_c_kywd_t *keyword_trie, s_token_t
         return;
     } else {
         tk_idtr = token->data;
-        type = token_language_c_keyword_match(keyword_tire, tk_idtr->name);
+        type = token_language_c_keyword_match(keyword_trie, tk_idtr->name);
 
         if (TK_C_IDTR_NONE != type) {
             dp_free(tk_idtr->name);
@@ -98,7 +97,7 @@ token_language_c_constant_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
 
         if (match_length) {
             token = token_language_c_cnst_create(buf, match_length);
-            token_insert_before(token_head, token);
+            token_list_insert_before(token_head, token);
         }
 
         return match_length;
@@ -108,8 +107,8 @@ token_language_c_constant_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
 uint32
 token_language_c_punctuation_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
 {
-    uint32 retval;
     s_token_t *token;
+    uint32 match_length;
 
     if (!buf) {
         return TK_LANG_UNMATCH;
@@ -124,7 +123,7 @@ token_language_c_punctuation_match(s_nfa_t *nfa, s_token_t *token_head, char *bu
             assert_exit(2 >= match_length);
 
             token = token_language_c_pctt_create(buf[0]);
-            token_insert_before(token_head, token);
+            token_list_insert_before(token_head, token);
         }
 
         return match_length;
@@ -286,8 +285,8 @@ token_language_c_pctt_type_p(e_token_language_c_pctt_type_t type)
         case TK_C_PCTT_S_BRKT_L:
         case TK_C_PCTT_S_BRKT_R:
         case TK_C_PCTT_M_BRKT_L:
-        case TK_C_PCTT_M_BRKT_L:
-        case TK_C_PCTT_L_BRKT_R:
+        case TK_C_PCTT_M_BRKT_R:
+        case TK_C_PCTT_L_BRKT_L:
         case TK_C_PCTT_L_BRKT_R:
         case TK_C_PCTT_SEMICOLON:
             return true;
@@ -316,11 +315,10 @@ token_language_c_optr_create(e_token_language_c_optr_type_t type)
 static inline s_token_t *
 token_language_c_idtr_create(char *buf, uint32 size)
 {
-    char *c;
     s_token_t *token;
     s_token_language_c_idtr_t *idtr;
 
-    assert_exit(buf);
+    assert_exit(buf && size);
 
     if (SENTINEL_CHAR != buf[size - 1]) {
         size++;
@@ -342,11 +340,10 @@ token_language_c_idtr_create(char *buf, uint32 size)
 static inline s_token_t *
 token_language_c_cnst_create(char *buf, uint32 size)
 {
-    char *c;
     s_token_t *token;
     s_token_language_c_cnst_t *cnst;
 
-    assert_exit(buf)
+    assert_exit(buf && size);
 
     if (SENTINEL_CHAR != buf[size - 1]) {
         size++;
@@ -357,7 +354,7 @@ token_language_c_cnst_create(char *buf, uint32 size)
     token->data = cnst = dp_malloc(sizeof(s_token_language_c_cnst_t));
 
     cnst->name = dp_malloc(sizeof(*cnst->name) * size);
-    dp_memcpy(cnst->name, buf, sizeof(*name->name) * size);
+    dp_memcpy(cnst->name, buf, sizeof(*cnst->name) * size);
     cnst->name[size - 1] = NULL_CHAR;
 
     doubly_linked_list_initial(&token->list);
@@ -430,15 +427,16 @@ token_language_c_keyword_trie_node_create(char c)
 s_token_language_c_kywd_t *
 token_language_c_keyword_trie_create(void)
 {
-    char **tmp, *keyword;
+    char **keyword_list, **keyword_limit;
     s_token_language_c_kywd_t *keyword_root;
 
-    tmp = token_language_c_keywords;
+    keyword_list = (void *)token_language_c_keywords;
+    keyword_limit = keyword_list + ARRAY_SIZE_OF(token_language_c_keywords);
     keyword_root = token_language_c_keyword_trie_node_create(NULL_CHAR);
 
-    while (tmp < token_language_c_keywords + ARRAY_SIZE_OF(token_language_c_keywords)) {
-        token_language_c_keyword_trie_insert(keyword_root, tmp);
-        tmp++;
+    while (keyword_list < keyword_limit) {
+        token_language_c_keyword_trie_insert(keyword_root, keyword_list);
+        keyword_list++;
     }
 
     assert_exit(token_language_c_keyword_trie_legal_p(keyword_root));
@@ -494,7 +492,7 @@ token_language_c_keyword_trie_destroy(s_token_language_c_kywd_t *keyword_trie)
                 array_queue_enter(queue, *child);
                 child++;
             }
-            assert_exit(child <= tmp->children + TOKEN_LANG_SUB_SIZE);
+            assert_exit(child <= tmp->children + TK_KYWD_CHILD_MAX);
 
             dp_free(tmp);
         }
@@ -533,7 +531,7 @@ token_language_c_keyword_match(s_token_language_c_kywd_t *keyword_trie,
             }
             child++;
         }
-        assert_exit(child <= root->children + TOKEN_LANG_SUB_SIZE);
+        assert_exit(child <= root->children + TK_KYWD_CHILD_MAX);
 
         if (!*child) {
             return TK_C_IDTR_NONE;
@@ -548,22 +546,23 @@ token_language_c_keyword_match(s_token_language_c_kywd_t *keyword_trie,
     }
 }
 
-static inline void
+static inline bool
 token_language_c_keyword_trie_legal_p(s_token_language_c_kywd_t *keyword_trie)
 {
-    char **tmp;
+    char **keyword_list, **keyword_limit;
     s_token_language_c_kywd_t *root;
 
     assert_exit(token_language_c_keyword_structure_legal_p(keyword_trie));
 
     root = keyword_trie;
-    tmp = token_language_c_keywords;
+    keyword_list = (void *)token_language_c_keywords;
+    keyword_limit = keyword_list + ARRAY_SIZE_OF(token_language_c_keywords);
 
-    while (tmp < token_language_c_keywords + ARRAY_SIZE_OF(token_language_c_keywords)) {
-        if (TK_C_IDTR_NONE == token_language_c_keyword_match(root, *tmp)) {
+    while (keyword_list < keyword_limit) {
+        if (TK_C_IDTR_NONE == token_language_c_keyword_match(root, *keyword_list)) {
             return false;
         }
-        tmp++;
+        keyword_list++;
     }
 
     return true;

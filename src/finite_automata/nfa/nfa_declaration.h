@@ -5,11 +5,11 @@
 
 
 bool nfa_engine_pattern_match_p(s_nfa_t *nfa, char *pn);
+bool nfa_engine_structure_legal_p(s_nfa_t *nfa);
 s_nfa_t * nfa_engine_create(char *regular);
 static inline bool nfa_engine_graph_dfs_reached_p(s_nfa_t *nfa, s_open_addressing_hash_t *hash, s_fa_status_t *status);
 static inline bool nfa_engine_graph_legal_p(s_nfa_t *nfa);
 static inline bool nfa_engine_pattern_match_ip(s_nfa_t *nfa, char *pn);
-static inline bool nfa_engine_structure_legal_p(s_nfa_t *nfa);
 static inline bool nfa_engine_terminal_reached_p(s_array_queue_t *master);
 static inline bool nfa_status_structure_legal_p(s_fa_status_t *status);
 static inline bool nfa_status_terminal_p(s_fa_status_t *status);

@@ -3,7 +3,7 @@ token_structure_legal_p(s_token_t *token)
 {
     if (!token) {
         return false;
-    } else if (!data) {
+    } else if (!token->data) {
         return false;
     } else if (doubly_linked_list_structure_legal_p(&token->list)) {
         return false;
