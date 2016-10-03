@@ -102,6 +102,11 @@ nfa_external_module_list="$src_dir/finite_automata/nfa"
 echo "    Generate .. $nfa_external_file"
 perl script/generate_external_declaration.pl $nfa_external_file $nfa_external_module_list
 
+test_external_file=$src_dir/inc/test_external.h
+test_external_module_list="$src_dir/test"
+echo "    Generate .. $test_external_file"
+perl script/generate_external_declaration.pl $test_external_file $test_external_module_list
+
 #######################
 ## Generate Makefile ##
 #######################

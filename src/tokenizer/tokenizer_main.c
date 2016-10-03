@@ -6,7 +6,7 @@ main(sint32 argc, char **argv)
     scil_log_initial();
     libds_log_file_create();
 
-    // test_main();
+    test_tokenizer_nfa_engine();
 
     memory_cache_cleanup();
     memory_track_counters_print();

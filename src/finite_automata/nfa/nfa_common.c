@@ -19,7 +19,7 @@ nfa_edge_next(s_fa_edge_t *edge)
 {
     assert_exit(edge);
 
-    return CONTAINS_OF(&edge->list.next, s_fa_edge_t, list);
+    return CONTAINS_OF(edge->list.next, s_fa_edge_t, list);
 }
 
 static inline void

@@ -37,7 +37,7 @@ token_list_previous_node_i(s_token_t *token)
 {
     assert_exit(token_structure_legal_p(token));
 
-    return CONTAINS_OF(&token->list.previous, s_token_t, list);
+    return CONTAINS_OF(token->list.previous, s_token_t, list);
 }
 
 static inline s_token_t *
@@ -45,6 +45,6 @@ token_list_next_node_i(s_token_t *token)
 {
     assert_exit(token_structure_legal_p(token));
 
-    return CONTAINS_OF(&token->list.next, s_token_t, list);
+    return CONTAINS_OF(token->list.next, s_token_t, list);
 }
 

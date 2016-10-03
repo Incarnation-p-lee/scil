@@ -109,7 +109,7 @@ tokenizer_file_list_next(s_tokenizer_file_list_t *tkz_file_list)
 {
     assert_exit(tokenizer_file_list_structure_legal_p(tkz_file_list));
 
-    return CONTAINS_OF(&tkz_file_list->list.next, s_tokenizer_file_list_t, list);
+    return CONTAINS_OF(tkz_file_list->list.next, s_tokenizer_file_list_t, list);
 }
 
 static inline void

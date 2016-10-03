@@ -7,6 +7,7 @@
 #include "token_external.h"
 #include "nfa.h"
 #include "nfa_external.h"
+#include "test_external.h"
 
 #include "tokenizer.h"
 #include "tokenizer_print.h"
