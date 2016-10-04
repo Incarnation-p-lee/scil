@@ -14,6 +14,18 @@ regular_stack_top_p(s_array_stack_t *stack, char expected)
 }
 
 static inline bool
+regular_stack_top_wildcard_unary_p(s_array_stack_t *stack)
+{
+    char *unary;
+
+    assert_exit(stack);
+
+    unary = array_stack_top(stack);
+
+    return regular_char_wildcard_unary_p(*unary);
+}
+
+static inline bool
 regular_reverse_polish_legal_p(char *polish)
 {
     char *c;
@@ -31,14 +43,14 @@ regular_reverse_polish_legal_p(char *polish)
         if (regular_char_data_p(*c)) {
             array_stack_push(stack, &tmp);
         } else if (regular_char_translated_p(*c)) {
-            assert_exit(regular_char_meta_p(c[1]));
+            assert_exit(regular_char_wildcard_p(c[1]));
             array_stack_push(stack, &tmp);
             c++;
-        } else if (regular_opt_binary_p(*c)) {
+        } else if (regular_char_wildcard_binary_p(*c)) {
             array_stack_pop(stack);
             array_stack_pop(stack);
             array_stack_push(stack, &tmp);
-        } else if (regular_opt_unary_p(*c)) {
+        } else if (regular_char_wildcard_unary_p(*c)) {
             array_stack_pop(stack);
             array_stack_push(stack, &tmp);
         } else {
@@ -81,7 +93,7 @@ regular_range_expand_print(char *regular)
 }
 
 static inline void
-regular_opt_and_insert_print(char *regular)
+regular_char_and_insert_print(char *regular)
 {
     char *c, tmp;
 

@@ -15,14 +15,13 @@ nfa_engine_graph_print_status(s_fa_status_t *status)
         scil_log_print("    Status %p [%d]\n", status, status->label);
 
         do {
-            tmp = NULL_CHAR == edge->c ? MARK_CHAR : edge->c;
+            tmp = NULL_CHAR == edge->c ? NFA_MARK_CHAR : edge->c;
             scil_log_print("        |-edges %02u [label %03d]: c = '%c' => succ = %p\n",
                 edge_idx++, edge->label, tmp, edge->succ);
             edge = nfa_edge_next(edge);
         } while (edge_head != edge);
     }
 }
-
 
 static inline void
 nfa_engine_graph_dfs_print(s_fa_status_t *status, s_open_addressing_hash_t *hash)

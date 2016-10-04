@@ -1,6 +1,4 @@
-//
 // Implementation of McMaughton-Yamda-Thompson algorithm
-//
 static inline s_nfa_t *
 nfa_subset_rule_basic(char c)
 {
@@ -49,7 +47,7 @@ nfa_subset_rule_induction_or(s_nfa_t *s, s_nfa_t *t)
 }
 
 static inline void
-nfa_subset_rule_induction_binary(s_array_stack_t *stack,  e_regular_meta_opt_t opt)
+nfa_subset_rule_induction_binary(s_array_stack_t *stack,  e_regular_wildcard_t opt)
 {
     s_nfa_t *nfa, *nfa_tmp;
     s_nfa_edge_map_t *map, *map_tmp;
@@ -63,10 +61,10 @@ nfa_subset_rule_induction_binary(s_array_stack_t *stack,  e_regular_meta_opt_t o
     nfa = nfa_edge_map_nfa_obtain(map);
 
     switch (opt) {
-        case RE_M_OPT_AND:
+        case RE_WILD_AND:
             nfa_subset_rule_induction_and(nfa, nfa_tmp);
             break;
-        case RE_M_OPT_OR:
+        case RE_WILD_OR:
             nfa_subset_rule_induction_or(nfa, nfa_tmp);
             break;
         default:
@@ -80,7 +78,7 @@ nfa_subset_rule_induction_binary(s_array_stack_t *stack,  e_regular_meta_opt_t o
 }
 
 static inline void
-nfa_subset_rule_induction_unary(s_array_stack_t *stack, e_regular_meta_opt_t opt)
+nfa_subset_rule_induction_unary(s_array_stack_t *stack, e_regular_wildcard_t opt)
 {
     s_nfa_t *nfa;
     s_nfa_edge_map_t *map;
@@ -91,13 +89,13 @@ nfa_subset_rule_induction_unary(s_array_stack_t *stack, e_regular_meta_opt_t opt
     nfa = nfa_edge_map_nfa_obtain(map);
 
     switch (opt) {
-        case RE_M_OPT_STAR:
+        case RE_WILD_STAR:
             nfa_subset_rule_induction_star(nfa);
             break;
-        case RE_M_OPT_PLUS:
+        case RE_WILD_PLUS:
             nfa_subset_rule_induction_plus(nfa);
             break;
-        case RE_M_OPT_QUST:
+        case RE_WILD_QUST:
             nfa_subset_rule_induction_question(nfa);
             break;
         default:
@@ -124,7 +122,6 @@ nfa_subset_rule_induction_and(s_nfa_t *s, s_nfa_t *t)
     t->start = t->terminal = NULL;
     nfa_engine_destroy_final(t);
 }
-
 
 /*
  * RE: a*

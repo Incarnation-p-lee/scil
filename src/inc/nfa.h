@@ -2,8 +2,9 @@
 #define HAVE_DEFINED_NFA_H
 
 #define NFA_LABEL_HASH_SIZE    127
-#define RE_EXPAND_MIN          8
-#define SZ_UNMATCH             -1
+#define NFA_SZ_UNMATCH         -1
+#define NFA_MARK_CHAR          ((char)0xa4)
+#define NFA_SENTINEL           ' '
 
 typedef struct nfa_edge_map    s_nfa_edge_map_t;
 

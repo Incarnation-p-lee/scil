@@ -2,8 +2,8 @@ static inline bool
 tokenizer_language_type_legal_p(e_tokenizer_language_type_t language_type)
 {
     switch (language_type) {
-        case TK_LANG_C:
-        case TK_LANG_CPP:
+        case TKZ_LANG_C:
+        case TKZ_LANG_CPP:
             return true;
         default:
             return false;
@@ -19,7 +19,7 @@ tokenizer_language_create(char *filename)
 
     assert_exit(filename);
 
-    c = dp_strrchr(filename, SPLIT_CHAR);
+    c = dp_strrchr(filename, TK_FILE_SPLIT);
     c++;
 
     tkz_type = (e_tokenizer_language_type_t)*c++;
@@ -39,8 +39,8 @@ static inline bool
 tokenizer_language_type_p(e_tokenizer_language_type_t tkz_language_type)
 {
     switch (tkz_language_type) {
-        case TK_LANG_C:
-        case TK_LANG_CPP:
+        case TKZ_LANG_C:
+        case TKZ_LANG_CPP:
             return true;
         default:
             return false;
@@ -66,7 +66,7 @@ tokenizer_language_destroy(s_tokenizer_language_t *tkz_language)
     assert_exit(tokenizer_language_structure_legal_p(tkz_language));
 
     switch (tkz_language->type) {
-        case TK_LANG_C:
+        case TKZ_LANG_C:
             tokenizer_language_c_destroy(tkz_language);
         default:
             assert_exit(false);
@@ -110,7 +110,7 @@ tokenizer_language_init(s_tokenizer_language_t *tkz_language)
     assert_exit(tkz_language);
 
     switch (tkz_language->type) {
-        case TK_LANG_C:
+        case TKZ_LANG_C:
             tokenizer_language_c_init(tkz_language);
             break;
         default:
@@ -156,7 +156,7 @@ tokenizer_language_operator_match(s_tokenizer_language_t *tkz_language,
     assert_exit(tokenizer_language_structure_legal_p(tkz_language));
 
     switch (tkz_language->type) {
-        case TK_LANG_C:
+        case TKZ_LANG_C:
             return token_language_c_operator_match(tkz_language->operator, token_head, buf);
         default:
             assert_exit(false);
@@ -176,7 +176,7 @@ tokenizer_language_identifer_match(s_tokenizer_language_t *tkz_language,
     assert_exit(tokenizer_language_structure_legal_p(tkz_language));
 
     switch (tkz_language->type) {
-        case TK_LANG_C:
+        case TKZ_LANG_C:
             n = token_language_c_identifier_match(tkz_language->identifier,
                 token_head, buf);
             if (n) {
@@ -201,7 +201,7 @@ tokenizer_language_constant_match(s_tokenizer_language_t *tkz_language,
     assert_exit(tokenizer_language_structure_legal_p(tkz_language));
 
     switch (tkz_language->type) {
-        case TK_LANG_C:
+        case TKZ_LANG_C:
             return token_language_c_constant_match(tkz_language->constant,
                 token_head, buf);
         default:
@@ -219,7 +219,7 @@ tokenizer_language_punctuation_match(s_tokenizer_language_t *tkz_language,
     assert_exit(tokenizer_language_structure_legal_p(tkz_language));
 
     switch (tkz_language->type) {
-        case TK_LANG_C:
+        case TKZ_LANG_C:
             return token_language_c_punctuation_match(tkz_language->operator,
                 token_head, buf);
         default:

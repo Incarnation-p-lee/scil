@@ -3,7 +3,7 @@ use strict;
 use 5.010;
 
 my $output = shift @ARGV;
-my $binary_dir = "$output/../out";
+my $binary_dir = "$output/../bin";
 my @obj_list = "";
 
 die "Failed to find output directory, $output." unless -d -e $output;

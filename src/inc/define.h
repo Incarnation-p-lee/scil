@@ -11,6 +11,9 @@
                                (void *)((ptr_t)(addr) - (ptr_t)(&((type *)0)->member))
 #define ARRAY_SIZE_OF(y)       (sizeof(y) / sizeof(y[0]))
 
+
+#define NULL_CHAR              ((char)0)
+
 #define assert_caution(exp)    do {                                                                  \
                                    if (!(exp)) {                                                     \
                                        assert_print_caution(#exp, __FILE__, __FUNCTION__, __LINE__); \

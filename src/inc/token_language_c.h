@@ -11,13 +11,13 @@
  *     pctt -> punctuation
  */
 #define LANGUAGE_C_RE_IDTR           "[A-Za-z_][a-zA-Z0-9_]*"
-#define LANGUAGE_C_RE_OPTR           "`+|`*|`?|-|/|`||~|^|%|!|&|.|:|=|>|<"
+#define LANGUAGE_C_RE_OPTR           "`+|`*|`?|-|/|`||~|^|%|!|`&|.|:|=|>|<"
 #define LANGUAGE_C_RE_CNST           "[0-9]+|\"[a-zA-Z0-9_ #%]+\""
 #define LANGUAGE_C_RE_PCTT           "`[`],;`(`){}"
 
 /* For Language C, 16 children size of keyword trie is enough */
 #define TK_KYWD_CHILD_MAX            16
-#define TK_LANG_UNMATCH             0
+#define TK_LANG_UNMATCH              0
 
 typedef enum token_language_c_optr_type e_token_language_c_optr_type_t;
 typedef enum token_language_c_kywd_type e_token_language_c_kywd_type_t;

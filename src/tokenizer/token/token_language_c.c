@@ -320,7 +320,7 @@ token_language_c_idtr_create(char *buf, uint32 size)
 
     assert_exit(buf && size);
 
-    if (SENTINEL_CHAR != buf[size - 1]) {
+    if (NFA_SENTINEL != buf[size - 1]) {
         size++;
     }
 
@@ -345,7 +345,7 @@ token_language_c_cnst_create(char *buf, uint32 size)
 
     assert_exit(buf && size);
 
-    if (SENTINEL_CHAR != buf[size - 1]) {
+    if (NFA_SENTINEL != buf[size - 1]) {
         size++;
     }
 
@@ -612,6 +612,42 @@ token_language_c_destroy(s_token_t *token_list)
             token_language_c_node_destroy(token_node);
             token_node = token_next;
         } while (token_list != token_node);
+    }
+}
+
+static inline bool
+token_language_c_single_comment_p(char *buf)
+{
+    assert_exit(buf);
+
+    if (TK_SLASH == buf[0] && TK_SLASH == buf[1]) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+static inline bool
+token_language_c_multiple_comment_head_p(char *buf)
+{
+    assert_exit(buf);
+
+    if (TK_SLASH == buf[0] && TK_STAR == buf[1]) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+static inline bool
+token_language_c_multiple_comment_tail_p(char *buf)
+{
+    assert_exit(buf);
+
+    if (TK_STAR == buf[0] && TK_SLASH == buf[1]) {
+        return true;
+    } else {
+        return false;
     }
 }
 

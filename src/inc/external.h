@@ -10,7 +10,7 @@ extern void assert_print_exit(char *msg, const char *fname, const char *func, ui
 extern void memory_track_counters_print(void);
 extern void memory_track_free(void *ptr);
 extern void scil_log_close(void);
-extern void scil_log_initial(void);
+extern void scil_log_initial(char *logfile_name);
 extern void scil_log_print(const char *format, ...);
 extern void scil_log_print_and_exit(const char *format, ...);
 

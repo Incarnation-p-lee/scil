@@ -1,5 +1,5 @@
 static inline void
-test_tokenizer_nfa_engine_basic(void)
+test_nfa_engine_basic(void)
 {
     TEST_ISOLATOR;
     s_nfa_t *nfa;
@@ -57,7 +57,7 @@ test_tokenizer_nfa_engine_basic(void)
 }
 
 static inline void
-test_tokenizer_nfa_engine_translate(void)
+test_nfa_engine_translate(void)
 {
     TEST_ISOLATOR;
     s_nfa_t *nfa;
@@ -96,7 +96,7 @@ test_tokenizer_nfa_engine_translate(void)
 
 
 static inline void
-test_tokenizer_nfa_engine_advance(void)
+test_nfa_engine_advance(void)
 {
     TEST_ISOLATOR;
     s_nfa_t *nfa;
@@ -143,10 +143,10 @@ test_tokenizer_nfa_engine_advance(void)
 }
 
 void
-test_tokenizer_nfa_engine(void)
+test_nfa_engine(void)
 {
-    test_tokenizer_nfa_engine_basic();
-    test_tokenizer_nfa_engine_translate();
-    test_tokenizer_nfa_engine_advance();
+    test_nfa_engine_basic();
+    test_nfa_engine_translate();
+    test_nfa_engine_advance();
 }
 

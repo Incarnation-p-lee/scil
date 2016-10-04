@@ -73,64 +73,17 @@ io_buffer_structure_legal_p(s_io_buffer_t *io_buffer)
 }
 
 static inline bool
-tokenizer_io_buffer_fill_buffer_p(s_tokenizer_io_buffer_t *tkz_io_buffer)
+tokenizer_io_buffer_fill_buffer_p(s_tokenizer_io_buffer_t *tkz_io_buffer,
+    e_tokenizer_language_type_t tkz_type)
 {
     assert_exit(tokenizer_io_buffer_structure_legal_p(tkz_io_buffer));
 
-    return tokenizer_io_buffer_fill_secondary_buffer_p(tkz_io_buffer);
-}
-
-// TODO move to language
-static inline bool
-tokenizer_char_double_quote_p(char *buf)
-{
-    assert_exit(buf);
-
-    if (D_QUOTE_CHAR == buf[0]) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-static inline bool
-tokenizer_char_single_comment_p(char *buf)
-{
-    assert_exit(buf);
-
-    if (SLASH_CHAR == buf[0] && SLASH_CHAR == buf[1]) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-static inline bool
-tokenizer_char_multiple_comment_head_p(char *buf)
-{
-    assert_exit(buf);
-
-    if (SLASH_CHAR == buf[0] && STAR_CHAR == buf[1]) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-static inline bool
-tokenizer_char_multiple_comment_tail_p(char *buf)
-{
-    assert_exit(buf);
-
-    if (STAR_CHAR == buf[0] && SLASH_CHAR == buf[1]) {
-        return true;
-    } else {
-        return false;
-    }
+    return tokenizer_io_buffer_fill_secondary_buffer_p(tkz_io_buffer, tkz_type);
 }
 
 static inline uint32
-tokenizer_io_buffer_skip_multiple_comment(s_tokenizer_io_buffer_t *tkz_io_buffer, uint32 index)
+tokenizer_io_buffer_skip_multiple_comment(s_tokenizer_io_buffer_t *tkz_io_buffer, uint32 index,
+    e_tokenizer_language_type_t tkz_type)
 {
     uint32 i;
     char *buf;
@@ -138,7 +91,7 @@ tokenizer_io_buffer_skip_multiple_comment(s_tokenizer_io_buffer_t *tkz_io_buffer
 
     assert_exit(index < READ_BUF_SIZE);
     assert_exit(tokenizer_io_buffer_structure_legal_p(tkz_io_buffer));
-    assert_exit(tokenizer_char_multiple_comment_head_p(tkz_io_buffer->primary->buf + index));
+    assert_exit(token_char_multiple_comment_head_p(tkz_io_buffer->primary->buf + index, tkz_type));
 
     i = index + 2;
     buf = tkz_io_buffer->primary->buf;
@@ -146,10 +99,10 @@ tokenizer_io_buffer_skip_multiple_comment(s_tokenizer_io_buffer_t *tkz_io_buffer
     array_stack_push(stack, stack);
 
     while (!array_stack_empty_p(stack)) {
-        if (tokenizer_char_multiple_comment_head_p(buf + i)) {
+        if (token_char_multiple_comment_head_p(buf + i, tkz_type)) {
             array_stack_push(stack, stack);
             i += 2;
-        } else if (tokenizer_char_multiple_comment_tail_p(buf + i)) {
+        } else if (token_char_multiple_comment_tail_p(buf + i, tkz_type)) {
             array_stack_pop(stack);
             i += 2;
         } else {
@@ -171,19 +124,20 @@ tokenizer_io_buffer_skip_multiple_comment(s_tokenizer_io_buffer_t *tkz_io_buffer
 }
 
 static inline uint32
-tokenizer_io_buffer_skip_single_comment(s_tokenizer_io_buffer_t *tkz_io_buffer, uint32 index)
+tokenizer_io_buffer_skip_single_comment(s_tokenizer_io_buffer_t *tkz_io_buffer, uint32 index,
+    e_tokenizer_language_type_t tkz_type)
 {
     uint32 i;
     s_io_buffer_t *primary;
 
     assert_exit(index < READ_BUF_SIZE);
     assert_exit(tokenizer_io_buffer_structure_legal_p(tkz_io_buffer));
-    assert_exit(tokenizer_char_single_comment_p(tkz_io_buffer->primary->buf + index));
+    assert_exit(token_char_single_comment_p(tkz_io_buffer->primary->buf + index, tkz_type));
 
     i = index;
     primary = tkz_io_buffer->primary;
 
-    while (NLINE_CHAR != primary->buf[i]) {
+    while (TK_NEWLINE != primary->buf[i]) {
         primary->index = i;
         if (tokenizer_io_buffer_reach_limit_p(primary)) {
             if (tokenizer_io_buffer_fill_primary_buffer_p(tkz_io_buffer)) {
@@ -243,7 +197,8 @@ tokenizer_io_buffer_fill_secondary_buffer_final_p(s_tokenizer_io_buffer_t *tkz_i
  * From primary -> secondary buffer
  */
 static inline bool
-tokenizer_io_buffer_fill_secondary_buffer_p(s_tokenizer_io_buffer_t *tkz_io_buffer)
+tokenizer_io_buffer_fill_secondary_buffer_p(s_tokenizer_io_buffer_t *tkz_io_buffer,
+    e_tokenizer_language_type_t tkz_type)
 {
     bool is_string;
     char *buf, last;
@@ -262,7 +217,7 @@ tokenizer_io_buffer_fill_secondary_buffer_p(s_tokenizer_io_buffer_t *tkz_io_buff
         k = primary->index;
         buf = primary->buf;
         while (!tokenizer_io_buffer_reach_limit_p(primary)) {
-            if (tokenizer_char_double_quote_p(buf + k)) {
+            if (token_char_double_quote_p(buf[k])) {
                 is_string = !is_string;
                 secondary->buf[index++] = buf[k++];
             } else if (is_string) {
@@ -270,13 +225,13 @@ tokenizer_io_buffer_fill_secondary_buffer_p(s_tokenizer_io_buffer_t *tkz_io_buff
             } else if (dp_isspace(buf[k])) {
                 last = buf[k++];
                 secondary->size = index;
-            } else if (tokenizer_char_single_comment_p(buf + k)) {
-                k = tokenizer_io_buffer_skip_single_comment(tkz_io_buffer, k);
-            } else if (tokenizer_char_multiple_comment_head_p(buf + k)) {
-                k = tokenizer_io_buffer_skip_multiple_comment(tkz_io_buffer, k);
+            } else if (token_char_single_comment_p(buf + k, tkz_type)) {
+                k = tokenizer_io_buffer_skip_single_comment(tkz_io_buffer, k, tkz_type);
+            } else if (token_char_multiple_comment_head_p(buf + k, tkz_type)) {
+                k = tokenizer_io_buffer_skip_multiple_comment(tkz_io_buffer, k, tkz_type);
             } else if (index < READ_BUF_SIZE - 1) {  // index may add twice
                 if (dp_isspace(last)) {
-                    secondary->buf[index++] = SENTINEL_CHAR;
+                    secondary->buf[index++] = NFA_SENTINEL;
                 }
                 secondary->buf[index++] = last = buf[k++];
             } else {

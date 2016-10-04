@@ -7,7 +7,7 @@ regular_normalize(char *re)
         return NULL;
     } else {
         expand = regular_range_expand(re);
-        normal = regular_opt_and_insert(expand);
+        normal = regular_char_and_insert(expand);
 
         dp_free(expand);
         return normal;
@@ -32,20 +32,20 @@ regular_range_expand(char *re)
     expand = dp_malloc(sizeof(char) * size);
 
     while (*c) {
-        if (RE_M_OPT_TRANS == *c) {
-            assert_exit(regular_char_meta_p(c[1]));
+        if (RE_WILD_TRANS == *c) {
+            assert_exit(regular_char_wildcard_p(c[1]));
             expand[i++] = c[1] | TRANS_MASK;
             c++;
-        } else if (RE_M_OPT_MBKT_L != *c) {
+        } else if (RE_WILD_MBKT_L != *c) {
             expand[i++] = *c;
         } else {
             c++;                                     /* [A */
-            expand[i++] = RE_M_OPT_BKT_L;
-            while (RE_M_OPT_MBKT_R != *c && *c) {
+            expand[i++] = RE_WILD_BKT_L;
+            while (RE_WILD_MBKT_R != *c && *c) {
                 advanced = c[1];
-                if (RE_M_OPT_CNNT != advanced) {
+                if (RE_DT_SML_SUB_CHAR != advanced) {
                     expand[i++] = *c;
-                    expand[i++] = RE_M_OPT_OR;
+                    expand[i++] = RE_WILD_OR;
                 } else {                             /* Handle '-' in [], like [A-Z] */
                     start = *c;                      /* [A-Z */
                     last = c[2];
@@ -54,14 +54,14 @@ regular_range_expand(char *re)
                     expand = dp_realloc(expand, size);
                     while (start <= last) {
                         expand[i++] = start;
-                        expand[i++] = RE_M_OPT_OR;
+                        expand[i++] = RE_WILD_OR;
                         start++;
                     }
                     c += 2;
                 }
                 c++;
             }
-            expand[i - 1] = RE_M_OPT_BKT_R;    /* overwrite last RE_M_OPT_OR */
+            expand[i - 1] = RE_WILD_BKT_R;           /* overwrite last RE_WILD_OR */
         }
         c++;
     }
@@ -73,13 +73,13 @@ regular_range_expand(char *re)
 }
 
 static inline bool
-regular_opt_and_needed_p(char last, char c)
+regular_char_and_needed_p(char last, char c)
 {
-    if ((regular_opt_unary_p(last) && regular_opt_bracket_left_p(c))
-        || (regular_char_data_p(last) && regular_opt_bracket_left_p(c))
-        || (regular_opt_bracket_right_p(last) && regular_opt_bracket_left_p(c))
-        || (regular_opt_bracket_right_p(last) && regular_char_data_p(c))
-        || (regular_opt_unary_p(last) && regular_char_data_p(c))
+    if ((regular_char_wildcard_unary_p(last) && regular_char_bracket_left_p(c))
+        || (regular_char_data_p(last) && regular_char_bracket_left_p(c))
+        || (regular_char_bracket_right_p(last) && regular_char_bracket_left_p(c))
+        || (regular_char_bracket_right_p(last) && regular_char_data_p(c))
+        || (regular_char_wildcard_unary_p(last) && regular_char_data_p(c))
         || (regular_char_data_p(last) && regular_char_data_p(c))) {
         return true;
     } else {
@@ -91,7 +91,7 @@ regular_opt_and_needed_p(char last, char c)
  * Convert RE abc => a&b&c
  */
 static inline char *
-regular_opt_and_insert(char *re)
+regular_char_and_insert(char *re)
 {
     uint32 index, size;
     char last, *insert, *c;
@@ -105,8 +105,8 @@ regular_opt_and_insert(char *re)
     index = 0;
     last = NULL_CHAR;
     while (*c) {
-        if (regular_opt_and_needed_p(last, *c)) {
-            insert[index++] = RE_M_OPT_AND;
+        if (regular_char_and_needed_p(last, *c)) {
+            insert[index++] = RE_WILD_AND;
         }
         insert[index++] = last = *c++;
 

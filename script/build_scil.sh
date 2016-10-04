@@ -24,7 +24,7 @@ base=$(pwd)
 src_dir=$base/src
 out_dir=$base/output
 obj_dir=$out_dir/obj
-bin_dir=$out_dir/out
+bin_dir=$out_dir/bin
 lib_dir=$base/lib
 
 #######################

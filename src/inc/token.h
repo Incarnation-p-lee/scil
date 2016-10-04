@@ -7,6 +7,12 @@
 #define TK_C_OPTR_TRIPLE(x, y, z)    ((TK_C_OPTR_DUAL(x, y) << TK_C_OPTR_SZ) + (z))
 #define TK_LANG_DUAL(x, y)           TK_C_OPTR_DUAL(x, y)
 
+#define TK_DOUBLE_QUOTE              ((char)0x22)    // '"'
+#define TK_SLASH                     '/'
+#define TK_STAR                      '*'
+#define TK_NEWLINE                   '\n'
+#define TK_FILE_SPLIT                '.'
+
 #include "token_language_c.h"
 
 typedef enum token_lexeme            e_token_lexeme_t;

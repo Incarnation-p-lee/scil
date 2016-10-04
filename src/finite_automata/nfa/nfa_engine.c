@@ -72,13 +72,13 @@ nfa_engine_create_operator(s_array_stack_t *stack, char c)
     assert_exit(stack);
 
     switch (c) {
-        case RE_M_OPT_OR:
-        case RE_M_OPT_AND:
+        case RE_WILD_OR:
+        case RE_WILD_AND:
             nfa_subset_rule_induction_binary(stack, c);
             break;
-        case RE_M_OPT_STAR:
-        case RE_M_OPT_PLUS:
-        case RE_M_OPT_QUST:
+        case RE_WILD_STAR:
+        case RE_WILD_PLUS:
+        case RE_WILD_QUST:
             nfa_subset_rule_induction_unary(stack, c);
             break;
         default:
@@ -165,7 +165,7 @@ nfa_engine_create(char *regular)
 }
 
 static inline void
-nfa_status_destroy_dfs(s_fa_status_t *status, s_open_addressing_hash_t *hash)
+nfa_engine_status_destroy_dfs(s_fa_status_t *status, s_open_addressing_hash_t *hash)
 {
     void *key;
     s_fa_edge_t *edge;
@@ -185,7 +185,7 @@ nfa_status_destroy_dfs(s_fa_status_t *status, s_open_addressing_hash_t *hash)
             do {
                 key = (void *)(ptr_t)edge->label;
                 if (!open_addressing_hash_find(hash, key)) {
-                    nfa_status_destroy_dfs(edge->succ, hash);
+                    nfa_engine_status_destroy_dfs(edge->succ, hash);
                 }
 
                 edge_next = nfa_edge_next(edge);
@@ -222,7 +222,7 @@ nfa_engine_destroy_i(s_nfa_t *nfa)
     NFA_ENGINE_DESTROY_PRINT(nfa);
 
     hash = open_addressing_hash_create(NFA_LABEL_HASH_SIZE);
-    nfa_status_destroy_dfs(nfa->start, hash);
+    nfa_engine_status_destroy_dfs(nfa->start, hash);
     open_addressing_hash_destroy(&hash);
 
     nfa->start = nfa->terminal = NULL;
@@ -373,7 +373,7 @@ nfa_engine_token_match_i(s_nfa_t *nfa, char *pn)
     master = array_queue_create();
     nfa_engine_pattern_match_setup(master, nfa);
 
-    while (*c && SENTINEL_CHAR != *c) {
+    while (*c && NFA_SENTINEL != *c) {
         while (!array_queue_empty_p(master)) {
             status = array_queue_leave(master);
             if (status->adj_list) {
@@ -398,7 +398,7 @@ nfa_engine_token_match_i(s_nfa_t *nfa, char *pn)
     if (nfa_engine_terminal_reached_p(master)) {
         token_size = PTR_SIZE_OF(c, pn);
     } else {
-        token_size = SZ_UNMATCH;
+        token_size = NFA_SZ_UNMATCH;
     }
 
 MATCH_DONE:
@@ -411,14 +411,13 @@ uint32
 nfa_engine_token_match(s_nfa_t *nfa, char *pn)
 {
     if (!pn) {
-        return SZ_UNMATCH;
+        return NFA_SZ_UNMATCH;
     } else if (!nfa_engine_structure_legal_p(nfa)) {
-        return SZ_UNMATCH;
+        return NFA_SZ_UNMATCH;
     } else if (!nfa_engine_graph_legal_p(nfa)) {
-        return SZ_UNMATCH;
+        return NFA_SZ_UNMATCH;
     } else {
         return nfa_engine_token_match_i(nfa, pn);
     }
 }
-
 

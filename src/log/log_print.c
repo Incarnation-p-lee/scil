@@ -1,7 +1,7 @@
 void
-scil_log_initial(void)
+scil_log_initial(char *logfile_name)
 {
-    if (!log_file) {
+    if (logfile_name) {
         log_file = dp_fopen(logfile_name, "w");
         if (!log_file) {
             dp_printf("Failed to create log file %s.\n", logfile_name);

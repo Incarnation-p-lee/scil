@@ -9,6 +9,9 @@
 #define TAIL_BUF_SIZE                128
 #define INDEX_INVALID                0xffffffffu
 #define BUF_PRINT_LEN                80
+#define PATH_ISOLATOR                '/'
+#define OPTION_CHAR                  '-'
+#define TKZ_LOG_SUFFIX               ".log"
 
 typedef struct tokenizer_io_buffer   s_tokenizer_io_buffer_t;
 typedef struct io_buffer             s_io_buffer_t;
@@ -17,8 +20,8 @@ typedef struct tokenizer_file_list   s_tokenizer_file_list_t;
 typedef enum tokenizer_language_type e_tokenizer_language_type_t;
 
 enum tokenizer_language_type {
-    TK_LANG_C   = 'c',
-    TK_LANG_CPP = TK_C_OPTR_TRIPLE('c', 'p', 'p'),
+    TKZ_LANG_C   = 'c',
+    TKZ_LANG_CPP = TK_C_OPTR_TRIPLE('c', 'p', 'p'),
 
 };
 

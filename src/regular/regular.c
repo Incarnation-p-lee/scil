@@ -9,6 +9,7 @@
     #include "regular_debug.c"
 #endif
 
+#include "regular_char.c"
 #include "regular_convert.c"
 #include "regular_normalize.c"
 

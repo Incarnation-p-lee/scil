@@ -33,6 +33,7 @@
 #define dp_strlen              strlen
 #define dp_strcpy              strcpy
 #define dp_strrchr             strrchr
+#define dp_strcmp              strcmp
 
 #if defined DEBUG
     #define dp_malloc          memory_track_malloc

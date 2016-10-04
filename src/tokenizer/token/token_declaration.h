@@ -4,12 +4,18 @@
 #define TOKEN_DECLARATION_H
 
 
+bool token_char_double_quote_p(char c);
+bool token_char_multiple_comment_head_p(char *buf, e_tokenizer_language_type_t tkz_type);
+bool token_char_multiple_comment_tail_p(char *buf, e_tokenizer_language_type_t tkz_type);
+bool token_char_single_comment_p(char *buf, e_tokenizer_language_type_t tkz_type);
 bool token_structure_legal_p(s_token_t *token);
 s_token_language_c_kywd_t * token_language_c_keyword_trie_create(void);
 s_token_t * token_list_previous_node(s_token_t *token);
 static inline bool token_language_c_keyword_structure_legal_p(s_token_language_c_kywd_t *node);
 static inline bool token_language_c_keyword_trie_legal_p(s_token_language_c_kywd_t *keyword_trie);
 static inline bool token_language_c_keyword_trie_node_leaf_p(s_token_language_c_kywd_t *node);
+static inline bool token_language_c_multiple_comment_head_p(char *buf);
+static inline bool token_language_c_multiple_comment_tail_p(char *buf);
 static inline bool token_language_c_optr_consist_p(e_token_language_c_optr_type_t prefix, e_token_language_c_optr_type_t suffix);
 static inline bool token_language_c_optr_dual_consist_of_p(e_token_language_c_optr_type_t prefix, e_token_language_c_optr_type_t suffix);
 static inline bool token_language_c_optr_dual_prefix_p(e_token_language_c_optr_type_t t);
@@ -19,6 +25,7 @@ static inline bool token_language_c_optr_triple_prefix(e_token_language_c_optr_t
 static inline bool token_language_c_optr_triple_prefix_p(e_token_language_c_optr_type_t t);
 static inline bool token_language_c_optr_type_p(char t);
 static inline bool token_language_c_pctt_type_p(e_token_language_c_pctt_type_t type);
+static inline bool token_language_c_single_comment_p(char *buf);
 static inline e_token_language_c_kywd_type_t token_language_c_keyword_match(s_token_language_c_kywd_t *keyword_trie, char *idtr);
 static inline e_token_language_c_kywd_type_t token_language_c_keyword_to_type(char **keyword);
 static inline e_token_language_c_optr_type_t token_language_c_optr_type_get(s_token_t *token);
