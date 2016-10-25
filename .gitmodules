@@ -1,0 +1,3 @@
+[submodule "libds"]
+	path = libds
+	url = https://github.com/Incarnation-p-lee/libds.git
