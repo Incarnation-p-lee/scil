@@ -9,11 +9,9 @@ bool token_char_multiple_comment_head_p(char *buf, e_tokenizer_language_type_t t
 bool token_char_multiple_comment_tail_p(char *buf, e_tokenizer_language_type_t tkz_type);
 bool token_char_single_comment_p(char *buf, e_tokenizer_language_type_t tkz_type);
 bool token_structure_legal_p(s_token_t *token);
-s_token_language_c_kywd_t * token_language_c_keyword_trie_create(void);
 s_token_t * token_list_previous_node(s_token_t *token);
-static inline bool token_language_c_keyword_structure_legal_p(s_token_language_c_kywd_t *node);
-static inline bool token_language_c_keyword_trie_legal_p(s_token_language_c_kywd_t *keyword_trie);
-static inline bool token_language_c_keyword_trie_node_leaf_p(s_token_language_c_kywd_t *node);
+s_trie_tree_t * token_language_c_keyword_trie_create(void);
+static inline bool token_language_c_keyword_legal_p(char *keyword);
 static inline bool token_language_c_multiple_comment_head_p(char *buf);
 static inline bool token_language_c_multiple_comment_tail_p(char *buf);
 static inline bool token_language_c_optr_consist_p(e_token_language_c_optr_type_t prefix, e_token_language_c_optr_type_t suffix);
@@ -26,26 +24,25 @@ static inline bool token_language_c_optr_triple_prefix_p(e_token_language_c_optr
 static inline bool token_language_c_optr_type_p(char t);
 static inline bool token_language_c_pctt_type_p(e_token_language_c_pctt_type_t type);
 static inline bool token_language_c_single_comment_p(char *buf);
-static inline e_token_language_c_kywd_type_t token_language_c_keyword_match(s_token_language_c_kywd_t *keyword_trie, char *idtr);
-static inline e_token_language_c_kywd_type_t token_language_c_keyword_to_type(char **keyword);
+static inline e_token_language_c_kywd_type_t token_language_c_keyword_match(s_trie_tree_t *keyword_trie, char *idtr);
+static inline e_token_language_c_kywd_type_t token_language_c_keyword_to_type(char *keyword);
 static inline e_token_language_c_optr_type_t token_language_c_optr_type_get(s_token_t *token);
-static inline s_token_language_c_kywd_t * token_language_c_keyword_trie_node_create(char c);
 static inline s_token_t * token_language_c_cnst_create(char *buf, uint32 size);
 static inline s_token_t * token_language_c_idtr_create(char *buf, uint32 size);
 static inline s_token_t * token_language_c_optr_create(e_token_language_c_optr_type_t type);
 static inline s_token_t * token_language_c_pctt_create(char c);
 static inline s_token_t * token_list_next_node_i(s_token_t *token);
 static inline s_token_t * token_list_previous_node_i(s_token_t *token);
-static inline void token_language_c_keyword_trie_insert(s_token_language_c_kywd_t *root, char **keyword);
 static inline void token_language_c_node_destroy(s_token_t *token_node);
 static inline void token_language_c_optr_type_set(s_token_t *token, e_token_language_c_optr_type_t type);
+static inline void token_language_c_print(s_token_t *token);
 static inline void token_list_insert_before(s_token_t *token_head, s_token_t *inserted);
 uint32 token_language_c_constant_match(s_nfa_t *nfa, s_token_t *token_head, char *buf);
 uint32 token_language_c_identifier_match(s_nfa_t *nfa, s_token_t *token_head, char *buf);
 uint32 token_language_c_operator_match(s_nfa_t *nfa, s_token_t *token_head, char *buf);
 uint32 token_language_c_punctuation_match(s_nfa_t *nfa, s_token_t *token_head, char *buf);
 void token_language_c_destroy(s_token_t *token_list);
-void token_language_c_keyword_seek(s_token_language_c_kywd_t *keyword_trie, s_token_t *token);
-void token_language_c_keyword_trie_destroy(s_token_language_c_kywd_t *keyword_trie);
+void token_language_c_keyword_seek(s_trie_tree_t *keyword_trie, s_token_t *token);
+void token_language_c_keyword_trie_destroy(s_trie_tree_t **keyword_trie);
 
 #endif

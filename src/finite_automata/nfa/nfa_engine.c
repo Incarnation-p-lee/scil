@@ -411,11 +411,11 @@ uint32
 nfa_engine_token_match(s_nfa_t *nfa, char *pn)
 {
     if (!pn) {
-        return NFA_SZ_UNMATCH;
+        return NFA_SZ_INVALID;
     } else if (!nfa_engine_structure_legal_p(nfa)) {
-        return NFA_SZ_UNMATCH;
+        return NFA_SZ_INVALID;
     } else if (!nfa_engine_graph_legal_p(nfa)) {
-        return NFA_SZ_UNMATCH;
+        return NFA_SZ_INVALID;
     } else {
         return nfa_engine_token_match_i(nfa, pn);
     }

@@ -14,7 +14,6 @@ typedef unsigned int           bool;
     typedef unsigned int       uint32;
     typedef signed long long   sint64;
     typedef unsigned long long uint64;
-    typedef unsigned long      ulint32;
     typedef unsigned int       ptr_t;
 #endif
 
@@ -36,7 +35,10 @@ enum log_level {
 };
 
 
+#define true                   1
+#define false                  0
 #define SIZE_INVALID           0xffffffffu
+#define TRIE_INDEX_INVALID     SIZE_INVALID
 #define LIST_SIZE_INVALID      SIZE_INVALID
 #define SKIP_LVL_LMT           8          // skip linked list level limitation
 #define SKIP_KEY_INVALID       (sint32)0x80000000
@@ -62,21 +64,35 @@ enum log_level {
 #define STACK_SIZE_DFT         1024       // stack size default
 #define STACK_EXPD_SIZE_MIN    128        // stack expand size minimal
 #define STACK_SIZE_INVALID     SIZE_INVALID
+#define TRIE_TREE_ROOT         -1         // Root node val of trie tree
+#define TRIE_TREE_SIZE_MIN     16         // Minimal sub tree size of trie tree
 #define BIN_IDXED_NMBR_INVALID 0          // binary indexed tree invalid number
 #define BIN_IDXED_SUM_INVALID  (sint64)(1ull << 63)
 #define PTR_INVALID            (void *)-1 // invalid pointer
 #define HEAP_IDX_CHILD_L(x)    ((x) * 2)
 #define HEAP_IDX_CHILD_R(x)    ((x) * 2 + 1)
-typedef struct single_linked_list   s_single_linked_list_t;
-typedef struct doubly_linked_list   s_doubly_linked_list_t;
-typedef struct skip_linked_list     s_skip_linked_list_t;
-typedef struct separate_chain_hash  s_separate_chain_hash_t;
-typedef struct open_addressing_hash s_open_addressing_hash_t;
-typedef struct hashing_table        s_hashing_table_t;
-typedef struct separate_chain       s_separate_chain_t;
-typedef struct open_addressing_hash s_open_addressing_hash_t;
-typedef struct array_queue          s_array_queue_t;
-typedef struct array_stack          s_array_stack_t;
+typedef struct single_linked_list    s_single_linked_list_t;
+typedef struct doubly_linked_list    s_doubly_linked_list_t;
+typedef struct skip_linked_list      s_skip_linked_list_t;
+typedef struct separate_chain_hash   s_separate_chain_hash_t;
+typedef struct open_addressing_hash  s_open_addressing_hash_t;
+typedef struct hashing_table         s_hashing_table_t;
+typedef struct separate_chain        s_separate_chain_t;
+typedef struct open_addressing_hash  s_open_addressing_hash_t;
+typedef struct array_stack           s_array_stack_t;
+typedef struct array_stack_space     s_array_stack_space_t;
+typedef struct linked_stack_space    s_linked_stack_space_t;
+typedef struct linked_stack          s_linked_stack_t;
+typedef struct array_queue_space     s_array_queue_space_t;
+typedef struct array_queue           s_array_queue_t;
+typedef struct stacked_queue         s_stacked_queue_t;
+typedef struct doubly_end_queue      s_doubly_end_queue_t;
+typedef struct doubly_end_queue_list s_doubly_end_queue_list_t;
+typedef struct trie_tree             s_trie_tree_t;
+typedef struct array_iterator        s_array_iterator_t;
+typedef void   (*f_array_iterator_initial_t)(void *);
+typedef bool   (*f_array_iterator_next_exist_t)(void *);
+typedef void * (*f_array_iterator_next_obtain_t)(void *);
 
 enum ITER_ORDER {
     ORDER_START,
@@ -84,6 +100,13 @@ enum ITER_ORDER {
     ORDER_IN,
     ORDER_POST,
     ORDER_END,
+};
+
+struct array_iterator {
+    uint32                         index;
+    f_array_iterator_initial_t     fp_index_initial;
+    f_array_iterator_next_exist_t  fp_next_exist_p;
+    f_array_iterator_next_obtain_t fp_next_obtain;
 };
 
 struct single_linked_list {
@@ -134,10 +157,10 @@ struct array_queue_space {
 
 struct array_queue {
     struct array_queue_space space;
+    s_array_iterator_t       iterator;
 };
 
 struct stacked_queue {
-    uint32             sid;
     uint32             dim;
     struct array_stack *enter; /* enter stack */
     struct array_stack *leave; /* leave stack */
@@ -149,9 +172,8 @@ struct doubly_end_queue_list {
 };
 
 struct doubly_end_queue {
-    uint32                       sid;
-    struct doubly_end_queue_list *head;
-    struct doubly_end_queue_list *tail;
+    struct doubly_end_queue_list *front;
+    struct doubly_end_queue_list *rear;
 };
 
 struct collision_chain {
@@ -181,6 +203,13 @@ struct splay_tree {
 struct binary_indexed_tree {
     sint64 *data;
     uint32 size;
+};
+
+struct trie_tree {
+    bool            is_deleted;
+    bool            is_terminal;
+    uint32          val;
+    s_array_queue_t *sub_queue;
 };
 
 struct hashing_table {
@@ -238,16 +267,24 @@ struct leftist_heap {
 };
 
 
+extern bool array_iterator_structure_legal_p(s_array_iterator_t *iterator);
 extern bool complain_no_memory_p(void *ptr);
 extern bool complain_null_pointer_p(void *ptr);
+extern bool complain_null_string_p(char *string);
 extern bool complain_zero_size_p(uint32 size);
+extern s_array_iterator_t * array_iterator_create(void);
 extern sint64 random_sint64(void);
+extern uint32 * convert_string_to_uint32_array(char *string, uint32 *len);
+extern uint32 * random_sequence_uint32_limited_obtain(uint32 len, uint32 limit);
+extern uint32 * random_sequence_uint32_obtain(uint32 len);
 extern uint32 prime_numeral_next(uint32 prime);
-extern uint32 random_uint32_with_limit(uint32 lmt);
+extern uint32 random_uint32_with_limit(uint32 limit);
 extern void * malloc_wrap(uint32 size);
 extern void * memory_cache_allocate(uint32 size);
 extern void * memory_cache_re_allocate(void *addr, uint32 size);
 extern void * realloc_wrap(void *ptr, uint32 size);
+extern void array_iterator_destroy(s_array_iterator_t *iterator);
+extern void array_iterator_initial(s_array_iterator_t *iterator, f_array_iterator_initial_t fp_index_initial, f_array_iterator_next_exist_t fp_next_exist_p, f_array_iterator_next_obtain_t fp_next_obtain);
 extern void complain_assert_caution(char *msg, const char *fname, const char *func, uint32 line);
 extern void complain_assert_exit(char *msg, const char *fname, const char *func, uint32 line);
 extern void free_wrap(void *ptr);
@@ -256,6 +293,7 @@ extern void libds_log_file_create(void);
 extern void libds_log_print(enum log_level lvl, const char *msg);
 extern void memory_cache_cleanup(void);
 extern void memory_cache_free(void *addr);
+extern void random_sequence_drop(uint32 *sequence);
 
 extern bool doubly_linked_list_contains_p(s_doubly_linked_list_t *list, s_doubly_linked_list_t *node);
 extern bool doubly_linked_list_structure_legal_p(s_doubly_linked_list_t *list);
@@ -308,73 +346,85 @@ extern void skip_linked_list_iterate(s_skip_linked_list_t *list, void (*handler)
 extern void skip_linked_list_key_set(s_skip_linked_list_t *list, sint32 key);
 extern void skip_linked_list_next_set(s_skip_linked_list_t *list, s_skip_linked_list_t *next);
 
-extern bool array_queue_empty_p(struct array_queue *queue);
-extern bool array_queue_full_p(struct array_queue *queue);
-extern bool doubly_end_queue_empty_p(struct doubly_end_queue *queue);
-extern bool stacked_queue_empty_p(struct stacked_queue *queue);
-extern bool stacked_queue_full_p(struct stacked_queue *queue);
-extern struct array_queue * array_queue_create(void);
-extern struct doubly_end_queue * doubly_end_queue_create(void);
-extern struct stacked_queue * stacked_queue_create(void);
-extern uint32 array_queue_capacity(struct array_queue *queue);
-extern uint32 array_queue_dim(struct array_queue *queue);
-extern uint32 array_queue_rest(struct array_queue *queue);
-extern uint32 doubly_end_queue_length(struct doubly_end_queue *queue);
-extern uint32 stacked_queue_capacity(struct stacked_queue *queue);
-extern uint32 stacked_queue_dim(struct stacked_queue *queue);
-extern uint32 stacked_queue_space_rest(struct stacked_queue *queue);
+extern bool array_queue_empty_p(s_array_queue_t *queue);
+extern bool array_queue_full_p(s_array_queue_t *queue);
+extern bool array_queue_structure_legal_p(s_array_queue_t *queue);
+extern bool doubly_end_queue_empty_p(s_doubly_end_queue_t *queue);
+extern bool doubly_end_queue_structure_legal_p(s_doubly_end_queue_t *queue);
+extern bool stacked_queue_empty_p(s_stacked_queue_t *queue);
+extern bool stacked_queue_full_p(s_stacked_queue_t *queue);
+extern s_array_iterator_t * array_queue_iterator_obtain(s_array_queue_t *queue);
+extern s_array_queue_t * array_queue_create(void);
+extern s_doubly_end_queue_t * doubly_end_queue_create(void);
+extern s_stacked_queue_t * stacked_queue_create(void);
+extern uint32 array_queue_capacity(s_array_queue_t *queue);
+extern uint32 array_queue_rest(s_array_queue_t *queue);
+extern uint32 doubly_end_queue_length(s_doubly_end_queue_t *queue);
+extern uint32 stacked_queue_capacity(s_stacked_queue_t *queue);
+extern uint32 stacked_queue_rest(s_stacked_queue_t *queue);
 extern void * array_queue_front(s_array_queue_t *queue);
-extern void * array_queue_leave(struct array_queue *queue);
+extern void * array_queue_leave(s_array_queue_t *queue);
 extern void * array_queue_rear(s_array_queue_t *queue);
-extern void * doubly_end_queue_head_leave(struct doubly_end_queue *queue);
-extern void * doubly_end_queue_tail_leave(struct doubly_end_queue *queue);
-extern void * stacked_queue_leave(struct stacked_queue *queue);
-extern void array_queue_cleanup(struct array_queue *queue);
-extern void array_queue_destroy(struct array_queue **queue);
-extern void array_queue_enter(struct array_queue *queue, void *member);
-extern void array_queue_iterate(struct array_queue *queue, void (*handler)(void *));
-extern void array_queue_resize(struct array_queue *queue, uint32 size);
-extern void doubly_end_queue_cleanup(struct doubly_end_queue *queue);
-extern void doubly_end_queue_destroy(struct doubly_end_queue **queue);
-extern void doubly_end_queue_head_enter(struct doubly_end_queue *queue, void *member);
-extern void doubly_end_queue_iterate(struct doubly_end_queue *queue, void (*handle)(void *));
-extern void doubly_end_queue_tail_enter(struct doubly_end_queue *queue, void *member);
-extern void stacked_queue_cleanup(struct stacked_queue *queue);
-extern void stacked_queue_destroy(struct stacked_queue **queue);
-extern void stacked_queue_enter(struct stacked_queue *queue, void *member);
-extern void stacked_queue_iterate(struct stacked_queue *queue, void (*handler)(void *));
-extern void stacked_queue_resize(struct stacked_queue *queue, uint32 dim);
+extern void * doubly_end_queue_front(s_doubly_end_queue_t *queue);
+extern void * doubly_end_queue_front_leave(s_doubly_end_queue_t *queue);
+extern void * doubly_end_queue_rear(s_doubly_end_queue_t *queue);
+extern void * doubly_end_queue_rear_leave(s_doubly_end_queue_t *queue);
+extern void * stacked_queue_front(s_stacked_queue_t *queue);
+extern void * stacked_queue_leave(s_stacked_queue_t *queue);
+extern void * stacked_queue_rear(s_stacked_queue_t *queue);
+extern void array_queue_cleanup(s_array_queue_t *queue);
+extern void array_queue_destroy(s_array_queue_t **queue);
+extern void array_queue_enter(s_array_queue_t *queue, void *member);
+extern void array_queue_iterate(s_array_queue_t *queue, void (*handler)(void *));
+extern void array_queue_resize(s_array_queue_t *queue, uint32 size);
+extern void doubly_end_queue_cleanup(s_doubly_end_queue_t *queue);
+extern void doubly_end_queue_destroy(s_doubly_end_queue_t **queue);
+extern void doubly_end_queue_front_enter(s_doubly_end_queue_t *queue, void *member);
+extern void doubly_end_queue_iterate(s_doubly_end_queue_t *queue, void (*handle)(void *));
+extern void doubly_end_queue_rear_enter(s_doubly_end_queue_t *queue, void *member);
+extern void stacked_queue_cleanup(s_stacked_queue_t *queue);
+extern void stacked_queue_destroy(s_stacked_queue_t **queue);
+extern void stacked_queue_enter(s_stacked_queue_t *queue, void *member);
+extern void stacked_queue_iterate(s_stacked_queue_t *queue, void (*handler)(void *));
+extern void stacked_queue_resize(s_stacked_queue_t *queue, uint32 dim);
 
-extern bool array_stack_empty_p(struct array_stack *stack);
-extern bool array_stack_full_p(struct array_stack *stack);
-extern bool linked_stack_empty_p(struct linked_stack *stack);
-extern bool linked_stack_full_p(struct linked_stack *stack);
-extern struct array_stack * array_stack_create(void);
-extern struct linked_stack * linked_stack_create(void);
-extern uint32 array_stack_capacity(struct array_stack *stack);
-extern uint32 array_stack_dim(struct array_stack *stack);
-extern uint32 array_stack_rest(struct array_stack *stack);
-extern uint32 array_stack_size(struct array_stack *stack);
-extern uint32 linked_stack_capacity(struct linked_stack *stack);
-extern uint32 linked_stack_rest(struct linked_stack *stack);
-extern void * array_stack_pop(struct array_stack *stack);
-extern void * array_stack_top(struct array_stack *stack);
-extern void * linked_stack_pop(struct linked_stack *stack);
-extern void array_stack_cleanup(struct array_stack *stack);
-extern void array_stack_destroy(struct array_stack **stack);
-extern void array_stack_iterate(struct array_stack *stack, void (*handler)(void *));
-extern void array_stack_push(struct array_stack *stack, void *member);
-extern void array_stack_resize(struct array_stack *stack, uint32 dim);
-extern void linked_stack_cleanup(struct linked_stack *stack);
-extern void linked_stack_destroy(struct linked_stack **stack);
-extern void linked_stack_iterate(struct linked_stack *stack, void (*handler)(void *));
-extern void linked_stack_push(struct linked_stack *stack, void *member);
-extern void linked_stack_resize(struct linked_stack *stack, uint32 dim);
+extern bool array_stack_empty_p(s_array_stack_t *stack);
+extern bool array_stack_full_p(s_array_stack_t *stack);
+extern bool array_stack_space_structure_legal_p(s_array_stack_space_t *space);
+extern bool array_stack_structure_legal_p(s_array_stack_t *stack);
+extern bool linked_stack_empty_p(s_linked_stack_t *stack);
+extern bool linked_stack_full_p(s_linked_stack_t *stack);
+extern bool linked_stack_structure_legal_p(s_linked_stack_t *stack);
+extern s_array_stack_t * array_stack_create(void);
+extern s_linked_stack_t * linked_stack_create(void);
+extern uint32 array_stack_capacity(s_array_stack_t *stack);
+extern uint32 array_stack_rest(s_array_stack_t *stack);
+extern uint32 array_stack_size(s_array_stack_t *stack);
+extern uint32 linked_stack_capacity(s_linked_stack_t *stack);
+extern uint32 linked_stack_rest(s_linked_stack_t *stack);
+extern void * array_stack_pop(s_array_stack_t *stack);
+extern void * array_stack_top(s_array_stack_t *stack);
+extern void * linked_stack_pop(s_linked_stack_t *stack);
+extern void * linked_stack_top(s_linked_stack_t *stack);
+extern void array_stack_cleanup(s_array_stack_t *stack);
+extern void array_stack_destroy(s_array_stack_t **stack);
+extern void array_stack_iterate(s_array_stack_t *stack, void (*handler)(void *));
+extern void array_stack_push(s_array_stack_t *stack, void *member);
+extern void array_stack_resize(s_array_stack_t *stack, uint32 dim);
+extern void linked_stack_cleanup(s_linked_stack_t *stack);
+extern void linked_stack_destroy(s_linked_stack_t **stack);
+extern void linked_stack_iterate(s_linked_stack_t *stack, void (*handler)(void *));
+extern void linked_stack_push(s_linked_stack_t *stack, void *member);
+extern void linked_stack_resize(s_linked_stack_t *stack, uint32 dim);
 
 extern bool avl_tree_balanced_p(struct avl_tree *tree);
 extern bool avl_tree_contains_p(struct avl_tree *tree, struct avl_tree *node);
 extern bool binary_search_tree_contains_p(struct binary_search_tree *tree, struct binary_search_tree *node);
 extern bool splay_tree_contains_p(struct splay_tree *tree, struct splay_tree *node);
+extern bool trie_tree_sequence_matched_p(s_trie_tree_t *trie, uint32 *sequence, uint32 len);
+extern bool trie_tree_string_matched_p(s_trie_tree_t *trie, char *string);
+extern bool trie_tree_structure_legal_p(s_trie_tree_t *trie);
+extern s_trie_tree_t * trie_tree_create(void);
 extern sint32 avl_tree_height(struct avl_tree *tree);
 extern sint32 binary_search_tree_height(struct binary_search_tree *tree);
 extern sint32 splay_tree_height(struct splay_tree *tree);
@@ -428,6 +478,11 @@ extern void splay_tree_destroy(struct splay_tree **tree);
 extern void splay_tree_initial(struct splay_tree *tree, sint64 nice);
 extern void splay_tree_iterate(struct splay_tree *tree, void (*handle)(void *), enum ITER_ORDER order);
 extern void splay_tree_nice_set(struct splay_tree *tree, sint64 nice);
+extern void trie_tree_destroy(s_trie_tree_t **trie);
+extern void trie_tree_sequence_insert(s_trie_tree_t *trie, uint32 *sequence, uint32 len);
+extern void trie_tree_sequence_remove(s_trie_tree_t *trie, uint32 *sequence, uint32 len);
+extern void trie_tree_string_insert(s_trie_tree_t *trie, char *string);
+extern void trie_tree_string_remove(s_trie_tree_t *trie, char *string);
 
 extern s_open_addressing_hash_t * open_addressing_hash_create(uint32 size);
 extern s_separate_chain_hash_t * separate_chain_hash_create(uint32 size);

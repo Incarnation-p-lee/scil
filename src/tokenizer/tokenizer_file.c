@@ -126,6 +126,7 @@ tokenizer_file_token_process(s_tokenizer_file_list_t *tkz_file_node)
 
     token_head = dp_malloc(sizeof(s_token_t));
     token_head->type = TK_LEX_HEAD;
+    doubly_linked_list_initial(&token_head->list);
 
     while (tokenizer_io_buffer_fill_buffer_p(tkz_io_buffer, tkz_language->type)) {
         tokenizer_file_io_buffer_process(tkz_io_buffer->secondary, tkz_language,

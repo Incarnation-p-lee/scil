@@ -11,8 +11,12 @@
 
 #include "token.h"
 #include "token_data.h"
-#include "token_language_c.h"
+#include "token_language.h"
 #include "token_declaration.h"
+
+#if defined DEBUG
+    #include "token_debug.c"
+#endif
 
 #include "token_char.c"
 #include "token_common.c"

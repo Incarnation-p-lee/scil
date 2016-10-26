@@ -24,7 +24,7 @@ tokenizer_language_create(char *filename)
 
     tkz_type = (e_tokenizer_language_type_t)*c++;
     while (*c) {
-        tkz_type = TK_C_OPTR_DUAL(tkz_type, (e_tokenizer_language_type_t)*c++);
+        tkz_type = TK_2_CHAR_JOIN(tkz_type, (e_tokenizer_language_type_t)*c++);
     }
     assert_exit(tokenizer_language_type_legal_p(tkz_type));
 
@@ -90,7 +90,7 @@ tokenizer_language_c_keyword_trie_destroy(s_tokenizer_language_t *tkz_language)
 {
     assert_exit(tkz_language);
 
-    token_language_c_keyword_trie_destroy(tkz_language->keyword_trie);
+    token_language_c_keyword_trie_destroy(&tkz_language->keyword_trie);
 }
 
 static inline void

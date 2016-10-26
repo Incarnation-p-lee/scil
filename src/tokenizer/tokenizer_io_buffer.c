@@ -230,7 +230,7 @@ tokenizer_io_buffer_fill_secondary_buffer_p(s_tokenizer_io_buffer_t *tkz_io_buff
             } else if (token_char_multiple_comment_head_p(buf + k, tkz_type)) {
                 k = tokenizer_io_buffer_skip_multiple_comment(tkz_io_buffer, k, tkz_type);
             } else if (index < READ_BUF_SIZE - 1) {  // index may add twice
-                if (dp_isspace(last)) {
+                if (dp_isspace(last) && index != 0) {
                     secondary->buf[index++] = NFA_SENTINEL;
                 }
                 secondary->buf[index++] = last = buf[k++];

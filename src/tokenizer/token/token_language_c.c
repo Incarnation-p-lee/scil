@@ -13,15 +13,17 @@ token_language_c_operator_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
         return TK_LANG_UNMATCH;
     } else {
         match_length = nfa_engine_token_match(nfa, buf);
-        assert_exit(match_length <= 2);
 
-        if (match_length) {
+        if (match_length == NFA_SZ_INVALID) {
+            scil_log_print_and_exit("Error occurs in 'nfa_engine_token_match'.\n");
+        } else if (match_length) {
+            assert_exit(match_length <= 2);
             optr_type = (e_token_language_c_optr_type_t)buf[0];
             token_last = token_list_previous_node(token_head);
             optr_type_last = token_language_c_optr_type_get(token_last);
 
             if (token_language_c_optr_consist_p(optr_type_last, optr_type)) {
-                optr_type = TK_C_OPTR_DUAL(optr_type_last, optr_type);
+                optr_type = TK_2_CHAR_JOIN(optr_type_last, optr_type);
                 token_language_c_optr_type_set(token_last, optr_type);
             } else {
                 token = token_language_c_optr_create(optr_type);
@@ -47,7 +49,9 @@ token_language_c_identifier_match(s_nfa_t *nfa, s_token_t *token_head, char *buf
     } else {
         match_length = nfa_engine_token_match(nfa, buf);
 
-        if (match_length) {
+        if (match_length == NFA_SZ_INVALID) {
+            scil_log_print_and_exit("Error occurs in 'nfa_engine_token_match'.\n");
+        } else if (match_length) {
             token = token_language_c_idtr_create(buf, match_length);
             token_list_insert_before(token_head, token);
         }
@@ -57,25 +61,27 @@ token_language_c_identifier_match(s_nfa_t *nfa, s_token_t *token_head, char *buf
 }
 
 void
-token_language_c_keyword_seek(s_token_language_c_kywd_t *keyword_trie, s_token_t *token)
+token_language_c_keyword_seek(s_trie_tree_t *keyword_trie, s_token_t *token)
 {
     s_token_language_c_idtr_t *tk_idtr;
     e_token_language_c_kywd_type_t type;
 
     if (!token_structure_legal_p(token)) {
         return;
-    } else if (!token_language_c_keyword_structure_legal_p(keyword_trie)) {
+    } else if (!trie_tree_structure_legal_p(keyword_trie)) {
         return;
     } else {
         tk_idtr = token->data;
         type = token_language_c_keyword_match(keyword_trie, tk_idtr->name);
 
-        if (TK_C_IDTR_NONE != type) {
+        if (TK_C_KYWD_NONE != type) {
             dp_free(tk_idtr->name);
 
             tk_idtr->is_keyword = true;
             tk_idtr->type = type;
             token->type = TK_LEX_KWRD;
+
+            TK_LANGUAGE_C_PRINT(token);
         }
     }
 }
@@ -95,7 +101,9 @@ token_language_c_constant_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
     } else {
         match_length = nfa_engine_token_match(nfa, buf);
 
-        if (match_length) {
+        if (match_length == NFA_SZ_INVALID) {
+            scil_log_print_and_exit("Error occurs in 'nfa_engine_token_match'.\n");
+        } else if (match_length) {
             token = token_language_c_cnst_create(buf, match_length);
             token_list_insert_before(token_head, token);
         }
@@ -119,7 +127,9 @@ token_language_c_punctuation_match(s_nfa_t *nfa, s_token_t *token_head, char *bu
     } else {
         match_length = nfa_engine_token_match(nfa, buf);
 
-        if (match_length) {
+        if (match_length == NFA_SZ_INVALID) {
+            scil_log_print_and_exit("Error occurs in 'nfa_engine_token_match'.\n");
+        } else if (match_length) {
             assert_exit(2 >= match_length);
 
             token = token_language_c_pctt_create(buf[0]);
@@ -309,6 +319,8 @@ token_language_c_optr_create(e_token_language_c_optr_type_t type)
     optr->type = type;
 
     doubly_linked_list_initial(&token->list);
+    TK_LANGUAGE_C_PRINT(token);
+
     return token;
 }
 
@@ -334,6 +346,8 @@ token_language_c_idtr_create(char *buf, uint32 size)
     idtr->name[size - 1] = NULL_CHAR;
 
     doubly_linked_list_initial(&token->list);
+    TK_LANGUAGE_C_PRINT(token);
+
     return token;
 }
 
@@ -358,6 +372,8 @@ token_language_c_cnst_create(char *buf, uint32 size)
     cnst->name[size - 1] = NULL_CHAR;
 
     doubly_linked_list_initial(&token->list);
+    TK_LANGUAGE_C_PRINT(token);
+
     return token;
 }
 
@@ -378,194 +394,57 @@ token_language_c_pctt_create(char c)
     pctt->type = type;
 
     doubly_linked_list_initial(&token->list);
+    TK_LANGUAGE_C_PRINT(token);
+
     return token;
 }
 
 static inline e_token_language_c_kywd_type_t
-token_language_c_keyword_to_type(char **keyword)
+token_language_c_keyword_to_type(char *keyword)
 {
-    e_token_language_c_kywd_type_t type;
-
     assert_exit(keyword);
+    assert_exit(token_language_c_keyword_legal_p(keyword));
 
-    type = (e_token_language_c_kywd_type_t)(keyword - (char **)token_language_c_keywords);
-
-    assert_exit(TK_C_IDTR_FIRST <= type && TK_C_IDTR_LAST > type);
-    return type;
+    return TK_4_CHAR_TO_U32(keyword);
 }
 
-static inline bool
-token_language_c_keyword_structure_legal_p(s_token_language_c_kywd_t *node)
-{
-    if (!node) {
-        return false;
-    } else if (NULL_CHAR != node->c && !regular_char_data_p(node->c)) {
-        return false;
-    } else if (TK_C_IDTR_FIRST > node->type || TK_C_IDTR_LAST < node->type) {
-        return false;
-    } else {
-        return true;
-    }
-}
-
-static inline s_token_language_c_kywd_t *
-token_language_c_keyword_trie_node_create(char c)
-{
-    s_token_language_c_kywd_t *node;
-
-    assert_exit(NULL_CHAR == c || regular_char_data_p(c));
-
-    node = dp_malloc(sizeof(*node));
-    node->c = c;
-    node->type = TK_C_IDTR_NONE;
-    dp_memset(node->children, 0, sizeof(node->children));
-
-    assert_exit(token_language_c_keyword_structure_legal_p(node));
-    return node;
-}
-
-s_token_language_c_kywd_t *
+s_trie_tree_t *
 token_language_c_keyword_trie_create(void)
 {
-    char **keyword_list, **keyword_limit;
-    s_token_language_c_kywd_t *keyword_root;
+    s_trie_tree_t *keyword_trie;
+    char **keyword, **keyword_limit;
 
-    keyword_list = (void *)token_language_c_keywords;
-    keyword_limit = keyword_list + ARRAY_SIZE_OF(token_language_c_keywords);
-    keyword_root = token_language_c_keyword_trie_node_create(NULL_CHAR);
+    keyword = (void *)token_language_c_keywords;
+    keyword_limit = keyword + ARRAY_SIZE_OF(token_language_c_keywords);
+    keyword_trie = trie_tree_create();
 
-    while (keyword_list < keyword_limit) {
-        token_language_c_keyword_trie_insert(keyword_root, keyword_list);
-        keyword_list++;
+    while (keyword < keyword_limit) {
+        trie_tree_string_insert(keyword_trie, *keyword);
+        keyword++;
     }
 
-    assert_exit(token_language_c_keyword_trie_legal_p(keyword_root));
-    return keyword_root;
-}
-
-static inline void
-token_language_c_keyword_trie_insert(s_token_language_c_kywd_t *root, char **keyword)
-{
-    char *c;
-    s_token_language_c_kywd_t *node, *node_tmp;
-    s_token_language_c_kywd_t **child;
-
-    assert_exit(keyword && *keyword);
-    assert_exit(token_language_c_keyword_structure_legal_p(root));
-
-    c = *keyword;
-    node = root;
-    while (*c) {
-        child = node->children;
-        while (*child) {
-            node_tmp = *child;
-            if (node_tmp->c == *c) {
-                node = node_tmp;
-                break;
-            }
-            child++;
-        }
-
-        if (!*child) {
-            *child = token_language_c_keyword_trie_node_create(*c);
-        }
-        c++;
-    }
-
-    (*child)->type = token_language_c_keyword_to_type(keyword);
+    return keyword_trie;
 }
 
 void
-token_language_c_keyword_trie_destroy(s_token_language_c_kywd_t *keyword_trie)
+token_language_c_keyword_trie_destroy(s_trie_tree_t **keyword_trie)
 {
-    s_array_queue_t *queue;
-    s_token_language_c_kywd_t *tmp, **child;
-
-    if (token_language_c_keyword_structure_legal_p(keyword_trie)) {
-        queue = array_queue_create();
-        array_queue_enter(queue, keyword_trie);
-
-        while (!array_queue_empty_p(queue)) {
-            tmp = array_queue_leave(queue);
-            child = tmp->children;
-            while (*child) {
-                array_queue_enter(queue, *child);
-                child++;
-            }
-            assert_exit(child <= tmp->children + TK_KYWD_CHILD_MAX);
-
-            dp_free(tmp);
-        }
-
-        array_queue_destroy(&queue);
+    if (keyword_trie && trie_tree_structure_legal_p(*keyword_trie)) {
+        trie_tree_destroy(keyword_trie);
     }
-}
-
-static inline bool
-token_language_c_keyword_trie_node_leaf_p(s_token_language_c_kywd_t *node)
-{
-    assert_exit(token_language_c_keyword_structure_legal_p(node));
-
-    return NULL == node->children[0];
 }
 
 static inline e_token_language_c_kywd_type_t
-token_language_c_keyword_match(s_token_language_c_kywd_t *keyword_trie,
-    char *idtr)
+token_language_c_keyword_match(s_trie_tree_t *keyword_trie, char *idtr)
 {
-    char *c;
-    s_token_language_c_kywd_t **child, *root;
-
     assert_exit(idtr);
-    assert_exit(token_language_c_keyword_structure_legal_p(keyword_trie));
+    assert_exit(trie_tree_structure_legal_p(keyword_trie));
 
-    c = idtr;
-    root = keyword_trie;
-
-    while (*c) {
-        child = root->children;
-        while (*child) {
-            if ((*child)->c == *c) {
-                root = *child;
-                break;
-            }
-            child++;
-        }
-        assert_exit(child <= root->children + TK_KYWD_CHILD_MAX);
-
-        if (!*child) {
-            return TK_C_IDTR_NONE;
-        }
-    }
-
-    if (!token_language_c_keyword_trie_node_leaf_p(*child)) {
-        return TK_C_IDTR_NONE;
+    if (trie_tree_string_matched_p(keyword_trie, idtr)) {
+        return token_language_c_keyword_to_type(idtr);
     } else {
-        assert_exit(TK_C_IDTR_NONE != (*child)->type);
-        return (*child)->type;
+        return TK_C_KYWD_NONE;
     }
-}
-
-static inline bool
-token_language_c_keyword_trie_legal_p(s_token_language_c_kywd_t *keyword_trie)
-{
-    char **keyword_list, **keyword_limit;
-    s_token_language_c_kywd_t *root;
-
-    assert_exit(token_language_c_keyword_structure_legal_p(keyword_trie));
-
-    root = keyword_trie;
-    keyword_list = (void *)token_language_c_keywords;
-    keyword_limit = keyword_list + ARRAY_SIZE_OF(token_language_c_keywords);
-
-    while (keyword_list < keyword_limit) {
-        if (TK_C_IDTR_NONE == token_language_c_keyword_match(root, *keyword_list)) {
-            return false;
-        }
-        keyword_list++;
-    }
-
-    return true;
 }
 
 static inline void

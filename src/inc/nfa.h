@@ -2,7 +2,8 @@
 #define HAVE_DEFINED_NFA_H
 
 #define NFA_LABEL_HASH_SIZE    127
-#define NFA_SZ_UNMATCH         -1
+#define NFA_SZ_UNMATCH         0
+#define NFA_SZ_INVALID         -1
 #define NFA_MARK_CHAR          ((char)0xa4)
 #define NFA_SENTINEL           ' '
 

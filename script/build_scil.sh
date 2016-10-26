@@ -22,10 +22,15 @@ fi
 
 base=$(pwd)
 src_dir=$base/src
+inc_dir=$src_dir/inc
 out_dir=$base/output
 obj_dir=$out_dir/obj
 bin_dir=$out_dir/bin
-lib_dir=$base/lib
+libds_dir=$base/libds
+libds_bin_dir=$libds_dir/output/bin
+libds_inc_dir=$libds_dir/output/inc
+libds_archive=$libds_bin_dir/libds.a
+libds_interface=$libds_inc_dir/data_structure_interface.h
 
 #######################
 ## parameters handle ##
@@ -147,7 +152,11 @@ done
 echo "    Copy     .. Makefile"
 cp $src_dir/Makefile.in $obj_dir
 echo "    Copy     .. libds.a"
-cp $lib_dir/* $obj_dir
+cp $libds_archive $obj_dir
+echo "    Copy     .. data_structure_interface.h"
+cp $libds_interface $inc_dir
+
+echo "    Generate .. Makefile"
 perl script/produce_link_makefile.pl $obj_dir
 echo "    Link     .. scil.elf"
 cd $obj_dir && make "ld_config=$ld_config" "ld_library=$ld_library" > $verbose

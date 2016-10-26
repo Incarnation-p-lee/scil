@@ -23,7 +23,6 @@ typedef enum token_language_c_optr_type e_token_language_c_optr_type_t;
 typedef enum token_language_c_kywd_type e_token_language_c_kywd_type_t;
 typedef enum token_language_c_pctt_type e_token_language_c_pctt_type_t;
 
-typedef struct token_language_c_kywd    s_token_language_c_kywd_t;
 typedef struct token_language_c_optr    s_token_language_c_optr_t;
 typedef struct token_language_c_idtr    s_token_language_c_idtr_t;
 typedef struct token_language_c_cnst    s_token_language_c_cnst_t;
@@ -49,65 +48,62 @@ enum token_language_c_optr_type {
 
     TK_C_OPTR_UNARY_LIMIT = TK_C_OPTR_NEG + 1,
 
-    TK_C_OPTR_GE      = TK_C_OPTR_DUAL(TK_C_OPTR_GT, TK_C_OPTR_EQ),               // >=
-    TK_C_OPTR_LE      = TK_C_OPTR_DUAL(TK_C_OPTR_LT, TK_C_OPTR_EQ),               // <=
-    TK_C_OPTR_ORE     = TK_C_OPTR_DUAL(TK_C_OPTR_OR, TK_C_OPTR_OR),               // |=
-    TK_C_OPTR_ADDE    = TK_C_OPTR_DUAL(TK_C_OPTR_ADD, TK_C_OPTR_EQ),              // +=
-    TK_C_OPTR_SUBE    = TK_C_OPTR_DUAL(TK_C_OPTR_SUB, TK_C_OPTR_EQ),              // -=
-    TK_C_OPTR_MULE    = TK_C_OPTR_DUAL(TK_C_OPTR_MUL, TK_C_OPTR_EQ),              // *=
-    TK_C_OPTR_ANDE    = TK_C_OPTR_DUAL(TK_C_OPTR_AND, TK_C_OPTR_EQ),              // &=
-    TK_C_OPTR_XORE    = TK_C_OPTR_DUAL(TK_C_OPTR_XOR, TK_C_OPTR_EQ),              // ^=
-    TK_C_OPTR_DIVE    = TK_C_OPTR_DUAL(TK_C_OPTR_DIV, TK_C_OPTR_EQ),              // /=
-    TK_C_OPTR_SHT_L   = TK_C_OPTR_DUAL(TK_C_OPTR_LT, TK_C_OPTR_LT),               // <<
-    TK_C_OPTR_SHT_R   = TK_C_OPTR_DUAL(TK_C_OPTR_GT, TK_C_OPTR_GT),               // >>
-    TK_C_OPTR_REF_PTR = TK_C_OPTR_DUAL(TK_C_OPTR_SUB, TK_C_OPTR_GT),              // ->
-    TK_C_OPTR_SHTE_L  = TK_C_OPTR_TRIPLE(TK_C_OPTR_LT, TK_C_OPTR_LT, TK_C_OPTR_EQ), // <<=
-    TK_C_OPTR_SHTE_R  = TK_C_OPTR_TRIPLE(TK_C_OPTR_GT, TK_C_OPTR_GT, TK_C_OPTR_EQ), // >>=
+    TK_C_OPTR_GE      = TK_2_CHAR_JOIN(TK_C_OPTR_GT, TK_C_OPTR_EQ),               // >=
+    TK_C_OPTR_LE      = TK_2_CHAR_JOIN(TK_C_OPTR_LT, TK_C_OPTR_EQ),               // <=
+    TK_C_OPTR_ORE     = TK_2_CHAR_JOIN(TK_C_OPTR_OR, TK_C_OPTR_OR),               // |=
+    TK_C_OPTR_ADDE    = TK_2_CHAR_JOIN(TK_C_OPTR_ADD, TK_C_OPTR_EQ),              // +=
+    TK_C_OPTR_SUBE    = TK_2_CHAR_JOIN(TK_C_OPTR_SUB, TK_C_OPTR_EQ),              // -=
+    TK_C_OPTR_MULE    = TK_2_CHAR_JOIN(TK_C_OPTR_MUL, TK_C_OPTR_EQ),              // *=
+    TK_C_OPTR_ANDE    = TK_2_CHAR_JOIN(TK_C_OPTR_AND, TK_C_OPTR_EQ),              // &=
+    TK_C_OPTR_XORE    = TK_2_CHAR_JOIN(TK_C_OPTR_XOR, TK_C_OPTR_EQ),              // ^=
+    TK_C_OPTR_DIVE    = TK_2_CHAR_JOIN(TK_C_OPTR_DIV, TK_C_OPTR_EQ),              // /=
+    TK_C_OPTR_SHT_L   = TK_2_CHAR_JOIN(TK_C_OPTR_LT, TK_C_OPTR_LT),               // <<
+    TK_C_OPTR_SHT_R   = TK_2_CHAR_JOIN(TK_C_OPTR_GT, TK_C_OPTR_GT),               // >>
+    TK_C_OPTR_REF_PTR = TK_2_CHAR_JOIN(TK_C_OPTR_SUB, TK_C_OPTR_GT),              // ->
+    TK_C_OPTR_SHTE_L  = TK_3_CHAR_JOIN(TK_C_OPTR_LT, TK_C_OPTR_LT, TK_C_OPTR_EQ), // <<=
+    TK_C_OPTR_SHTE_R  = TK_3_CHAR_JOIN(TK_C_OPTR_GT, TK_C_OPTR_GT, TK_C_OPTR_EQ), // >>=
 };
 
 /*
  * The element sequence should be the same as token_lang_c_keywords(token_data.h).
  */
-enum token_language_c_kywd_type {
-    TK_C_IDTR_ASM,
-    TK_C_IDTR_AUTO,
-    TK_C_IDTR_BREAK,
-    TK_C_IDTR_CASE,
-    TK_C_IDTR_CHAR,
-    TK_C_IDTR_CONST,
-    TK_C_IDTR_CONTINUE,
-    TK_C_IDTR_DEFAULT,
-    TK_C_IDTR_DOUBLE,
-    TK_C_IDTR_DO,
-    TK_C_IDTR_ELSE,
-    TK_C_IDTR_ENUM,
-    TK_C_IDTR_EXTERN,
-    TK_C_IDTR_FLOAT,
-    TK_C_IDTR_FOR,
-    TK_C_IDTR_GOTO,
-    TK_C_IDTR_IF,
-    TK_C_IDTR_INLINE,
-    TK_C_IDTR_INT,
-    TK_C_IDTR_LONG,
-    TK_C_IDTR_REGISTER,
-    TK_C_IDTR_RESTRICT,
-    TK_C_IDTR_RETURN,
-    TK_C_IDTR_SHORT,
-    TK_C_IDTR_SIGNED,
-    TK_C_IDTR_SIZEOF,
-    TK_C_IDTR_STATIC,
-    TK_C_IDTR_STRUCT,
-    TK_C_IDTR_SWITCH,
-    TK_C_IDTR_TYPEDEF,
-    TK_C_IDTR_UNION,
-    TK_C_IDTR_UNSIGNED,
-    TK_C_IDTR_VOID,
-    TK_C_IDTR_VOLATILE,
-    TK_C_IDTR_WHILE,
-    TK_C_IDTR_NONE,
-
-    TK_C_IDTR_FIRST = TK_C_IDTR_ASM,
-    TK_C_IDTR_LAST  = TK_C_IDTR_NONE,
+enum token_language_c_kywd_type { /* placehoulder '-' */
+    TK_C_KYWD_NONE,
+    TK_C_KYWD_ASM      = TK_4_CHAR_JOIN('a', 's', 'm', '-'),
+    TK_C_KYWD_AUTO     = TK_4_CHAR_JOIN('a', 'u', 't', 'o'),
+    TK_C_KYWD_BREAK    = TK_4_CHAR_JOIN('b', 'r', 'e', 'a'),
+    TK_C_KYWD_CASE     = TK_4_CHAR_JOIN('c', 'a', 's', 'e'),
+    TK_C_KYWD_CHAR     = TK_4_CHAR_JOIN('c', 'h', 'a', 'r'),
+    TK_C_KYWD_CONST    = TK_4_CHAR_JOIN('c', 'o', 'n', 's'),
+    TK_C_KYWD_CONTINUE = TK_4_CHAR_JOIN('c', 'o', 'n', 't'),
+    TK_C_KYWD_DEFAULT  = TK_4_CHAR_JOIN('d', 'e', 'f', 'a'),
+    TK_C_KYWD_DOUBLE   = TK_4_CHAR_JOIN('d', 'o', 'u', 'b'),
+    TK_C_KYWD_DO       = TK_4_CHAR_JOIN('d', 'o', '-', '-'),
+    TK_C_KYWD_ELSE     = TK_4_CHAR_JOIN('e', 'l', 's', 'e'),
+    TK_C_KYWD_ENUM     = TK_4_CHAR_JOIN('e', 'n', 'u', 'm'),
+    TK_C_KYWD_EXTERN   = TK_4_CHAR_JOIN('e', 'x', 't', 'e'),
+    TK_C_KYWD_FLOAT    = TK_4_CHAR_JOIN('f', 'l', 'o', 'a'),
+    TK_C_KYWD_FOR      = TK_4_CHAR_JOIN('f', 'o', 'r', '-'),
+    TK_C_KYWD_GOTO     = TK_4_CHAR_JOIN('g', 'o', 't', 'o'),
+    TK_C_KYWD_IF       = TK_4_CHAR_JOIN('i', 'f', '-', '-'),
+    TK_C_KYWD_INLINE   = TK_4_CHAR_JOIN('i', 'n', 'l', 'i'),
+    TK_C_KYWD_INT      = TK_4_CHAR_JOIN('i', 'n', 't', '-'),
+    TK_C_KYWD_LONG     = TK_4_CHAR_JOIN('l', 'o', 'n', 'g'),
+    TK_C_KYWD_REGISTER = TK_4_CHAR_JOIN('r', 'e', 'g', 'i'),
+    TK_C_KYWD_RESTRICT = TK_4_CHAR_JOIN('r', 'e', 's', 't'),
+    TK_C_KYWD_RETURN   = TK_4_CHAR_JOIN('r', 'e', 't', 'u'),
+    TK_C_KYWD_SHORT    = TK_4_CHAR_JOIN('s', 'h', 'o', 'r'),
+    TK_C_KYWD_SIGNED   = TK_4_CHAR_JOIN('s', 'i', 'g', 'n'),
+    TK_C_KYWD_SIZEOF   = TK_4_CHAR_JOIN('s', 'i', 'z', 'e'),
+    TK_C_KYWD_STATIC   = TK_4_CHAR_JOIN('s', 't', 'a', 't'),
+    TK_C_KYWD_STRUCT   = TK_4_CHAR_JOIN('s', 't', 'r', 'u'),
+    TK_C_KYWD_SWITCH   = TK_4_CHAR_JOIN('s', 'w', 'i', 't'),
+    TK_C_KYWD_TYPEDEF  = TK_4_CHAR_JOIN('t', 'y', 'p', 'e'),
+    TK_C_KYWD_UNIONEF  = TK_4_CHAR_JOIN('u', 'n', 'i', 'o'),
+    TK_C_KYWD_UNSIGNED = TK_4_CHAR_JOIN('u', 'n', 's', 'i'),
+    TK_C_KYWD_VOID     = TK_4_CHAR_JOIN('v', 'o', 'i', 'd'),
+    TK_C_KYWD_VOLATILE = TK_4_CHAR_JOIN('v', 'o', 'l', 'a'),
+    TK_C_KYWD_WHILE    = TK_4_CHAR_JOIN('w', 'h', 'i', 'l'),
 };
 
 enum token_language_c_pctt_type {
@@ -119,13 +115,6 @@ enum token_language_c_pctt_type {
     TK_C_PCTT_L_BRKT_L  = '{',
     TK_C_PCTT_L_BRKT_R  = '}',
     TK_C_PCTT_SEMICOLON = ';',
-};
-
-/* only used for tokenizer language for keyword trie */
-struct token_language_c_kywd {
-    char                           c;
-    e_token_language_c_kywd_type_t type;
-    s_token_language_c_kywd_t      *children[TK_KYWD_CHILD_MAX];
 };
 
 struct token_language_c_optr {

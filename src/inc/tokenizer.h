@@ -21,7 +21,7 @@ typedef enum tokenizer_language_type e_tokenizer_language_type_t;
 
 enum tokenizer_language_type {
     TKZ_LANG_C   = 'c',
-    TKZ_LANG_CPP = TK_C_OPTR_TRIPLE('c', 'p', 'p'),
+    TKZ_LANG_CPP = TK_3_CHAR_JOIN('c', 'p', 'p'),
 
 };
 
@@ -33,11 +33,11 @@ struct tokenizer_io_buffer {
 
 struct tokenizer_language {
     e_tokenizer_language_type_t type;
-    void                       *keyword_trie;
-    s_nfa_t                    *operator;
-    s_nfa_t                    *identifier;
-    s_nfa_t                    *constant;
-    s_nfa_t                    *punctuation;
+    s_trie_tree_t               *keyword_trie;
+    s_nfa_t                     *operator;
+    s_nfa_t                     *identifier;
+    s_nfa_t                     *constant;
+    s_nfa_t                     *punctuation;
 };
 
 struct tokenizer_file_list {
