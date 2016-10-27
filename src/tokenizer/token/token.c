@@ -11,6 +11,7 @@
 
 #include "token.h"
 #include "token_data.h"
+#include "token_define.h"
 #include "token_language.h"
 #include "token_declaration.h"
 

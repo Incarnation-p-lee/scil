@@ -6,7 +6,7 @@
 extern bool nfa_engine_pattern_match_p(s_nfa_t *nfa, char *pn);
 extern bool nfa_engine_structure_legal_p(s_nfa_t *nfa);
 extern s_nfa_t * nfa_engine_create(char *regular);
-extern uint32 nfa_engine_token_match(s_nfa_t *nfa, char *pn);
+extern uint32 nfa_engine_pattern_match(s_nfa_t *nfa, char *pn);
 extern void nfa_engine_destroy(s_nfa_t *nfa);
 
 #endif

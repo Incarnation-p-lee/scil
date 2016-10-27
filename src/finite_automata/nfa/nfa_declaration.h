@@ -19,7 +19,7 @@ static inline s_nfa_edge_map_t * nfa_edge_map_create(char c);
 static inline s_nfa_t * nfa_edge_map_nfa_obtain(s_nfa_edge_map_t *map);
 static inline s_nfa_t * nfa_engine_create_i(char *polish);
 static inline s_nfa_t * nfa_subset_rule_basic(char c);
-static inline uint32 nfa_engine_token_match_i(s_nfa_t *nfa, char *pn);
+static inline uint32 nfa_engine_pattern_match_i(s_nfa_t *nfa, char *pn);
 static inline uint32 nfa_label_obtain(void);
 static inline void nfa_edge_map_destroy(s_nfa_edge_map_t *map);
 static inline void nfa_engine_array_queue_swap(s_array_queue_t **a, s_array_queue_t **b);
@@ -44,7 +44,7 @@ static inline void nfa_subset_rule_induction_plus(s_nfa_t *s);
 static inline void nfa_subset_rule_induction_question(s_nfa_t *s);
 static inline void nfa_subset_rule_induction_star(s_nfa_t *s);
 static inline void nfa_subset_rule_induction_unary(s_array_stack_t *stack, e_regular_wildcard_t opt);
-uint32 nfa_engine_token_match(s_nfa_t *nfa, char *pn);
+uint32 nfa_engine_pattern_match(s_nfa_t *nfa, char *pn);
 void nfa_engine_destroy(s_nfa_t *nfa);
 
 #endif

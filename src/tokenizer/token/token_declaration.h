@@ -33,6 +33,8 @@ static inline s_token_t * token_language_c_optr_create(e_token_language_c_optr_t
 static inline s_token_t * token_language_c_pctt_create(char c);
 static inline s_token_t * token_list_next_node_i(s_token_t *token);
 static inline s_token_t * token_list_previous_node_i(s_token_t *token);
+static inline uint32 token_language_c_nfa_match(s_nfa_t *nfa, char *buf);
+static inline void token_language_c_keyword_encode(char *encode_buf, char *keyword);
 static inline void token_language_c_node_destroy(s_token_t *token_node);
 static inline void token_language_c_optr_type_set(s_token_t *token, e_token_language_c_optr_type_t type);
 static inline void token_language_c_print(s_token_t *token);

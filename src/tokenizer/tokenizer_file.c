@@ -143,8 +143,8 @@ static inline void
 tokenizer_file_io_buffer_process(s_io_buffer_t *io_buffer,
     s_tokenizer_language_t *tkz_language, s_token_t *token_head)
 {
-    char *c;
     uint32 limit;
+    char *c, *match_start;
 
     assert_exit(token_head);
     assert_exit(tokenizer_language_structure_legal_p(tkz_language));
@@ -154,10 +154,15 @@ tokenizer_file_io_buffer_process(s_io_buffer_t *io_buffer,
     limit = io_buffer->size;
 
     while (c < limit + io_buffer->buf) {
+        match_start = c;
         c += tokenizer_language_operator_match(tkz_language,    token_head, c);
         c += tokenizer_language_identifer_match(tkz_language,   token_head, c);
         c += tokenizer_language_constant_match(tkz_language,    token_head, c);
         c += tokenizer_language_punctuation_match(tkz_language, token_head, c);
+
+        if (c == match_start) {
+            scil_log_print_and_exit("Detect unknown token.\n");
+        }
     }
 }
 

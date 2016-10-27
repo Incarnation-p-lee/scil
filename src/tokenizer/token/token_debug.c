@@ -1,11 +1,13 @@
 static inline bool
 token_language_c_keyword_legal_p(char *keyword)
 {
+    char encode_buf[TK_C_KYWD_ENCODE_SIZE];
     e_token_language_c_kywd_type_t type;
 
     assert_exit(keyword);
 
-    type = TK_4_CHAR_TO_U32(keyword);
+    token_language_c_keyword_encode(encode_buf, keyword);
+    type = TK_4_CHAR_TO_U32(encode_buf);
 
     switch (type) {
         case TK_C_KYWD_ASM:
@@ -52,6 +54,9 @@ token_language_c_keyword_legal_p(char *keyword)
 static inline void
 token_language_c_print(s_token_t *token)
 {
+    char *keyword;
+    s_token_language_c_idtr_t *idtr;
+
     assert_exit(token_structure_legal_p(token));
 
     switch (token->type) {
@@ -62,10 +67,14 @@ token_language_c_print(s_token_t *token)
             scil_log_print(" >> token OPTR\n");
             break;
         case TK_LEX_KWRD:
-            scil_log_print(" >> token KWRD\n");
+            idtr = token->data;
+            keyword = (char *)&idtr->type;
+            scil_log_print(" >> token KWRD '%c%c%c%c'\n",
+                keyword[3], keyword[2], keyword[1], keyword[0]);
             break;
         case TK_LEX_IDTR:
-            scil_log_print(" >> token IDTR\n");
+            idtr = token->data;
+            scil_log_print(" >> token IDTR '%s'\n", idtr->name);
             break;
         case TK_LEX_CNST:
             scil_log_print(" >> token CNST\n");

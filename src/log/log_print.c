@@ -37,6 +37,7 @@ scil_log_print_and_exit(const char *format, ...)
     dp_va_list vl;
 
     if (format) {
+        dp_fprintf(log_file, "Err: ");
         dp_va_start(vl, format);
         dp_vfprintf(log_file, format, vl);
         dp_fflush(log_file);

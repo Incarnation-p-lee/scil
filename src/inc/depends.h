@@ -23,6 +23,7 @@
 #define dp_fclose              fclose
 #define dp_fread               fread
 #define dp_exit                exit
+#define dp_fprintf             fprintf
 #define dp_vfprintf            vfprintf
 #define dp_sprintf             sprintf
 #define dp_va_list             va_list

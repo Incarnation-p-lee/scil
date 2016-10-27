@@ -1,3 +1,23 @@
+static inline uint32
+token_language_c_nfa_match(s_nfa_t *nfa, char *buf)
+{
+    uint32 idx;
+    uint32 match_size;
+
+    assert_exit(nfa && buf);
+
+    idx = 0;
+    while (buf[idx] != TK_SENTINEL) {
+        idx++;
+    }
+
+    buf[idx] = NULL_CHAR;
+    match_size = nfa_engine_pattern_match(nfa, buf);
+    buf[idx] = TK_SENTINEL;
+
+    return match_size;
+}
+
 uint32
 token_language_c_operator_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
 {
@@ -12,10 +32,10 @@ token_language_c_operator_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
     } else if (!token_structure_legal_p(token_head)) {
         return TK_LANG_UNMATCH;
     } else {
-        match_length = nfa_engine_token_match(nfa, buf);
+        match_length = token_language_c_nfa_match(nfa, buf);
 
         if (match_length == NFA_SZ_INVALID) {
-            scil_log_print_and_exit("Error occurs in 'nfa_engine_token_match'.\n");
+            scil_log_print_and_exit("Error occurs in 'token_language_c_nfa_match'.\n");
         } else if (match_length) {
             assert_exit(match_length <= 2);
             optr_type = (e_token_language_c_optr_type_t)buf[0];
@@ -47,10 +67,10 @@ token_language_c_identifier_match(s_nfa_t *nfa, s_token_t *token_head, char *buf
     } else if (!token_structure_legal_p(token_head)) {
         return TK_LANG_UNMATCH;
     } else {
-        match_length = nfa_engine_token_match(nfa, buf);
+        match_length = token_language_c_nfa_match(nfa, buf);
 
         if (match_length == NFA_SZ_INVALID) {
-            scil_log_print_and_exit("Error occurs in 'nfa_engine_token_match'.\n");
+            scil_log_print_and_exit("Error occurs in 'token_language_c_nfa_match'.\n");
         } else if (match_length) {
             token = token_language_c_idtr_create(buf, match_length);
             token_list_insert_before(token_head, token);
@@ -99,10 +119,10 @@ token_language_c_constant_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
     } else if (!token_structure_legal_p(token_head)) {
         return TK_LANG_UNMATCH;
     } else {
-        match_length = nfa_engine_token_match(nfa, buf);
+        match_length = token_language_c_nfa_match(nfa, buf);
 
         if (match_length == NFA_SZ_INVALID) {
-            scil_log_print_and_exit("Error occurs in 'nfa_engine_token_match'.\n");
+            scil_log_print_and_exit("Error occurs in 'token_language_c_nfa_match'.\n");
         } else if (match_length) {
             token = token_language_c_cnst_create(buf, match_length);
             token_list_insert_before(token_head, token);
@@ -125,10 +145,10 @@ token_language_c_punctuation_match(s_nfa_t *nfa, s_token_t *token_head, char *bu
     } else if (!token_structure_legal_p(token_head)) {
         return TK_LANG_UNMATCH;
     } else {
-        match_length = nfa_engine_token_match(nfa, buf);
+        match_length = token_language_c_nfa_match(nfa, buf);
 
         if (match_length == NFA_SZ_INVALID) {
-            scil_log_print_and_exit("Error occurs in 'nfa_engine_token_match'.\n");
+            scil_log_print_and_exit("Error occurs in 'token_language_c_nfa_match'.\n");
         } else if (match_length) {
             assert_exit(2 >= match_length);
 
@@ -332,7 +352,7 @@ token_language_c_idtr_create(char *buf, uint32 size)
 
     assert_exit(buf && size);
 
-    if (NFA_SENTINEL != buf[size - 1]) {
+    if (TK_SENTINEL != buf[size - 1]) {
         size++;
     }
 
@@ -359,7 +379,7 @@ token_language_c_cnst_create(char *buf, uint32 size)
 
     assert_exit(buf && size);
 
-    if (NFA_SENTINEL != buf[size - 1]) {
+    if (TK_SENTINEL != buf[size - 1]) {
         size++;
     }
 
@@ -399,13 +419,28 @@ token_language_c_pctt_create(char c)
     return token;
 }
 
+static inline void
+token_language_c_keyword_encode(char *encode_buf, char *keyword)
+{
+    assert_exit(keyword);
+
+    // keyword to type encoded by first 4 char
+    // if keyword has chars < 4, use TK_C_KYWD_HOLDER as placeholder
+    dp_memset(encode_buf, TK_C_KYWD_HOLDER, TK_C_KYWD_ENCODE_SIZE);
+    dp_memcpy(encode_buf, keyword, dp_strlen(keyword));
+}
+
 static inline e_token_language_c_kywd_type_t
 token_language_c_keyword_to_type(char *keyword)
 {
+    char encode_buf[TK_C_KYWD_ENCODE_SIZE];
+
     assert_exit(keyword);
     assert_exit(token_language_c_keyword_legal_p(keyword));
 
-    return TK_4_CHAR_TO_U32(keyword);
+    token_language_c_keyword_encode(encode_buf, keyword);
+
+    return TK_4_CHAR_TO_U32(encode_buf);
 }
 
 s_trie_tree_t *
