@@ -9,6 +9,17 @@ token_char_double_quote_p(char c)
 }
 
 bool
+token_char_comment_p(char *buf, e_tokenizer_language_type_t tkz_type)
+{
+    if (!buf) {
+        return false;
+    } else {
+        return token_char_single_comment_p(buf, tkz_type)
+            || token_char_multiple_comment_head_p(buf, tkz_type);
+    }
+}
+
+bool
 token_char_single_comment_p(char *buf, e_tokenizer_language_type_t tkz_type)
 {
     if (!buf) {

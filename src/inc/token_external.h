@@ -3,6 +3,7 @@
 #ifndef HAVE_DEFINED_EXTERNAL_H_token_
 #define HAVE_DEFINED_EXTERNAL_H_token_
 
+extern bool token_char_comment_p(char *buf, e_tokenizer_language_type_t tkz_type);
 extern bool token_char_double_quote_p(char c);
 extern bool token_char_multiple_comment_head_p(char *buf, e_tokenizer_language_type_t tkz_type);
 extern bool token_char_multiple_comment_tail_p(char *buf, e_tokenizer_language_type_t tkz_type);

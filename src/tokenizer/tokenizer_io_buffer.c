@@ -124,6 +124,22 @@ tokenizer_io_buffer_skip_multiple_comment(s_tokenizer_io_buffer_t *tkz_io_buffer
 }
 
 static inline uint32
+tokenizer_io_buffer_skip_comment(s_tokenizer_io_buffer_t *tkz_io_buffer, uint32 index,
+    e_tokenizer_language_type_t tkz_type)
+{
+
+    assert_exit(index < READ_BUF_SIZE);
+    assert_exit(tokenizer_io_buffer_structure_legal_p(tkz_io_buffer));
+    assert_exit(token_char_comment_p(tkz_io_buffer->primary->buf + index, tkz_type));
+
+    if (token_char_single_comment_p(tkz_io_buffer->primary->buf + index, tkz_type)) {
+        return tokenizer_io_buffer_skip_single_comment(tkz_io_buffer, index, tkz_type);
+    } else {
+        return tokenizer_io_buffer_skip_multiple_comment(tkz_io_buffer, index, tkz_type);
+    }
+}
+
+static inline uint32
 tokenizer_io_buffer_skip_single_comment(s_tokenizer_io_buffer_t *tkz_io_buffer, uint32 index,
     e_tokenizer_language_type_t tkz_type)
 {
@@ -207,8 +223,8 @@ tokenizer_io_buffer_fill_secondary_buffer_p(s_tokenizer_io_buffer_t *tkz_io_buff
 
     assert_exit(tokenizer_io_buffer_structure_legal_p(tkz_io_buffer));
 
-    is_string = false;
     last = NULL_CHAR;
+    is_string = false;
     primary = tkz_io_buffer->primary;
     secondary = tkz_io_buffer->secondary;
     index = tokenizer_io_secondary_buffer_resume(secondary);
@@ -225,11 +241,9 @@ tokenizer_io_buffer_fill_secondary_buffer_p(s_tokenizer_io_buffer_t *tkz_io_buff
             } else if (dp_isspace(buf[k])) {
                 last = buf[k++];
                 secondary->size = index;
-            } else if (token_char_single_comment_p(buf + k, tkz_type)) {
-                k = tokenizer_io_buffer_skip_single_comment(tkz_io_buffer, k, tkz_type);
-            } else if (token_char_multiple_comment_head_p(buf + k, tkz_type)) {
-                k = tokenizer_io_buffer_skip_multiple_comment(tkz_io_buffer, k, tkz_type);
-            } else if (index < READ_BUF_SIZE - 1) {  // index may add twice
+            } else if (token_char_comment_p(buf + k, tkz_type)) {
+                k = tokenizer_io_buffer_skip_comment(tkz_io_buffer, k, tkz_type);
+            } else if (index < READ_BUF_SIZE - 1) { // index may add twice
                 if (dp_isspace(last) && index != 0) {
                     secondary->buf[index++] = TK_SENTINEL;
                 }
