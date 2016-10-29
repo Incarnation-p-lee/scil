@@ -57,8 +57,8 @@ token_language_c_operator_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
 uint32
 token_language_c_identifier_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
 {
-    uint32 match_length;
     s_token_t *token;
+    uint32 match_length;
 
     if (!buf) {
         return TK_LANG_UNMATCH;

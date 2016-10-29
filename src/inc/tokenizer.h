@@ -12,9 +12,11 @@
 #define PATH_ISOLATOR                '/'
 #define OPTION_CHAR                  '-'
 #define TKZ_LOG_SUFFIX               ".log"
+#define TKZ_IO_BLOCK_SIZE            256
 
 typedef struct tokenizer_io_buffer   s_tokenizer_io_buffer_t;
 typedef struct io_buffer             s_io_buffer_t;
+typedef struct io_block              s_io_block_t;
 typedef struct tokenizer_language    s_tokenizer_language_t;
 typedef struct tokenizer_file_list   s_tokenizer_file_list_t;
 typedef enum tokenizer_language_type e_tokenizer_language_type_t;
@@ -58,6 +60,13 @@ struct io_buffer {
     };
     char   buf[READ_BUF_SIZE + 1];
 };
+
+struct io_block {
+    uint32 size;
+    char   *block_buf;
+    char   *iterate_buf;
+};
+
 
 #endif
 
