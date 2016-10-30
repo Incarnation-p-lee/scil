@@ -13,7 +13,7 @@
 #define LANGUAGE_C_RE_IDTR           "[A-Za-z_][a-zA-Z0-9_]*"
 #define LANGUAGE_C_RE_OPTR           "`+|`*|`?|-|/|`||~|^|%|!|`&|.|:|=|>|<"
 #define LANGUAGE_C_RE_CNST           "[0-9]+|\"[a-zA-Z0-9_ #%]+\""
-#define LANGUAGE_C_RE_PCTT           "`[`],;`(`){}"
+#define LANGUAGE_C_RE_PCTT           "`[|`]|,|;|`(|`)|{|}"
 
 /* For Language C, 16 children size of keyword trie is enough */
 #define TK_KYWD_CHILD_MAX            16

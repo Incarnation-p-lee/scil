@@ -43,7 +43,7 @@ tokenizer_io_block_fill(s_io_block_t *io_block, char *buf)
     assert_exit(buf);
     assert_exit(tokenizer_io_block_structure_legal_p(io_block));
 
-    io_block_size = tokenizer_io_block_size(buf);
+    io_block_size = tokenizer_io_block_data_size(buf);
     if (io_block_size > io_block->size) {
         io_block->block_buf = dp_realloc(io_block->block_buf, io_block_size);
         io_block->iterate_buf = dp_realloc(io_block->iterate_buf, io_block_size);
@@ -51,7 +51,6 @@ tokenizer_io_block_fill(s_io_block_t *io_block, char *buf)
     }
 
     dp_memcpy(io_block->block_buf, buf, sizeof(char) * io_block_size);
-    io_block->block_buf[io_block_size - 1] = NULL_CHAR;
 
     return io_block_size;
 }
@@ -86,7 +85,7 @@ tokenizer_io_block_process(s_tokenizer_language_t *tkz_language,
  *              sentinel
  */
 static inline uint32
-tokenizer_io_block_size(char *io_block)
+tokenizer_io_block_data_size(char *io_block)
 {
     char *c;
     uint32 io_block_size;
@@ -96,6 +95,7 @@ tokenizer_io_block_size(char *io_block)
     c = io_block;
     io_block_size = 0;
     while (*c != TK_SENTINEL) {
+        c++;
         io_block_size++;
     }
 
@@ -108,31 +108,35 @@ tokenizer_io_block_language_c_match(s_tokenizer_language_t *tkz_language,
 {
     char *buf;
     uint32 i, last_index;
-    uint32 buf_size, match_size, rest_size;
+    uint32 data_size, match_size, rest_size;
 
     assert_exit(token_structure_legal_p(token_head));
     assert_exit(tokenizer_io_block_structure_legal_p(io_block));
     assert_exit(tokenizer_language_structure_legal_p(tkz_language));
 
-    buf_size = io_block->size;
     buf = io_block->iterate_buf;
-    dp_memcpy(buf, io_block->block_buf, sizeof(char) * buf_size);
+    data_size = tokenizer_io_block_data_size(io_block->block_buf);
+    assert_exit(data_size >= 2);
+
+    dp_memcpy(buf, io_block->block_buf, sizeof(char) * data_size);
+    buf[data_size - 1] = NULL_CHAR;
 
     i = match_size = 0;
-    rest_size = buf_size - 1;
-    last_index = buf_size - 2;
+    rest_size = dp_strlen(buf);
+    last_index = rest_size - 1;
 
-    while (match_size != rest_size) {
+    while (rest_size != 0) {
         match_size = tokenizer_language_c_token_match(tkz_language, token_head, buf);
-        if (match_size == 0 && last_index == 0) {
+        if (match_size == NFA_SZ_UNMATCH && last_index == 0) {
             scil_log_print_and_exit("Cannot detect any token of '%s'.\n", io_block->block_buf);
         } else if (match_size == 0) {
             buf[last_index--] = NULL_CHAR;
         } else {
-            match_size--; // chop the last sentinel char
-            rest_size -= match_size;
             i += match_size;
-            dp_memcpy(buf, io_block->block_buf + i, rest_size + 1);
+            rest_size -= match_size;
+
+            dp_memcpy(buf, io_block->block_buf + i, rest_size);
+            buf[rest_size] = NULL_CHAR;
         }
     }
 }

@@ -1,21 +1,13 @@
 static inline uint32
 token_language_c_nfa_match(s_nfa_t *nfa, char *buf)
 {
-    uint32 idx;
-    uint32 match_size;
-
     assert_exit(nfa && buf);
 
-    idx = 0;
-    while (buf[idx] != TK_SENTINEL) {
-        idx++;
+    if (nfa_engine_pattern_match_p(nfa, buf)) {
+        return dp_strlen(buf);
+    } else {
+        return NFA_SZ_UNMATCH;
     }
-
-    buf[idx] = NULL_CHAR;
-    match_size = nfa_engine_pattern_match(nfa, buf);
-    buf[idx] = TK_SENTINEL;
-
-    return match_size;
 }
 
 uint32

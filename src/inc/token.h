@@ -16,7 +16,7 @@
 #define TK_STAR                    '*'
 #define TK_NEWLINE                 '\n'
 #define TK_FILE_SPLIT              '.'
-#define TK_SENTINEL                ((char)0xa4)
+#define TK_SENTINEL                ' '
 
 #include "token_language_c.h"
 
