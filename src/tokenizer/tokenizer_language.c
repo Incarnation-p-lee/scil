@@ -68,6 +68,7 @@ tokenizer_language_destroy(s_tokenizer_language_t *tkz_language)
     switch (tkz_language->type) {
         case TKZ_LANG_C:
             tokenizer_language_c_destroy(tkz_language);
+            break;
         default:
             assert_exit(false);
             break;

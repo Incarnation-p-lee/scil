@@ -25,7 +25,7 @@ static inline s_tokenizer_file_list_t * tokenizer_file_list_create(char *fname);
 static inline s_tokenizer_file_list_t * tokenizer_file_list_next(s_tokenizer_file_list_t *tkz_file_list);
 static inline s_tokenizer_io_buffer_t * tokenizer_io_buffer_create(char *fname);
 static inline s_tokenizer_language_t * tokenizer_language_create(char *filename);
-static inline uint32 tokenizer_io_block_data_size(char *io_block);
+static inline uint32 tokenizer_io_block_data_size(char *buf);
 static inline uint32 tokenizer_io_block_fill(s_io_block_t *io_block, char *buf);
 static inline uint32 tokenizer_io_buffer_skip_comment(s_tokenizer_io_buffer_t *tkz_io_buffer, uint32 index, e_tokenizer_language_type_t tkz_type);
 static inline uint32 tokenizer_io_buffer_skip_multiple_comment(s_tokenizer_io_buffer_t *tkz_io_buffer, uint32 index, e_tokenizer_language_type_t tkz_type);

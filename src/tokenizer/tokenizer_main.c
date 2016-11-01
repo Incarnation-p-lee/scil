@@ -67,7 +67,6 @@ tokenizer_arguements_option_process(char *option)
     }
 }
 
-
 static inline char *
 tokenizer_logfile_name_create(char *binary_name)
 {

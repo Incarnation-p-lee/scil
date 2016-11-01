@@ -10,16 +10,13 @@
  *     cnst -> constant
  *     pctt -> punctuation
  */
-#define LANGUAGE_C_RE_IDTR           "[A-Za-z_][a-zA-Z0-9_]*"
-#define LANGUAGE_C_RE_OPTR           "`+|`*|`?|-|/|`||~|^|%|!|`&|.|:|=|>|<"
-#define LANGUAGE_C_RE_CNST           "[0-9]+|\"[a-zA-Z0-9_ #%]+\""
-#define LANGUAGE_C_RE_PCTT           "`[|`]|,|;|`(|`)|{|}"
+#define LANGUAGE_C_RE_IDTR     "[A-Za-z_][a-zA-Z0-9_]*"
+#define LANGUAGE_C_RE_OPTR     "((`+|-|`*|/|>|<|%|^|`&|~|`||=|>>|<<)=?)|(`?|!|.|:|->)|`**"
+#define LANGUAGE_C_RE_CNST     "([0-9]+)|(\"[a-zA-Z0-9_ #%,.\\]+\")"
+#define LANGUAGE_C_RE_PCTT     "`[|`]|,|;|`(|`)|{|}"
 
-/* For Language C, 16 children size of keyword trie is enough */
-#define TK_KYWD_CHILD_MAX            16
-#define TK_LANG_UNMATCH              0
+#define TK_LANG_UNMATCH        0
 
-typedef enum token_language_c_optr_type e_token_language_c_optr_type_t;
 typedef enum token_language_c_kywd_type e_token_language_c_kywd_type_t;
 typedef enum token_language_c_pctt_type e_token_language_c_pctt_type_t;
 
@@ -27,42 +24,6 @@ typedef struct token_language_c_optr    s_token_language_c_optr_t;
 typedef struct token_language_c_idtr    s_token_language_c_idtr_t;
 typedef struct token_language_c_cnst    s_token_language_c_cnst_t;
 typedef struct token_language_c_pctt    s_token_language_c_pctt_t;
-
-enum token_language_c_optr_type {
-    TK_C_OPTR_NOT = '!',                // ! 0x21
-    TK_C_OPTR_MOD = '%',                // % 0x25
-    TK_C_OPTR_AND = '&',                // & 0x26
-    TK_C_OPTR_MUL = '*',                // * 0x2A
-    TK_C_OPTR_ADD = '+',                // + 0x2B
-    TK_C_OPTR_SUB = '-',                // - 0x2D
-    TK_C_OPTR_REF = '.',                // . 0x2E
-    TK_C_OPTR_DIV = '/',                // / 0x2F
-    TK_C_OPTR_CLN = ':',                // : 0x3A
-    TK_C_OPTR_LT  = '<',                // < 0x3C
-    TK_C_OPTR_EQ  = '=',                // = 0x3D
-    TK_C_OPTR_GT  = '>',                // > 0x3E
-    TK_C_OPTR_QST = '?',                // ? 0x3F
-    TK_C_OPTR_XOR = '^',                // ^ 0x5E
-    TK_C_OPTR_OR  = '|',                // | 0x7C
-    TK_C_OPTR_NEG = '~',                // ~ 0x7E
-
-    TK_C_OPTR_UNARY_LIMIT = TK_C_OPTR_NEG + 1,
-
-    TK_C_OPTR_GE      = TK_2_CHAR_JOIN(TK_C_OPTR_GT, TK_C_OPTR_EQ),               // >=
-    TK_C_OPTR_LE      = TK_2_CHAR_JOIN(TK_C_OPTR_LT, TK_C_OPTR_EQ),               // <=
-    TK_C_OPTR_ORE     = TK_2_CHAR_JOIN(TK_C_OPTR_OR, TK_C_OPTR_OR),               // |=
-    TK_C_OPTR_ADDE    = TK_2_CHAR_JOIN(TK_C_OPTR_ADD, TK_C_OPTR_EQ),              // +=
-    TK_C_OPTR_SUBE    = TK_2_CHAR_JOIN(TK_C_OPTR_SUB, TK_C_OPTR_EQ),              // -=
-    TK_C_OPTR_MULE    = TK_2_CHAR_JOIN(TK_C_OPTR_MUL, TK_C_OPTR_EQ),              // *=
-    TK_C_OPTR_ANDE    = TK_2_CHAR_JOIN(TK_C_OPTR_AND, TK_C_OPTR_EQ),              // &=
-    TK_C_OPTR_XORE    = TK_2_CHAR_JOIN(TK_C_OPTR_XOR, TK_C_OPTR_EQ),              // ^=
-    TK_C_OPTR_DIVE    = TK_2_CHAR_JOIN(TK_C_OPTR_DIV, TK_C_OPTR_EQ),              // /=
-    TK_C_OPTR_SHT_L   = TK_2_CHAR_JOIN(TK_C_OPTR_LT, TK_C_OPTR_LT),               // <<
-    TK_C_OPTR_SHT_R   = TK_2_CHAR_JOIN(TK_C_OPTR_GT, TK_C_OPTR_GT),               // >>
-    TK_C_OPTR_REF_PTR = TK_2_CHAR_JOIN(TK_C_OPTR_SUB, TK_C_OPTR_GT),              // ->
-    TK_C_OPTR_SHTE_L  = TK_3_CHAR_JOIN(TK_C_OPTR_LT, TK_C_OPTR_LT, TK_C_OPTR_EQ), // <<=
-    TK_C_OPTR_SHTE_R  = TK_3_CHAR_JOIN(TK_C_OPTR_GT, TK_C_OPTR_GT, TK_C_OPTR_EQ), // >>=
-};
 
 /*
  * The element sequence should be the same as token_lang_c_keywords(token_data.h).
@@ -118,7 +79,7 @@ enum token_language_c_pctt_type {
 };
 
 struct token_language_c_optr {
-    e_token_language_c_optr_type_t type;
+    char *name;
 };
 
 struct token_language_c_idtr {

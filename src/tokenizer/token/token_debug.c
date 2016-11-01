@@ -51,11 +51,22 @@ token_language_c_keyword_legal_p(char *keyword)
     }
 }
 
+static inline char
+token_language_c_pctt_type_to_char(e_token_language_c_pctt_type_t type)
+{
+    assert_exit(token_language_c_pctt_type_p(type));
+
+    return (char)type;
+}
+
 static inline void
 token_language_c_print(s_token_t *token)
 {
-    char *keyword;
+    char *name;
     s_token_language_c_idtr_t *idtr;
+    s_token_language_c_optr_t *optr;
+    s_token_language_c_pctt_t *pctt;
+    s_token_language_c_cnst_t *cnst;
 
     assert_exit(token_structure_legal_p(token));
 
@@ -64,23 +75,27 @@ token_language_c_print(s_token_t *token)
             scil_log_print(" >> token HEAD\n");
             break;
         case TK_LEX_OPTR:
-            scil_log_print(" >> token OPTR\n");
+            optr = token->data;
+            scil_log_print(" >> token OPTR '%s'\n", optr->name);
             break;
         case TK_LEX_KWRD:
             idtr = token->data;
-            keyword = (char *)&idtr->type;
+            name = (char *)&idtr->type;
             scil_log_print(" >> token KWRD '%c%c%c%c'\n",
-                keyword[3], keyword[2], keyword[1], keyword[0]);
+                name[3], name[2], name[1], name[0]);
             break;
         case TK_LEX_IDTR:
             idtr = token->data;
             scil_log_print(" >> token IDTR '%s'\n", idtr->name);
             break;
         case TK_LEX_CNST:
-            scil_log_print(" >> token CNST\n");
+            cnst = token->data;
+            scil_log_print(" >> token CNST '%s'\n", cnst->name);
             break;
         case TK_LEX_PCTT:
-            scil_log_print(" >> token PCTT\n");
+            pctt = token->data;
+            scil_log_print(" >> token PCTT '%c'\n",
+                token_language_c_pctt_type_to_char(pctt->type));
             break;
         default:
             assert_exit(false);

@@ -57,7 +57,7 @@ tokenizer_io_block_fill(s_io_block_t *io_block, char *buf)
 
 /*
  * A io_block indicate a chunk buffer of io_buffer.
- * and that chunk of buffer end with TK_SENTINEL.
+ * and that chunk of buffer end with TK_SENTINEL/NULL_CHAR.
  */
 static inline void
 tokenizer_io_block_process(s_tokenizer_language_t *tkz_language,
@@ -78,28 +78,28 @@ tokenizer_io_block_process(s_tokenizer_language_t *tkz_language,
 }
 
 /*
- * Return the size of io_block include sentinel.
- * Example: |a|b|c| |, will return 4.
+ * Return the size of buf of io_block data, include sentinel.
+ * Example: |a|b|c| |X|Y|Z|, will return 4.
  *                 ^
  *                 |
- *              sentinel
+ *              sentinel or null_char
  */
 static inline uint32
-tokenizer_io_block_data_size(char *io_block)
+tokenizer_io_block_data_size(char *buf)
 {
     char *c;
-    uint32 io_block_size;
+    uint32 data_size;
 
-    assert_exit(io_block);
+    assert_exit(buf);
 
-    c = io_block;
-    io_block_size = 0;
-    while (*c != TK_SENTINEL) {
+    c = buf;
+    data_size = 0;
+    while (*c != NULL_CHAR && *c != TK_SENTINEL) {
         c++;
-        io_block_size++;
+        data_size++;
     }
 
-    return io_block_size + 1;
+    return data_size + 1;
 }
 
 static inline void
@@ -134,6 +134,7 @@ tokenizer_io_block_language_c_match(s_tokenizer_language_t *tkz_language,
         } else {
             i += match_size;
             rest_size -= match_size;
+            last_index = rest_size - 1;
 
             dp_memcpy(buf, io_block->block_buf + i, rest_size);
             buf[rest_size] = NULL_CHAR;

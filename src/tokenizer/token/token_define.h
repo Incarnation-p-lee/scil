@@ -7,8 +7,8 @@
     #define TK_LANGUAGE_C_PRINT(tk)
 #endif
 
-#define TK_C_KYWD_HOLDER       '-'
-#define TK_C_KYWD_ENCODE_SIZE  4
+#define TK_C_KYWD_HOLDER            '-'
+#define TK_C_KYWD_ENCODE_SIZE       4
 
 
 #endif
