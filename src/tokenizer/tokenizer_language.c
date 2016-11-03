@@ -10,26 +10,57 @@ tokenizer_language_type_legal_p(e_tokenizer_language_type_t language_type)
     }
 }
 
-static inline s_tokenizer_language_t *
-tokenizer_language_create(char *filename)
+static inline e_tokenizer_language_type_t
+tokenizer_language_filename_to_type(char *filename)
 {
     char *c;
-    s_tokenizer_language_t *tkz_language;
-    e_tokenizer_language_type_t tkz_type;
 
     assert_exit(filename);
 
     c = dp_strrchr(filename, TK_FILE_SPLIT);
     c++;
 
-    tkz_type = (e_tokenizer_language_type_t)*c++;
-    while (*c) {
-        tkz_type = TK_2_CHAR_JOIN(tkz_type, (e_tokenizer_language_type_t)*c++);
+    if (dp_strcmp(c, "c") == 0) {
+        return TKZ_LANG_C;
+    } else if (dp_strcmp(c, "cpp") == 0) {
+        return TKZ_LANG_CPP;
+    } else {
+        scil_log_print_and_exit("Unsupported language source file %s\n", filename);
+        return TKZ_LANG_UNSUPPORTED;
     }
-    assert_exit(tokenizer_language_type_legal_p(tkz_type));
+}
+
+static inline s_tokenizer_language_t *
+tokenizer_language_obtain(char *filename)
+{
+    uint32 index;
+    e_tokenizer_language_type_t type;
+    s_tokenizer_language_t *tkz_language;
+
+    assert_exit(filename);
+
+    type = tokenizer_language_filename_to_type(filename);
+    index = (uint32)type;
+    tkz_language = tkz_language_set[index];
+
+    if (!tkz_language) {
+        tkz_language = tokenizer_language_create(type);
+        tkz_language_set[index] = tkz_language;
+    }
+
+    return tkz_language;
+}
+
+static inline s_tokenizer_language_t *
+tokenizer_language_create(e_tokenizer_language_type_t type)
+{
+    s_tokenizer_language_t *tkz_language;
+
+    assert_exit(tokenizer_language_type_legal_p(type));
 
     tkz_language = dp_malloc(sizeof(*tkz_language));
-    tkz_language->type = tkz_type;
+
+    tkz_language->type = type;
     tokenizer_language_init(tkz_language);
 
     return tkz_language;
@@ -163,7 +194,7 @@ tokenizer_language_c_token_match(s_tokenizer_language_t *tkz_language,
     nfa_engine = tkz_language->identifier;
     match_size = token_language_c_identifier_match(nfa_engine, token_head, buf);
     if (match_size != NFA_SZ_UNMATCH) {
-        last_token = token_list_previous_node(token_head);
+        last_token = token_list_node_previous(token_head);
         token_language_c_keyword_seek(tkz_language->keyword_trie, last_token);
         return match_size;
     }

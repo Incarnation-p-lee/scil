@@ -13,12 +13,12 @@ token_structure_legal_p(s_token_t *token)
 }
 
 s_token_t *
-token_list_previous_node(s_token_t *token)
+token_list_node_previous(s_token_t *token)
 {
     if (!token_structure_legal_p(token)) {
         return PTR_INVALID;
     } else {
-        return token_list_previous_node_i(token);
+        return token_list_node_previous_i(token);
     }
 
 }
@@ -33,15 +33,25 @@ token_list_insert_before(s_token_t *token_head, s_token_t *inserted)
 }
 
 static inline s_token_t *
-token_list_previous_node_i(s_token_t *token)
+token_list_node_previous_i(s_token_t *token)
 {
     assert_exit(token_structure_legal_p(token));
 
     return CONTAINS_OF(token->list.previous, s_token_t, list);
 }
 
+s_token_t *
+token_list_node_next(s_token_t *token)
+{
+    if (!token_structure_legal_p(token)) {
+        return PTR_INVALID;
+    } else {
+        return token_list_node_next_i(token);
+    }
+}
+
 static inline s_token_t *
-token_list_next_node_i(s_token_t *token)
+token_list_node_next_i(s_token_t *token)
 {
     assert_exit(token_structure_legal_p(token));
 

@@ -10,24 +10,26 @@ bool token_char_multiple_comment_head_p(char *buf, e_tokenizer_language_type_t t
 bool token_char_multiple_comment_tail_p(char *buf, e_tokenizer_language_type_t tkz_type);
 bool token_char_single_comment_p(char *buf, e_tokenizer_language_type_t tkz_type);
 bool token_structure_legal_p(s_token_t *token);
-s_token_t * token_list_previous_node(s_token_t *token);
+s_token_t * token_list_node_next(s_token_t *token);
+s_token_t * token_list_node_previous(s_token_t *token);
 s_trie_tree_t * token_language_c_keyword_trie_create(void);
 static inline bool token_language_c_keyword_legal_p(char *keyword);
+static inline bool token_language_c_keyword_match_p(s_trie_tree_t *keyword_trie, char *name);
 static inline bool token_language_c_multiple_comment_head_p(char *buf);
 static inline bool token_language_c_multiple_comment_tail_p(char *buf);
 static inline bool token_language_c_pctt_type_p(e_token_language_c_pctt_type_t type);
 static inline bool token_language_c_single_comment_p(char *buf);
 static inline char token_language_c_pctt_type_to_char(e_token_language_c_pctt_type_t type);
-static inline e_token_language_c_kywd_type_t token_language_c_keyword_match(s_trie_tree_t *keyword_trie, char *idtr);
 static inline e_token_language_c_kywd_type_t token_language_c_keyword_to_type(char *keyword);
 static inline s_token_t * token_language_c_cnst_create(char *buf, uint32 size);
 static inline s_token_t * token_language_c_idtr_create(char *buf, uint32 size);
 static inline s_token_t * token_language_c_optr_create(char *name);
 static inline s_token_t * token_language_c_pctt_create(char c);
-static inline s_token_t * token_list_next_node_i(s_token_t *token);
-static inline s_token_t * token_list_previous_node_i(s_token_t *token);
+static inline s_token_t * token_list_node_next_i(s_token_t *token);
+static inline s_token_t * token_list_node_previous_i(s_token_t *token);
 static inline uint32 token_language_c_nfa_match(s_nfa_t *nfa, char *buf);
 static inline void token_language_c_keyword_encode(char *encode_buf, char *keyword);
+static inline void token_language_c_log_print(s_token_t *token);
 static inline void token_language_c_node_destroy(s_token_t *token_node);
 static inline void token_language_c_print(s_token_t *token);
 static inline void token_list_insert_before(s_token_t *token_head, s_token_t *inserted);
@@ -38,5 +40,6 @@ uint32 token_language_c_punctuation_match(s_nfa_t *nfa, s_token_t *token_head, c
 void token_language_c_destroy(s_token_t *token_list);
 void token_language_c_keyword_seek(s_trie_tree_t *keyword_trie, s_token_t *token);
 void token_language_c_keyword_trie_destroy(s_trie_tree_t **keyword_trie);
+void token_print(s_token_t *token, e_tokenizer_language_type_t tkz_language_type);
 
 #endif

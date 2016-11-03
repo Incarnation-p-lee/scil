@@ -18,13 +18,13 @@ typedef struct tokenizer_io_buffer   s_tokenizer_io_buffer_t;
 typedef struct io_buffer             s_io_buffer_t;
 typedef struct io_block              s_io_block_t;
 typedef struct tokenizer_language    s_tokenizer_language_t;
-typedef struct tokenizer_file_list   s_tokenizer_file_list_t;
+typedef struct tokenizer_file        s_tokenizer_file_t;
 typedef enum tokenizer_language_type e_tokenizer_language_type_t;
 
 enum tokenizer_language_type {
-    TKZ_LANG_C   = 'c',
-    TKZ_LANG_CPP = TK_3_CHAR_JOIN('c', 'p', 'p'),
-
+    TKZ_LANG_C,
+    TKZ_LANG_CPP,
+    TKZ_LANG_UNSUPPORTED,
 };
 
 struct tokenizer_io_buffer {
@@ -42,11 +42,41 @@ struct tokenizer_language {
     s_nfa_t                     *punctuation;
 };
 
-struct tokenizer_file_list {
+struct tokenizer_file {
     char                    *filename;
-    s_token_t               *token_list;
+    s_token_t               *tk_list;
+    s_tokenizer_io_buffer_t *tkz_io_buffer;
+    s_tokenizer_language_t  *tkz_language;
     s_doubly_linked_list_t  list;
 };
+
+/*
+ * TOKENIZER data structure layout
+ * tokenizer_file
+ *              |- filename
+ *              |- tk_list
+ *              |        |- type
+ *              |        |- data
+ *              |        |- list
+ *              |- tkz_io_buffer
+ *              |              |- fd
+ *              |              |- primary
+ *              |              |        |- index/size
+ *              |              |        |- buf
+ *              |              |- secondary
+ *              |                         |- index/size
+ *              |                         |- buf
+ *              |- tkz_language
+ *              |             |- type
+ *              |             |- keyword_trie
+ *              |             |- operator
+ *              |             |- identifier
+ *              |             |- constant
+ *              |             |- punctuation
+ *              |- list
+ * NOTE:
+ * 1. tkz_language points to one static data that holds all supported language
+ */
 
 /*
  * Start indicate the read start index of buf
@@ -66,7 +96,6 @@ struct io_block {
     char   *block_buf;
     char   *iterate_buf;
 };
-
 
 #endif
 

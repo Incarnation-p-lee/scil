@@ -21,5 +21,6 @@
 
 #include "token_char.c"
 #include "token_common.c"
+#include "token_print.c"
 #include "token_language_c.c"
 

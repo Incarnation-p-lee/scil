@@ -65,7 +65,6 @@ void
 token_language_c_keyword_seek(s_trie_tree_t *keyword_trie, s_token_t *token)
 {
     s_token_language_c_idtr_t *tk_idtr;
-    e_token_language_c_kywd_type_t type;
 
     if (!token_structure_legal_p(token)) {
         return;
@@ -73,15 +72,9 @@ token_language_c_keyword_seek(s_trie_tree_t *keyword_trie, s_token_t *token)
         return;
     } else {
         tk_idtr = token->data;
-        type = token_language_c_keyword_match(keyword_trie, tk_idtr->name);
-
-        if (TK_C_KYWD_NONE != type) {
-            dp_free(tk_idtr->name);
-
+        if (token_language_c_keyword_match_p(keyword_trie, tk_idtr->name)) {
             tk_idtr->is_keyword = true;
-            tk_idtr->type = type;
             token->type = TK_LEX_KWRD;
-
             TK_LANGUAGE_C_PRINT(token);
         }
     }
@@ -309,17 +302,13 @@ token_language_c_keyword_trie_destroy(s_trie_tree_t **keyword_trie)
     }
 }
 
-static inline e_token_language_c_kywd_type_t
-token_language_c_keyword_match(s_trie_tree_t *keyword_trie, char *idtr)
+static inline bool
+token_language_c_keyword_match_p(s_trie_tree_t *keyword_trie, char *name)
 {
-    assert_exit(idtr);
+    assert_exit(name);
     assert_exit(trie_tree_structure_legal_p(keyword_trie));
 
-    if (trie_tree_string_matched_p(keyword_trie, idtr)) {
-        return token_language_c_keyword_to_type(idtr);
-    } else {
-        return TK_C_KYWD_NONE;
-    }
+    return trie_tree_string_matched_p(keyword_trie, name);
 }
 
 static inline void
@@ -366,7 +355,7 @@ token_language_c_destroy(s_token_t *token_list)
     if (!token_structure_legal_p(token_list)) {
         token_node = token_list;
         do {
-            token_next = token_list_next_node_i(token_node);
+            token_next = token_list_node_next_i(token_node);
             token_language_c_node_destroy(token_node);
             token_node = token_next;
         } while (token_list != token_node);
@@ -407,5 +396,13 @@ token_language_c_multiple_comment_tail_p(char *buf)
     } else {
         return false;
     }
+}
+
+static inline char
+token_language_c_pctt_type_to_char(e_token_language_c_pctt_type_t type)
+{
+    assert_exit(token_language_c_pctt_type_p(type));
+
+    return (char)type;
 }
 

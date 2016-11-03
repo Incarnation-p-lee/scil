@@ -11,13 +11,17 @@
 #include "nfa_external.h"
 #include "test_external.h"
 
+#include "tokenizer_define.h"
 #include "tokenizer_print.h"
+#include "tokenizer_language.h"
 #include "tokenizer_declaration.h"
 
 #if defined DEBUG
     #include "tokenizer_debug.c"
 #endif
 
+#include "tokenizer_arguement.c"
+#include "tokenizer_print.c"
 #include "tokenizer_io_buffer.c"
 #include "tokenizer_io_block.c"
 #include "tokenizer_language.c"

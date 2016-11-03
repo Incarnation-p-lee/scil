@@ -51,18 +51,9 @@ token_language_c_keyword_legal_p(char *keyword)
     }
 }
 
-static inline char
-token_language_c_pctt_type_to_char(e_token_language_c_pctt_type_t type)
-{
-    assert_exit(token_language_c_pctt_type_p(type));
-
-    return (char)type;
-}
-
 static inline void
-token_language_c_print(s_token_t *token)
+token_language_c_log_print(s_token_t *token)
 {
-    char *name;
     s_token_language_c_idtr_t *idtr;
     s_token_language_c_optr_t *optr;
     s_token_language_c_pctt_t *pctt;
@@ -70,31 +61,31 @@ token_language_c_print(s_token_t *token)
 
     assert_exit(token_structure_legal_p(token));
 
+    scil_log_print(" >> token ");
+
     switch (token->type) {
         case TK_LEX_HEAD:
-            scil_log_print(" >> token HEAD\n");
+            scil_log_print("HEAD\n");
             break;
         case TK_LEX_OPTR:
             optr = token->data;
-            scil_log_print(" >> token OPTR '%s'\n", optr->name);
+            scil_log_print("OPTR %s\n", optr->name);
             break;
         case TK_LEX_KWRD:
             idtr = token->data;
-            name = (char *)&idtr->type;
-            scil_log_print(" >> token KWRD '%c%c%c%c'\n",
-                name[3], name[2], name[1], name[0]);
+            scil_log_print("IDTR -> KWRD %s\n", idtr->name);
             break;
         case TK_LEX_IDTR:
             idtr = token->data;
-            scil_log_print(" >> token IDTR '%s'\n", idtr->name);
+            scil_log_print("IDTR %s\n", idtr->name);
             break;
         case TK_LEX_CNST:
             cnst = token->data;
-            scil_log_print(" >> token CNST '%s'\n", cnst->name);
+            scil_log_print("CNST %s\n", cnst->name);
             break;
         case TK_LEX_PCTT:
             pctt = token->data;
-            scil_log_print(" >> token PCTT '%c'\n",
+            scil_log_print("PCTT %c\n",
                 token_language_c_pctt_type_to_char(pctt->type));
             break;
         default:
@@ -102,4 +93,5 @@ token_language_c_print(s_token_t *token)
             break;
     }
 }
+
 

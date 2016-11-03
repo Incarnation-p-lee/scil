@@ -2,7 +2,7 @@
 #define HAVE_DEFINED_TOKEN_DEFINE_H
 
 #if defined DEBUG
-    #define TK_LANGUAGE_C_PRINT(tk) token_language_c_print(tk)
+    #define TK_LANGUAGE_C_PRINT(tk) token_language_c_log_print(tk)
 #else
     #define TK_LANGUAGE_C_PRINT(tk)
 #endif
