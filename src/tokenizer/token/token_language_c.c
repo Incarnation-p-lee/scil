@@ -134,24 +134,6 @@ token_language_c_punctuation_match(s_nfa_t *nfa, s_token_t *token_head, char *bu
     }
 }
 
-static inline bool
-token_language_c_pctt_type_p(e_token_language_c_pctt_type_t type)
-{
-    switch (type) {
-        case TK_C_PCTT_COMMA:
-        case TK_C_PCTT_S_BRKT_L:
-        case TK_C_PCTT_S_BRKT_R:
-        case TK_C_PCTT_M_BRKT_L:
-        case TK_C_PCTT_M_BRKT_R:
-        case TK_C_PCTT_L_BRKT_L:
-        case TK_C_PCTT_L_BRKT_R:
-        case TK_C_PCTT_SEMICOLON:
-            return true;
-        default:
-            return false;
-    }
-}
-
 static inline s_token_t *
 token_language_c_optr_create(char *name)
 {
@@ -235,45 +217,18 @@ token_language_c_pctt_create(char c)
 {
     s_token_t *token;
     s_token_language_c_pctt_t *pctt;
-    e_token_language_c_pctt_type_t type;
 
-    type = (e_token_language_c_pctt_type_t)c;
-
-    assert_exit(token_language_c_pctt_type_p(type));
+    assert_exit(token_language_c_pctt_char_p(c));
 
     token = dp_malloc(sizeof(*token));
     token->type = TK_LEX_PCTT;
     token->data = pctt = dp_malloc(sizeof(s_token_language_c_pctt_t));
-    pctt->type = type;
+    pctt->c = c;
 
     doubly_linked_list_initial(&token->list);
     TK_LANGUAGE_C_PRINT(token);
 
     return token;
-}
-
-static inline void
-token_language_c_keyword_encode(char *encode_buf, char *keyword)
-{
-    assert_exit(keyword);
-
-    // keyword to type encoded by first 4 char
-    // if keyword has chars < 4, use TK_C_KYWD_HOLDER as placeholder
-    dp_memset(encode_buf, TK_C_KYWD_HOLDER, TK_C_KYWD_ENCODE_SIZE);
-    dp_memcpy(encode_buf, keyword, dp_strlen(keyword));
-}
-
-static inline e_token_language_c_kywd_type_t
-token_language_c_keyword_to_type(char *keyword)
-{
-    char encode_buf[TK_C_KYWD_ENCODE_SIZE];
-
-    assert_exit(keyword);
-    assert_exit(token_language_c_keyword_legal_p(keyword));
-
-    token_language_c_keyword_encode(encode_buf, keyword);
-
-    return TK_4_CHAR_TO_U32(encode_buf);
 }
 
 s_trie_tree_t *
@@ -322,28 +277,32 @@ token_language_c_node_destroy(s_token_t *token_node)
 
      switch (token_node->type) {
          case TK_LEX_HEAD:
-         case TK_LEX_KWRD:
+             break;
          case TK_LEX_PCTT:
-             dp_free(token_node);
+             dp_free(token_node->data);
              break;
          case TK_LEX_IDTR:
+         case TK_LEX_KWRD:
              token_idtr = token_node->data;
              dp_free(token_idtr->name);
-             dp_free(token_node);
+             dp_free(token_idtr);
+             break;
          case TK_LEX_OPTR:
              token_optr = token_node->data;
              dp_free(token_optr->name);
-             dp_free(token_node);
+             dp_free(token_optr);
              break;
          case TK_LEX_CNST:
              token_cnst = token_node->data;
              dp_free(token_cnst->name);
-             dp_free(token_node);
+             dp_free(token_cnst);
              break;
          default:
              assert_exit(false);
              break;
      }
+
+     dp_free(token_node);
 }
 
 void
@@ -352,7 +311,7 @@ token_language_c_destroy(s_token_t *token_list)
     s_token_t *token_node;
     s_token_t *token_next;
 
-    if (!token_structure_legal_p(token_list)) {
+    if (token_structure_legal_p(token_list)) {
         token_node = token_list;
         do {
             token_next = token_list_node_next_i(token_node);
@@ -396,13 +355,5 @@ token_language_c_multiple_comment_tail_p(char *buf)
     } else {
         return false;
     }
-}
-
-static inline char
-token_language_c_pctt_type_to_char(e_token_language_c_pctt_type_t type)
-{
-    assert_exit(token_language_c_pctt_type_p(type));
-
-    return (char)type;
 }
 

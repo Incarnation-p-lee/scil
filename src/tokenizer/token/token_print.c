@@ -45,8 +45,7 @@ token_language_c_print(s_token_t *token)
             break;
         case TK_LEX_PCTT:
             pctt = token->data;
-            dp_printf("PCTT %c\n",
-                token_language_c_pctt_type_to_char(pctt->type));
+            dp_printf("PCTT %c\n", pctt->c);
             break;
         default:
             assert_exit(false);

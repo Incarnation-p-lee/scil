@@ -21,7 +21,6 @@ extern void token_language_c_destroy(s_token_t *token_list);
 extern void token_language_c_keyword_seek(s_trie_tree_t *keyword_trie, s_token_t *token);
 extern void token_language_c_keyword_trie_destroy(s_trie_tree_t **keyword_trie);
 extern void token_print(s_token_t *token, e_tokenizer_language_type_t tkz_language_type);
-extern void tokenizer_file_destroy(s_tokenizer_file_t *tkz_file_list);
 
 #endif
 

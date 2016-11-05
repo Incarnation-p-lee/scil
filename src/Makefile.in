@@ -9,7 +9,8 @@ LD           =gcc
 
 AFLAG        =-rcv
 LFLAG        =-Wl,--warn-common
-CFLAG        =-Wall -Werror -c
+WFLAG        =-Wall -Wextra -Winline -Wno-return-local-addr -Werror
+CFLAG        =$(WFLAG) -c
 CFLAG        +=$(cc_config)
 LFLAG        +=$(ld_config)
 

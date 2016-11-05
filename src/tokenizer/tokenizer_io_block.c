@@ -32,6 +32,8 @@ tokenizer_io_block_destroy(s_io_block_t *io_block)
 {
     assert_exit(tokenizer_io_block_structure_legal_p(io_block));
 
+    dp_free(io_block->iterate_buf);
+    dp_free(io_block->block_buf);
     dp_free(io_block);
 }
 

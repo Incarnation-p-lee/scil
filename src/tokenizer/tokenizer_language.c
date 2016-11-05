@@ -92,6 +92,21 @@ tokenizer_language_structure_legal_p(s_tokenizer_language_t *tkz_language)
 }
 
 static inline void
+tokenizer_language_cache_cleanup(void)
+{
+    s_tokenizer_language_t **tkz_iterator;
+
+    tkz_iterator = tkz_language_set;
+
+    while (tkz_iterator < tkz_language_set + ARRAY_SIZE_OF(tkz_language_set)) {
+        if (*tkz_iterator) {
+            tokenizer_language_destroy(*tkz_iterator);
+        }
+        tkz_iterator++;
+    }
+}
+
+static inline void
 tokenizer_language_destroy(s_tokenizer_language_t *tkz_language)
 {
     assert_exit(tokenizer_language_structure_legal_p(tkz_language));

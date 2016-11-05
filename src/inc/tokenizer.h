@@ -47,7 +47,6 @@ struct tokenizer_file {
     s_token_t               *tk_list;
     s_tokenizer_io_buffer_t *tkz_io_buffer;
     s_tokenizer_language_t  *tkz_language;
-    s_doubly_linked_list_t  list;
 };
 
 /*
@@ -73,7 +72,6 @@ struct tokenizer_file {
  *              |             |- identifier
  *              |             |- constant
  *              |             |- punctuation
- *              |- list
  * NOTE:
  * 1. tkz_language points to one static data that holds all supported language
  */

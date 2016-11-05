@@ -21,8 +21,6 @@ static inline e_tokenizer_language_type_t tokenizer_language_filename_to_type(ch
 static inline s_io_block_t * tokenizer_io_block_create(void);
 static inline s_io_buffer_t * io_buffer_create(void);
 static inline s_tokenizer_file_t * tokenizer_file_create(char *fname);
-static inline s_tokenizer_file_t * tokenizer_file_next(s_tokenizer_file_t *tkz_file_list);
-static inline s_tokenizer_file_t * tokenizer_file_process(char **file_list, uint32 count);
 static inline s_tokenizer_io_buffer_t * tokenizer_io_buffer_create(char *fname);
 static inline s_tokenizer_language_t * tokenizer_language_create(e_tokenizer_language_type_t type);
 static inline s_tokenizer_language_t * tokenizer_language_obtain(char *filename);
@@ -35,12 +33,10 @@ static inline uint32 tokenizer_io_secondary_buffer_resume(s_io_buffer_t *seconda
 static inline uint32 tokenizer_language_c_token_match(s_tokenizer_language_t *tkz_language, s_token_t *token_head, char *buf);
 static inline void tokenizer_arguements_option_process(char *option);
 static inline void tokenizer_arguements_process(uint32 argc, char **argv);
-static inline void tokenizer_file_insert_before(s_tokenizer_file_t *tkz_file_list, s_tokenizer_file_t *tkz_file);
+static inline void tokenizer_file_destroy(s_tokenizer_file_t *tkz_file);
 static inline void tokenizer_file_io_buffer_process(s_io_buffer_t *io_buffer, s_tokenizer_language_t *tkz_language, s_token_t *token_head);
-static inline void tokenizer_file_node_destroy(s_tokenizer_file_t *tkz_file);
-static inline void tokenizer_file_node_print(s_tokenizer_file_t *tkz_file_list);
-static inline void tokenizer_file_print(s_tokenizer_file_t *tkz_file_list);
-static inline void tokenizer_file_remove(s_tokenizer_file_t *tkz_file_list);
+static inline void tokenizer_file_print(s_tokenizer_file_t *tkz_file);
+static inline void tokenizer_file_process(char **file_list, uint32 count);
 static inline void tokenizer_file_token_process(s_tokenizer_file_t *tkz_file);
 static inline void tokenizer_io_block_destroy(s_io_block_t *io_block);
 static inline void tokenizer_io_block_language_c_match(s_tokenizer_language_t *tkz_language, s_token_t *token_head, s_io_block_t *io_block);
@@ -52,12 +48,12 @@ static inline void tokenizer_language_c_keyword_trie_destroy(s_tokenizer_languag
 static inline void tokenizer_language_c_keyword_trie_init(s_tokenizer_language_t *tkz_language);
 static inline void tokenizer_language_c_nfa_engine_destroy(s_tokenizer_language_t *tkz_language);
 static inline void tokenizer_language_c_nfa_engine_init(s_tokenizer_language_t *tkz_language);
+static inline void tokenizer_language_cache_cleanup(void);
 static inline void tokenizer_language_destroy(s_tokenizer_language_t *tkz_language);
 static inline void tokenizer_language_init(s_tokenizer_language_t *tkz_language);
 static inline void tokenizer_logfile_close(void);
 static inline void tokenizer_logfile_open(char *binary_name);
 static void io_buffer_print(s_io_buffer_t *buffer);
 static void tokenizer_file_open_print(char *fname);
-void tokenizer_file_destroy(s_tokenizer_file_t *tkz_file_list);
 
 #endif

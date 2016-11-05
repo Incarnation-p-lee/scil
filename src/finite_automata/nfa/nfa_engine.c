@@ -117,6 +117,7 @@ nfa_engine_create_i(char *polish)
     array_stack_destroy(&stack);
 
     nfa = map->nfa;
+    nfa_simplify(nfa);
     nfa_edge_map_destroy(map);
 
     assert_exit(nfa_engine_structure_legal_p(nfa));
