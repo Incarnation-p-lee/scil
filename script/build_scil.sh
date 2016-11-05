@@ -46,7 +46,7 @@ do
             ld_config="$ld_config -m32" ;;
         "DEBUG")
             debug_mode="Yes"
-            cc_config="$cc_config -g3 -DDEBUG"
+            cc_config="$cc_config -g3 -ggdb -DDEBUG"
             ld_config="$ld_config -g3" ;;
         "RELEASE")
             debug_mode="No"
@@ -122,9 +122,8 @@ perl script/produce_compile_makefile.pl $src_dir
 ## compiling object file function ##
 ####################################
 function obj_compile() {
-    cd $1 > /dev/null
-    make "cc_config=$cc_config" > $verbose
-    mv *.o $obj_dir
+    # cd $1 > /dev/null
+    make -f $1/Makefile "cc_config=$cc_config" > $verbose
 
     if [ "$?" != 0 ]
     then
@@ -133,7 +132,6 @@ function obj_compile() {
 
     ## else
     ##     mv *.o $obj_dir
-    cd - > /dev/null 
 }
 
 ########################################
@@ -145,6 +143,8 @@ do
     echo "    Compile  .. $(basename $var)"
     obj_compile $var
 done
+
+mv -v *.o $obj_dir > $verbose
 
 ########################################################
 ## generate linking Makefile and link to final target ##
