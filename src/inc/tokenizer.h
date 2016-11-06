@@ -5,6 +5,7 @@
 
 #define FILENAME_LEN_MAX             256
 #define READ_BUF_SIZE                4096
+#define READ_BUF_INDEX_LAST          READ_BUF_SIZE - 1
 #define READ_ELE_SIZE                64
 #define TAIL_BUF_SIZE                128
 #define INDEX_INVALID                0xffffffffu

@@ -111,6 +111,7 @@ tokenizer_file_io_buffer_process(s_io_buffer_t *io_buffer,
         c += tokenizer_io_block_fill(io_block, c);
         tokenizer_io_block_process(tkz_language, token_head, io_block);
     }
+    assert_exit(c == limit + io_buffer->buf);
 
     tokenizer_io_block_destroy(io_block);
 }

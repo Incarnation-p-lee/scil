@@ -1,4 +1,4 @@
-static void
+static inline void
 tokenizer_file_open_print(char *fname)
 {
     assert_exit(fname);
@@ -6,7 +6,7 @@ tokenizer_file_open_print(char *fname)
     scil_log_print("\n<Open source file %s>\n", fname);
 }
 
-static void
+static inline void
 io_buffer_print(s_io_buffer_t *buffer)
 {
     uint32 i;
@@ -17,7 +17,7 @@ io_buffer_print(s_io_buffer_t *buffer)
 
     i = k = 0;
     buf = buffer->buf;
-    scil_log_print("<Print IO buffer %d>\n[\n ", buffer->index);
+    scil_log_print("<Print IO buffer %d>\n[\n ", buffer->size);
 
     while (buf[i]) {
         scil_log_print("%c", buf[i]);

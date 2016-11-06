@@ -127,7 +127,6 @@ static inline uint32
 tokenizer_io_buffer_skip_comment(s_tokenizer_io_buffer_t *tkz_io_buffer, uint32 index,
     e_tokenizer_language_type_t tkz_type)
 {
-
     assert_exit(index < READ_BUF_SIZE);
     assert_exit(tokenizer_io_buffer_structure_legal_p(tkz_io_buffer));
     assert_exit(token_char_comment_p(tkz_io_buffer->primary->buf + index, tkz_type));
@@ -148,7 +147,11 @@ tokenizer_io_buffer_skip_single_comment(s_tokenizer_io_buffer_t *tkz_io_buffer, 
 
     assert_exit(index < READ_BUF_SIZE);
     assert_exit(tokenizer_io_buffer_structure_legal_p(tkz_io_buffer));
-    assert_exit(token_char_single_comment_p(tkz_io_buffer->primary->buf + index, tkz_type));
+
+    // Fix-Me
+    if (!token_char_single_comment_p(tkz_io_buffer->primary->buf + index, tkz_type)) {
+        return 0;
+    }
 
     i = index;
     primary = tkz_io_buffer->primary;
@@ -182,30 +185,12 @@ tokenizer_io_secondary_buffer_resume(s_io_buffer_t *secondary)
     while (secondary->buf[index]) {
         secondary->buf[k++] = secondary->buf[index++];
     }
-
     assert_exit(index <= READ_BUF_SIZE);
-    secondary->buf[k] = NULL_CHAR;
+
+    secondary->buf[k] = TK_SENTINEL;
     secondary->size = k;
 
     return k;
-}
-
-static inline bool
-tokenizer_io_buffer_fill_secondary_buffer_final_p(s_tokenizer_io_buffer_t *tkz_io_buffer,
-    uint32 index)
-{
-    assert_exit(tokenizer_io_buffer_structure_legal_p(tkz_io_buffer));
-
-    if (0 == index) {
-        return false;
-    } else {
-        assert_exit(READ_BUF_SIZE >= index);
-
-        tkz_io_buffer->secondary->buf[index] = NULL_CHAR;
-        IO_BUFFER_PRINT(tkz_io_buffer->secondary);
-
-        return true;
-    }
 }
 
 /*
@@ -216,47 +201,52 @@ static inline bool
 tokenizer_io_buffer_fill_secondary_buffer_p(s_tokenizer_io_buffer_t *tkz_io_buffer,
     e_tokenizer_language_type_t tkz_type)
 {
-    bool is_string;
-    char *buf, last;
+    char last;
     uint32 index, k;
     s_io_buffer_t *primary, *secondary;
 
     assert_exit(tokenizer_io_buffer_structure_legal_p(tkz_io_buffer));
 
     last = NULL_CHAR;
-    is_string = false;
     primary = tkz_io_buffer->primary;
     secondary = tkz_io_buffer->secondary;
     index = tokenizer_io_secondary_buffer_resume(secondary);
 
     while (tokenizer_io_buffer_fill_primary_buffer_p(tkz_io_buffer)) {
         k = primary->index;
-        buf = primary->buf;
         while (!tokenizer_io_buffer_reach_limit_p(primary)) {
-            if (token_char_double_quote_p(buf[k])) {
-                is_string = !is_string;
-                secondary->buf[index++] = buf[k++];
-            } else if (is_string) {
-                secondary->buf[index++] = buf[k++];
-            } else if (dp_isspace(buf[k])) {
-                last = buf[k++];
-                secondary->size = index;
-            } else if (token_char_comment_p(buf + k, tkz_type)) {
+            if (token_char_double_quote_p(primary->buf[k])) {
+                secondary->buf[index++] = primary->buf[k++];
+                do {
+                    secondary->buf[index++] = primary->buf[k];
+                } while (!token_char_double_quote_p(primary->buf[k++]));
+            } else if (dp_isspace(primary->buf[k])) {
+                last = primary->buf[k++];
+                secondary->size = index + 1;              // include the sentinel
+            } else if (token_char_comment_p(primary->buf + k, tkz_type)) {
                 k = tokenizer_io_buffer_skip_comment(tkz_io_buffer, k, tkz_type);
-            } else if (index < READ_BUF_SIZE - 1) { // index may add twice
+            } else if (index < READ_BUF_INDEX_LAST - 1) { // index may +2
                 if (dp_isspace(last) && index != 0) {
                     secondary->buf[index++] = TK_SENTINEL;
                 }
-                secondary->buf[index++] = last = buf[k++];
+                secondary->buf[index++] = last = primary->buf[k++];
             } else {
-                goto FILL_DONE;
+                primary->index = k;
+                secondary->buf[index] = NULL_CHAR;
+                IO_BUFFER_PRINT(tkz_io_buffer->secondary);
+                return true;
             }
             primary->index = k;
         }
     }
 
-FILL_DONE:
-    return tokenizer_io_buffer_fill_secondary_buffer_final_p(tkz_io_buffer, index);
+    if (index == 0) {
+        return false;
+    } else { // Make the rest part of buffer begin with NULL_CHAR
+        secondary->buf[index] = secondary->buf[index + 1] = NULL_CHAR;
+        IO_BUFFER_PRINT(tkz_io_buffer->secondary);
+        return true;
+    }
 }
 
 static inline bool

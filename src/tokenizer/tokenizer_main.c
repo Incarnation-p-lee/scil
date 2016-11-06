@@ -5,9 +5,9 @@ main(int argc, char **argv)
 
     // skip binary name for argv[0]
     tokenizer_arguements_process(argc - 1, argv + 1);
-
     memory_cache_cleanup();
-    TKZ_LOGFILE_CLOSE();
+
+    TKZ_LOGFILE_CLOSE;
 
     return 0;
 }

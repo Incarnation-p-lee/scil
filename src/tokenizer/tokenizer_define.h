@@ -5,7 +5,7 @@
 
 #if defined DEBUG
     #define TKZ_LOGFILE_OPEN(name)   tokenizer_logfile_open(name)
-    #define TKZ_LOGFILE_CLOSE        tokenizer_logfile_close
+    #define TKZ_LOGFILE_CLOSE        tokenizer_logfile_close()
 #else
     #define TKZ_LOGFILE_OPEN(name)
     #define TKZ_LOGFILE_CLOSE
