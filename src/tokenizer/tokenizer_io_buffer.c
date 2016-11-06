@@ -254,8 +254,7 @@ tokenizer_io_buffer_reach_limit_p(s_io_buffer_t *buffer)
 {
     assert_exit(io_buffer_structure_legal_p(buffer));
 
-    if (READ_BUF_SIZE == buffer->index
-        || NULL_CHAR == buffer->buf[buffer->index]) {
+    if (buffer->buf[buffer->index] == NULL_CHAR) {
         return true;
     } else {
         return false;
@@ -265,6 +264,7 @@ tokenizer_io_buffer_reach_limit_p(s_io_buffer_t *buffer)
 static inline bool
 tokenizer_io_buffer_fill_primary_buffer_p(s_tokenizer_io_buffer_t *tkz_io_buffer)
 {
+    char *buf;
     uint32 len;
     uint32 rest;
     uint32 offset;
@@ -276,17 +276,23 @@ tokenizer_io_buffer_fill_primary_buffer_p(s_tokenizer_io_buffer_t *tkz_io_buffer
     } else if (dp_feof(tkz_io_buffer->fd)) {
         return false;
     } else {
+        buf = tkz_io_buffer->primary->buf;
         tkz_io_buffer->primary->index = offset = 0;
-        rest = READ_BUF_SIZE;
+        rest = READ_BUF_BASE_SIZE;
 
         while (rest != 0 && !dp_feof(tkz_io_buffer->fd)) {
-            len = dp_fread(tkz_io_buffer->primary->buf + offset, 1, rest, tkz_io_buffer->fd);
+            len = dp_fread(buf + offset, 1, rest, tkz_io_buffer->fd);
             assert_exit(len <= rest);
             offset += len;
             rest -= len;
         }
 
-        tkz_io_buffer->primary->buf[offset] = NULL_CHAR;
+        if (rest == 0 && buf[offset - 1] == TKZ_LANG_C_COMMENT) {
+            dp_fread(buf + offset, 1, 1, tkz_io_buffer->fd);;
+            offset++;
+        }
+
+        buf[offset] = NULL_CHAR;
         return true;
     }
 }

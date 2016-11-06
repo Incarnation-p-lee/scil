@@ -4,13 +4,16 @@
 #include "token.h"
 
 #define FILENAME_LEN_MAX             256
-#define READ_BUF_SIZE                4096
-#define READ_BUF_INDEX_LAST          READ_BUF_SIZE - 1
+#define READ_BUF_BASE_SIZE           4096
+#define READ_BUF_EXTRA_SIZE          4
+#define READ_BUF_SIZE                READ_BUF_BASE_SIZE + READ_BUF_EXTRA_SIZE
+#define READ_BUF_INDEX_LAST          READ_BUF_BASE_SIZE - 1
 #define READ_ELE_SIZE                64
 #define TAIL_BUF_SIZE                128
 #define INDEX_INVALID                0xffffffffu
 #define BUF_PRINT_LEN                80
 #define PATH_ISOLATOR                '/'
+#define TKZ_LANG_C_COMMENT           '/'
 #define OPTION_CHAR                  '-'
 #define TKZ_LOG_SUFFIX               ".log"
 #define TKZ_IO_BLOCK_SIZE            256
@@ -87,7 +90,7 @@ struct io_buffer {
         uint32 index;  // For primary buf
         uint32 size;   // For secondary buf
     };
-    char   buf[READ_BUF_SIZE + 1];
+    char   buf[READ_BUF_BASE_SIZE + READ_BUF_EXTRA_SIZE];
 };
 
 struct io_block {
