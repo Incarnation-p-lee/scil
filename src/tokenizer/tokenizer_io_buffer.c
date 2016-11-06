@@ -78,7 +78,7 @@ tokenizer_io_buffer_fill_buffer_p(s_tokenizer_io_buffer_t *tkz_io_buffer,
 {
     assert_exit(tokenizer_io_buffer_structure_legal_p(tkz_io_buffer));
 
-    return tokenizer_io_buffer_fill_secondary_buffer_p(tkz_io_buffer, tkz_type);
+    return tokenizer_io_buffer_secondary_fill_p(tkz_io_buffer, tkz_type);
 }
 
 static inline uint32
@@ -108,7 +108,7 @@ tokenizer_io_buffer_skip_multiple_comment(s_tokenizer_io_buffer_t *tkz_io_buffer
         } else {
             tkz_io_buffer->primary->index = i;
             if (tokenizer_io_buffer_reach_limit_p(tkz_io_buffer->primary)) {
-                if (tokenizer_io_buffer_fill_primary_buffer_p(tkz_io_buffer)) {
+                if (tokenizer_io_buffer_primary_fill_p(tkz_io_buffer)) {
                     i = tkz_io_buffer->primary->index;
                 } else {
                     scil_log_print_and_exit("Unmatched multiple comments pair.\n");
@@ -159,7 +159,7 @@ tokenizer_io_buffer_skip_single_comment(s_tokenizer_io_buffer_t *tkz_io_buffer, 
     while (TK_NEWLINE != primary->buf[i]) {
         primary->index = i;
         if (tokenizer_io_buffer_reach_limit_p(primary)) {
-            if (tokenizer_io_buffer_fill_primary_buffer_p(tkz_io_buffer)) {
+            if (tokenizer_io_buffer_primary_fill_p(tkz_io_buffer)) {
                 i = primary->index;
             } else {
                 return i;
@@ -174,7 +174,7 @@ tokenizer_io_buffer_skip_single_comment(s_tokenizer_io_buffer_t *tkz_io_buffer, 
 }
 
 static inline uint32
-tokenizer_io_secondary_buffer_resume(s_io_buffer_t *secondary)
+tokenizer_io_buffer_secondary_resume(s_io_buffer_t *secondary)
 {
     uint32 index, k;
 
@@ -193,33 +193,51 @@ tokenizer_io_secondary_buffer_resume(s_io_buffer_t *secondary)
     return k;
 }
 
+static inline bool
+tokenizer_io_buffer_fill_secondary_tail_p(s_io_buffer_t *secondary, uint32 index)
+{
+    assert_exit(index < READ_BUF_SIZE);
+    assert_exit(io_buffer_structure_legal_p(secondary));
+
+    if (index == 0) {
+        return false;
+    } else { // Make the rest part of buffer begin with NULL_CHAR
+        secondary->buf[index] = secondary->buf[index + 1] = NULL_CHAR;
+
+        IO_BUFFER_PRINT(secondary);
+        return true;
+    }
+}
+
 /*
  * Secondary buffer will delete space and comments
  * From primary -> secondary buffer
  */
 static inline bool
-tokenizer_io_buffer_fill_secondary_buffer_p(s_tokenizer_io_buffer_t *tkz_io_buffer,
+tokenizer_io_buffer_secondary_fill_p(s_tokenizer_io_buffer_t *tkz_io_buffer,
     e_tokenizer_language_type_t tkz_type)
 {
     char last;
+    bool is_string;
     uint32 index, k;
     s_io_buffer_t *primary, *secondary;
 
     assert_exit(tokenizer_io_buffer_structure_legal_p(tkz_io_buffer));
 
     last = NULL_CHAR;
+    is_string = false;
     primary = tkz_io_buffer->primary;
     secondary = tkz_io_buffer->secondary;
-    index = tokenizer_io_secondary_buffer_resume(secondary);
+    index = tokenizer_io_buffer_secondary_resume(secondary);
 
-    while (tokenizer_io_buffer_fill_primary_buffer_p(tkz_io_buffer)) {
+    while (tokenizer_io_buffer_primary_fill_p(tkz_io_buffer)) {
         k = primary->index;
         while (!tokenizer_io_buffer_reach_limit_p(primary)) {
             if (token_char_double_quote_p(primary->buf[k])) {
+                is_string = !is_string;
                 secondary->buf[index++] = primary->buf[k++];
-                do {
-                    secondary->buf[index++] = primary->buf[k];
-                } while (!token_char_double_quote_p(primary->buf[k++]));
+            } else if (is_string) {
+                secondary->buf[index++] = primary->buf[k++];
             } else if (dp_isspace(primary->buf[k])) {
                 last = primary->buf[k++];
                 secondary->size = index + 1;              // include the sentinel
@@ -233,20 +251,14 @@ tokenizer_io_buffer_fill_secondary_buffer_p(s_tokenizer_io_buffer_t *tkz_io_buff
             } else {
                 primary->index = k;
                 secondary->buf[index] = NULL_CHAR;
-                IO_BUFFER_PRINT(tkz_io_buffer->secondary);
+                IO_BUFFER_PRINT(secondary);
                 return true;
             }
             primary->index = k;
         }
     }
 
-    if (index == 0) {
-        return false;
-    } else { // Make the rest part of buffer begin with NULL_CHAR
-        secondary->buf[index] = secondary->buf[index + 1] = NULL_CHAR;
-        IO_BUFFER_PRINT(tkz_io_buffer->secondary);
-        return true;
-    }
+    return tokenizer_io_buffer_fill_secondary_tail_p(secondary, index);
 }
 
 static inline bool
@@ -262,7 +274,7 @@ tokenizer_io_buffer_reach_limit_p(s_io_buffer_t *buffer)
 }
 
 static inline bool
-tokenizer_io_buffer_fill_primary_buffer_p(s_tokenizer_io_buffer_t *tkz_io_buffer)
+tokenizer_io_buffer_primary_fill_p(s_tokenizer_io_buffer_t *tkz_io_buffer)
 {
     char *buf;
     uint32 len;
