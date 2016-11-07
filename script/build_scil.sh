@@ -60,6 +60,9 @@ do
         "COVERAGE")
             cc_config="$cc_config --coverage"
             ld_config="$ld_config --coverage" ;;
+        "PROFILE")
+            cc_config="$cc_config -pg"
+            ld_config="$ld_config -pg" ;;
         "VERBOSE")
             verbose="/dev/stdout" ;;
     esac
