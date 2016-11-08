@@ -11,7 +11,7 @@
 #define READ_ELE_SIZE                64
 #define TAIL_BUF_SIZE                128
 #define INDEX_INVALID                0xffffffffu
-#define BUF_PRINT_LEN                80
+#define BUF_PRINT_LEN                128
 #define PATH_ISOLATOR                '/'
 #define TKZ_LANG_C_COMMENT           '/'
 #define OPTION_CHAR                  '-'
@@ -33,6 +33,11 @@ enum tokenizer_language_type {
 
 struct tokenizer_io_buffer {
     FILE          *fd;
+    // If the tail of secondary buffer is string un-terminated
+    // Example:
+    // printf("Hello, worl
+    // d");
+    bool          is_string;
     s_io_buffer_t *primary;
     s_io_buffer_t *secondary;
 };

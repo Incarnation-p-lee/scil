@@ -27,6 +27,7 @@ tokenizer_io_buffer_create(char *fname)
         TOKENIZER_FILE_OPEN_PRINT(fname);
     }
 
+    tkz_io_buffer->is_string = false;
     tkz_io_buffer->primary = io_buffer_create();
     tkz_io_buffer->secondary = io_buffer_create();
 
@@ -218,14 +219,12 @@ tokenizer_io_buffer_secondary_fill_p(s_tokenizer_io_buffer_t *tkz_io_buffer,
     e_tokenizer_language_type_t tkz_type)
 {
     char last;
-    bool is_string;
     uint32 index, k;
     s_io_buffer_t *primary, *secondary;
 
     assert_exit(tokenizer_io_buffer_structure_legal_p(tkz_io_buffer));
 
     last = NULL_CHAR;
-    is_string = false;
     primary = tkz_io_buffer->primary;
     secondary = tkz_io_buffer->secondary;
     index = tokenizer_io_buffer_secondary_resume(secondary);
@@ -234,16 +233,16 @@ tokenizer_io_buffer_secondary_fill_p(s_tokenizer_io_buffer_t *tkz_io_buffer,
         k = primary->index;
         while (!tokenizer_io_buffer_reach_limit_p(primary)) {
             if (token_char_double_quote_p(primary->buf[k])) {
-                is_string = !is_string;
+                tkz_io_buffer->is_string = !tkz_io_buffer->is_string;
                 secondary->buf[index++] = primary->buf[k++];
-            } else if (is_string) {
+            } else if (tkz_io_buffer->is_string && index <= READ_BUF_INDEX_LAST) {
                 secondary->buf[index++] = primary->buf[k++];
             } else if (dp_isspace(primary->buf[k])) {
                 last = primary->buf[k++];
                 secondary->size = index + 1;              // include the sentinel
             } else if (token_char_comment_p(primary->buf + k, tkz_type)) {
                 k = tokenizer_io_buffer_skip_comment(tkz_io_buffer, k, tkz_type);
-            } else if (index < READ_BUF_INDEX_LAST - 1) { // index may +2
+            } else if (index <= READ_BUF_INDEX_LAST) {    // index may +2
                 if (dp_isspace(last) && index != 0) {
                     secondary->buf[index++] = TK_SENTINEL;
                 }
