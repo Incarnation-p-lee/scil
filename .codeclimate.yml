@@ -1,0 +1,22 @@
+C: true
+engines:
+  rubocop: 
+    enabled: true
+  fixme:
+    enabled: true
+    checks:
+      HACK:
+        enabled: false
+  gnu-complexity:
+    enabled: true
+ratings:
+  paths:
+  - "**.h"
+  - "**.c"
+exclude_paths:
+  - script/
+  - libds/
+  - output/
+  - lib/
+  - data/
+
