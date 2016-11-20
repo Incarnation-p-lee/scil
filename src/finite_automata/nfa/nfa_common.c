@@ -52,7 +52,17 @@ nfa_label_obtain(void)
 static inline void
 nfa_label_cleanup(void)
 {
-    nfa_status_lalel = 1;
+    nfa_status_lalel = NFA_LABEL_MIN;
+}
+
+static inline void
+nfa_label_range_set(s_nfa_t *nfa)
+{
+    assert_exit(nfa_engine_structure_legal_p(nfa));
+
+    // For convention, the min of nfa label range is always NFA_LABEL_MIN.
+    nfa->label_range.min = NFA_LABEL_MIN;
+    nfa->label_range.max = nfa_status_lalel;
 }
 
 static inline s_fa_status_t *

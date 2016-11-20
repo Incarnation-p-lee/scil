@@ -16,6 +16,7 @@
 #endif
 
 #include "nfa_common.c"
+#include "nfa_closure.c"
 #include "nfa_subset_construction.c"
 #include "nfa_engine.c"
 #include "nfa_simplify.c"

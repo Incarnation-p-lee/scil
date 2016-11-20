@@ -10,17 +10,17 @@
  *     cnst -> constant
  *     pctt -> punctuation
  */
-#define LANGUAGE_C_RE_IDTR     "[A-Za-z_][a-zA-Z0-9_]*"
-#define LANGUAGE_C_RE_OPTR     "((`+|-|`*|/|>|<|%|^|`&|~|`||=|>>|<<|!)=?)|(`?|.|:|->)|`**"
-#define LANGUAGE_C_RE_CNST     "([0-9]+)|(\"[a-zA-Z0-9_ #%,.\\]+\")"
-#define LANGUAGE_C_RE_PCTT     "`[|`]|,|;|`(|`)|{|}"
+#define LANGUAGE_C_RE_IDTR "[A-Za-z_][a-zA-Z0-9_]*"
+#define LANGUAGE_C_RE_OPTR "((`+|-|`*|/|>|<|%|^|`&|~|`||=|>>|<<|!)=?)|(`?|.|:|->|`+`+|--)|`**"
+#define LANGUAGE_C_RE_CNST "([0-9]+)|(\"[a-zA-Z0-9_ #%,.\\]+\")"
+#define LANGUAGE_C_RE_PCTT "`[|`]|,|;|`(|`)|{|}"
 
-#define TK_LANG_UNMATCH        0
+typedef struct token_language_c_optr s_token_language_c_optr_t;
+typedef struct token_language_c_idtr s_token_language_c_idtr_t;
+typedef struct token_language_c_cnst s_token_language_c_cnst_t;
+typedef struct token_language_c_pctt s_token_language_c_pctt_t;
 
-typedef struct token_language_c_optr    s_token_language_c_optr_t;
-typedef struct token_language_c_idtr    s_token_language_c_idtr_t;
-typedef struct token_language_c_cnst    s_token_language_c_cnst_t;
-typedef struct token_language_c_pctt    s_token_language_c_pctt_t;
+#define TK_LANG_UNMATCH              0
 
 struct token_language_c_optr {
     char *name;

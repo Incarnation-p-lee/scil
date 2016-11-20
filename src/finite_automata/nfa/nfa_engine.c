@@ -97,10 +97,10 @@ nfa_engine_create_i(char *polish)
 
     assert_exit(polish);
 
-    nfa = NULL;
+    nfa_label_cleanup();
+
     c = polish;
     stack = array_stack_create();
-    nfa_label_cleanup();
 
     while (*c) {
         if (regular_char_data_p(*c)) {
@@ -114,11 +114,13 @@ nfa_engine_create_i(char *polish)
 
     map = array_stack_pop(stack);
     assert_exit(array_stack_empty_p(stack));
-    array_stack_destroy(&stack);
 
     nfa = map->nfa;
     nfa_simplify(nfa);
+    nfa_label_range_set(nfa);
+
     nfa_edge_map_destroy(map);
+    array_stack_destroy(&stack);
 
     assert_exit(nfa_engine_structure_legal_p(nfa));
     assert_exit(nfa_engine_graph_legal_p(nfa));
@@ -128,15 +130,15 @@ nfa_engine_create_i(char *polish)
 static inline void
 nfa_engine_re_copy(s_nfa_t *nfa, char *re)
 {
-    uint32 l;
+    uint32 len;
 
     assert_exit(re);
     assert_exit(nfa_engine_structure_legal_p(nfa));
 
-    l = dp_strlen(re);
-    nfa->re = dp_malloc(sizeof(*re) * (l + 1));
-    dp_memcpy(nfa->re, re, l);
-    nfa->re[l] = NULL_CHAR;
+    len = dp_strlen(re);
+    nfa->re = dp_malloc(sizeof(*re) * (len + 1));
+    dp_memcpy(nfa->re, re, len);
+    nfa->re[len] = NULL_CHAR;
 }
 
 /*
@@ -242,60 +244,19 @@ nfa_engine_destroy(s_nfa_t *nfa)
     }
 }
 
-static inline void
-nfa_engine_array_queue_swap(s_array_queue_t **a, s_array_queue_t **b)
-{
-    void *tmp;
-
-    tmp = *a;
-    *a = *b;
-    *b = tmp;
-}
-
 static inline bool
-nfa_engine_terminal_reached_p(s_array_queue_t *master)
+nfa_engine_terminal_reached_p(s_nfa_t *nfa, s_fa_closure_t *closure)
 {
+    s_bitmap_t *bitmap;
     s_fa_status_t *status;
-    s_fa_edge_t *edge, *edge_head;
 
-    assert_exit(master);
-
-    while (!array_queue_empty_p(master)) {
-        status = array_queue_leave(master);
-        if (!status->adj_list) {
-            return true;
-        } else {
-            edge = edge_head = status->adj_list;
-            do {
-                if (NULL_CHAR == edge->c) {
-                    array_queue_enter(master, edge->succ);
-                }
-                edge = nfa_edge_next(edge);
-            } while (edge_head != edge);
-        }
-    }
-
-    return false;
-}
-
-static inline void
-nfa_engine_pattern_match_setup(s_array_queue_t *master, s_nfa_t *nfa)
-{
-    s_fa_edge_t *edge, *edge_head;
-
-    assert_exit(master);
     assert_exit(nfa_engine_structure_legal_p(nfa));
+    assert_exit(nfa_closure_structure_legal_p(closure));
 
-    edge = edge_head = nfa->start->adj_list;
+    bitmap = closure->bitmap;
+    status = nfa->terminal;
 
-    do {
-        if (NULL_CHAR == edge->c) {
-            array_queue_enter(master, edge->succ);
-        }
-        edge = nfa_edge_next(edge);
-    } while (edge_head != edge);
-
-    array_queue_enter(master, nfa->start);
+    return bitmap_bit_set_p(bitmap, status->label);
 }
 
 static inline bool
@@ -312,50 +273,42 @@ nfa_engine_pattern_match_ip(s_nfa_t *nfa, char *pn)
     }
 }
 
+static inline void
+nfa_engine_patern_match_char_mov(s_fa_closure_t *closure, char c)
+{
+    assert_exit(nfa_closure_structure_legal_p(closure));
+    assert_exit(array_queue_empty_p(closure->path_queue));
+
+    nfa_closure_seek(closure, c);
+}
+
 static inline uint32
 nfa_engine_pattern_match_i(s_nfa_t *nfa, char *pn)
 {
     char *c;
     uint32 match_size;
-    s_fa_status_t *status;
-    s_fa_edge_t *edge, *edge_head;
-    s_array_queue_t *master, *slave;
+    s_fa_closure_t *closure;
 
     assert_exit(pn);
-    assert_exit(nfa_engine_graph_legal_p(nfa));
     assert_exit(nfa_engine_structure_legal_p(nfa));
+    assert_exit(nfa_engine_graph_legal_p(nfa));
+
+    closure = nfa_closure_create(&nfa->label_range);
+    nfa_closure_init(nfa, closure);
 
     c = pn;
-    slave = array_queue_create();
-    master = array_queue_create();
-    nfa_engine_pattern_match_setup(master, nfa);
-
     while (*c) {
-        while (!array_queue_empty_p(master)) {
-            status = array_queue_leave(master);
-            if (status->adj_list) {
-                edge = edge_head = status->adj_list;
-                do {
-                    if (*c == edge->c) {
-                        array_queue_enter(slave, edge->succ);
-                    } else if (NULL_CHAR == edge->c) {
-                        array_queue_enter(master, edge->succ);
-                    }
-                    edge = nfa_edge_next(edge);
-                } while (edge_head != edge);
-            }
-        }
-        nfa_engine_array_queue_swap(&master, &slave);
+        nfa_engine_patern_match_char_mov(closure, *c);
         c++;
     }
 
-    if (nfa_engine_terminal_reached_p(master)) {
+    if (nfa_engine_terminal_reached_p(nfa, closure)) {
         match_size = dp_strlen(pn) + 1;
     } else {
         match_size = NFA_SZ_UNMATCH;
     }
-    array_queue_destroy(&master);
-    array_queue_destroy(&slave);
+
+    nfa_closure_destroy(&closure);
 
     return match_size;
 }
