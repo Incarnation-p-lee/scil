@@ -1,7 +1,20 @@
 #ifndef HAVE_DEFINED_REGULAR_H
 #define HAVE_DEFINED_REGULAR_H
 
-#define RE_EXPAND_MIN          8
+#define RE_RECOVER_MIN         8u
+#define RE_RANGE_START         0u
+#define RE_RANGE_LAST          2u
+#define RE_RANGE_SIZE          (RE_RANGE_LAST + 1 - RE_RANGE_START)
+
+typedef enum regular_wildcard         e_regular_wildcard_t;
+typedef struct regular_recover_buffer s_regular_recover_buffer_t;
+
+
+struct regular_recover_buffer {
+    char *buf;
+    uint32 size;  /* bytes count */
+    uint32 index;
+};
 
 /*
  * Use char ` as the translate prefix for meta char
@@ -42,8 +55,6 @@ enum regular_data_symbol {
     RE_DT_SML_UDRLINE_CHAR = '_',
     RE_DT_SML_XOR_CHAR     = '^',
 };
-
-typedef enum regular_wildcard e_regular_wildcard_t;
 
 #endif
 

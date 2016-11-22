@@ -71,7 +71,7 @@ regular_reverse_polish_legal_p(char *polish)
 }
 
 static inline void
-regular_range_expand_print(char *regular)
+regular_range_recover_print(char *regular)
 {
     char *c, tmp;
 

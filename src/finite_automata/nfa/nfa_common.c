@@ -79,6 +79,9 @@ nfa_status_create(void)
     return retval;
 }
 
+/*
+ * Merge the adj_queue from m => t.
+ */
 static inline void
 nfa_status_terminal_merge(s_fa_status_t *t, s_fa_status_t *m)
 {

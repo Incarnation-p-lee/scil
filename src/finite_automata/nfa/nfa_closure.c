@@ -56,7 +56,6 @@ nfa_closure_init(s_nfa_t *nfa, s_fa_closure_t *closure)
     assert_exit(nfa_closure_structure_legal_p(closure));
 
     array_queue_enter(closure->collection, nfa->start);
-    // bitmap_bit_set(closure->bitmap, nfa->start->label);
     nfa_closure_null_seek(closure);
 }
 

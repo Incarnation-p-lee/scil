@@ -115,6 +115,9 @@ test_external_module_list="$src_dir/test"
 echo "    Generate .. $test_external_file"
 perl script/generate_external_declaration.pl $test_external_file $test_external_module_list
 
+echo "    Copy     .. data_structure_interface.h"
+cp $libds_interface $inc_dir
+
 #######################
 ## Generate Makefile ##
 #######################
@@ -156,8 +159,6 @@ echo "    Copy     .. Makefile"
 cp $src_dir/Makefile.in $obj_dir
 echo "    Copy     .. libds.a"
 cp $libds_archive $obj_dir
-echo "    Copy     .. data_structure_interface.h"
-cp $libds_interface $inc_dir
 
 echo "    Generate .. Makefile"
 perl script/produce_link_makefile.pl $obj_dir
