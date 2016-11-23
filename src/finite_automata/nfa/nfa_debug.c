@@ -85,3 +85,41 @@ nfa_status_terminal_p(s_fa_status_t *status)
     }
 }
 
+static inline void
+nfa_closure_print(s_fa_closure_t *closure)
+{
+    char c;
+    uint32 i;
+    s_fa_status_t *status;
+    s_array_queue_t *collection;
+    s_array_iterator_t *iterator;
+
+    assert_exit(nfa_closure_structure_legal_p(closure));
+
+    c = closure->c;
+
+    if (c == NULL_CHAR) {
+        scil_log_print("\n<NFA closure collection of start status>\n[\n ");
+    } else {
+        scil_log_print("\n<NFA closure collection of '%c'>\n[\n ", c);
+    }
+
+    i = 0;
+    collection = closure->collection;
+    iterator = array_queue_iterator_obtain(collection);
+    iterator->fp_index_initial(collection);
+
+    while (iterator->fp_next_exist_p(collection)) {
+        status = iterator->fp_next_obtain(collection);
+        scil_log_print("%04d, ", status->label);
+
+        i++;
+        if (i == NFA_CLOSURE_PRINT_LEN) {
+            i = 0;
+            scil_log_print("\n ");
+        }
+    }
+
+    scil_log_print("\n]\n<End of NFA closure collection>\n\n");
+}
+
