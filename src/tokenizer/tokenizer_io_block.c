@@ -54,6 +54,7 @@ tokenizer_io_block_fill(s_io_block_t *io_block, char *buf)
 
     dp_memcpy(io_block->block_buf, buf, sizeof(char) * io_block_size);
 
+    TKZ_IO_BLOCK_PRINT(io_block);
     return io_block_size;
 }
 

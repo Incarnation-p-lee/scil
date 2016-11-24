@@ -3,7 +3,7 @@ tokenizer_file_open_print(char *fname)
 {
     assert_exit(fname);
 
-    scil_log_print("\n<Open source file %s>\n", fname);
+    scil_log_print(">> Open source file %s\n", fname);
 }
 
 static inline void
@@ -17,7 +17,7 @@ io_buffer_print(s_io_buffer_t *buffer)
 
     i = k = 0;
     buf = buffer->buf;
-    scil_log_print("<Print IO buffer %d>\n[\n ", buffer->size);
+    scil_log_print("\n>> Print IO buffer %d\n[\n    ", buffer->size);
 
     while (buf[i]) {
         scil_log_print("%c", buf[i]);
@@ -25,7 +25,7 @@ io_buffer_print(s_io_buffer_t *buffer)
         i++;
         if (BUF_PRINT_LEN == k) {
             k = 0;
-            scil_log_print("\n ");
+            scil_log_print("\n    ");
         }
     }
 
@@ -33,8 +33,8 @@ io_buffer_print(s_io_buffer_t *buffer)
         scil_log_print("\n");
     }
 
+    scil_log_print("]\n\n");
     assert_exit(i <= READ_BUF_SIZE);
-    scil_log_print("]\n<End of Print IO buffer>\n\n");
 }
 
 static inline void
@@ -66,5 +66,23 @@ tokenizer_logfile_close(void)
     memory_track_counters_print();
     libds_log_file_close();
     scil_log_close();
+}
+
+static inline void
+tokenizer_io_block_print(s_io_block_t *io_block)
+{
+    char *buf;
+
+    assert_exit(tokenizer_io_block_structure_legal_p(io_block));
+
+    buf = dp_malloc(io_block->size);
+    dp_memcpy(buf, io_block->block_buf, io_block->size);
+    buf[io_block->size - 1] = NULL_CHAR;
+
+    scil_log_print("\n>> Print IO block %d\n[\n", io_block->size);
+    scil_log_print("    %s\n", buf);
+    scil_log_print("]\n\n");
+
+    dp_free(buf);
 }
 

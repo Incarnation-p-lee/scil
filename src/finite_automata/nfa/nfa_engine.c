@@ -256,6 +256,7 @@ nfa_engine_closure_match_p(s_nfa_t *nfa, s_fa_closure_t *closure)
     bitmap = closure->bitmap;
     status = nfa->terminal;
 
+    NFA_ENGINE_CLOSURE_MATCH_PRINT(nfa, closure);
     return bitmap_bit_set_p(bitmap, status->label);
 }
 
@@ -266,8 +267,6 @@ nfa_engine_patern_match_char_mov(s_fa_closure_t *closure, char c)
     assert_exit(array_queue_empty_p(closure->path_queue));
 
     nfa_closure_seek(closure, c);
-
-    NFA_CLOSURE_PRINT(closure);
 }
 
 static inline uint32
@@ -285,8 +284,11 @@ nfa_engine_pattern_match_ip(s_nfa_t *nfa, char *pn)
     nfa_closure_init(nfa, closure);
 
     c = pn;
+    NFA_CLOSURE_PRINT(closure, pn);
+
     while (*c) {
         nfa_engine_patern_match_char_mov(closure, *c);
+        NFA_CLOSURE_PRINT(closure, pn);
         c++;
     }
 

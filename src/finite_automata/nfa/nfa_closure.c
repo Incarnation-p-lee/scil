@@ -57,8 +57,6 @@ nfa_closure_init(s_nfa_t *nfa, s_fa_closure_t *closure)
 
     array_queue_enter(closure->collection, nfa->start);
     nfa_closure_null_seek(closure);
-
-    NFA_CLOSURE_PRINT(closure);
 }
 
 static inline void

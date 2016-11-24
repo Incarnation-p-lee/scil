@@ -8,7 +8,7 @@ token_language_c_log_print(s_token_t *token)
 
     assert_exit(token_structure_legal_p(token));
 
-    scil_log_print(" >> token ");
+    scil_log_print(">> token ");
 
     switch (token->type) {
         case TK_LEX_HEAD:
