@@ -72,14 +72,16 @@ static inline void
 tokenizer_io_block_print(s_io_block_t *io_block)
 {
     char *buf;
+    uint32 size;
 
     assert_exit(tokenizer_io_block_structure_legal_p(io_block));
 
+    size = tokenizer_io_block_data_size(io_block->block_buf);
     buf = dp_malloc(io_block->size);
-    dp_memcpy(buf, io_block->block_buf, io_block->size);
-    buf[io_block->size - 1] = NULL_CHAR;
 
-    scil_log_print("\n>> Print IO block %d\n[\n", io_block->size);
+    dp_memcpy(buf, io_block->block_buf, size);
+
+    scil_log_print("\n>> Print IO block %d\n[\n", size);
     scil_log_print("    %s\n", buf);
     scil_log_print("]\n\n");
 

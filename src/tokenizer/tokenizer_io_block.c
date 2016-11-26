@@ -40,12 +40,14 @@ tokenizer_io_block_destroy(s_io_block_t *io_block)
 static inline uint32
 tokenizer_io_block_fill(s_io_block_t *io_block, char *buf)
 {
+    uint32 index_last;
     uint32 io_block_size;
 
     assert_exit(buf);
     assert_exit(tokenizer_io_block_structure_legal_p(io_block));
 
     io_block_size = tokenizer_io_block_data_size(buf);
+
     if (io_block_size > io_block->size) {
         io_block->block_buf = dp_realloc(io_block->block_buf, io_block_size);
         io_block->iterate_buf = dp_realloc(io_block->iterate_buf, io_block_size);
@@ -53,6 +55,9 @@ tokenizer_io_block_fill(s_io_block_t *io_block, char *buf)
     }
 
     dp_memcpy(io_block->block_buf, buf, sizeof(char) * io_block_size);
+
+    index_last = io_block_size - 1;
+    io_block->block_buf[index_last] = NULL_CHAR;
 
     TKZ_IO_BLOCK_PRINT(io_block);
     return io_block_size;
@@ -110,37 +115,23 @@ tokenizer_io_block_language_c_match(s_tokenizer_language_t *tkz_language,
     s_token_t *token_head, s_io_block_t *io_block)
 {
     char *buf;
-    uint32 i, last_index;
-    uint32 data_size, match_size, rest_size;
+    uint32 rest_size;
+    uint32 match_size;
 
     assert_exit(token_structure_legal_p(token_head));
     assert_exit(tokenizer_io_block_structure_legal_p(io_block));
     assert_exit(tokenizer_language_structure_legal_p(tkz_language));
 
-    buf = io_block->iterate_buf;
-    data_size = tokenizer_io_block_data_size(io_block->block_buf);
-    assert_exit(data_size >= 2);
-
-    dp_memcpy(buf, io_block->block_buf, sizeof(char) * data_size);
-    buf[data_size - 1] = NULL_CHAR;
-
-    i = match_size = 0;
+    buf = io_block->block_buf;
     rest_size = dp_strlen(buf);
-    last_index = rest_size - 1;
 
     while (rest_size != 0) {
         match_size = tokenizer_language_c_token_match(tkz_language, token_head, buf);
-        if (match_size == NFA_SZ_UNMATCH && last_index == 0) {
+        if (match_size == NFA_SZ_UNMATCH) {
             scil_log_print_and_exit("Cannot detect any token of '%s'.\n", io_block->block_buf);
-        } else if (match_size == 0) {
-            buf[last_index--] = NULL_CHAR;
         } else {
-            i += match_size;
+            buf += match_size;
             rest_size -= match_size;
-            last_index = rest_size - 1;
-
-            dp_memcpy(buf, io_block->block_buf + i, rest_size);
-            buf[rest_size] = NULL_CHAR;
         }
     }
 }

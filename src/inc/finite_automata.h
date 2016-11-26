@@ -7,7 +7,7 @@ typedef struct fa_status       s_fa_status_t;
 typedef struct fa_edge         s_fa_edge_t;
 typedef struct range_uint32    s_range_uint32_t;
 typedef struct fa_closure      s_fa_closure_t;
-typedef struct fa_closure_dp   s_fa_closure_dp_t;
+typedef struct fa_match_dp     s_fa_match_dp_t;
 
 struct range_uint32 {
     uint32 min;
@@ -35,18 +35,16 @@ struct fa_edge {
 
 struct fa_closure {
     char            c;
+    s_fa_match_dp_t *match_dp;
     s_array_queue_t *path_queue;
     s_array_queue_t *collection;
     s_bitmap_t      *bitmap;
 };
 
-/*
- * dp means dynamic programming here.
- */
-struct fa_closure_dp {
-    s_fa_closure_t **dp;
-    uint32         size;
-    uint32         index;
+struct fa_match_dp {
+    bool   *dp;
+    uint32 size;
+    uint32 index;
 };
 
 #endif

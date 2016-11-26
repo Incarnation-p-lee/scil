@@ -7,11 +7,82 @@ nfa_closure_structure_legal_p(s_fa_closure_t *closure)
         return false;
     } else if (!array_queue_structure_legal_p(closure->collection)) {
         return false;
+    } else if (!nfa_closure_match_dp_structure_legal_p(closure->match_dp)) {
+        return false;
     } else if (bitmap_structure_illegal_p(closure->bitmap)) {
         return false;
     } else {
         return true;
     }
+}
+
+static inline bool
+nfa_closure_match_dp_structure_legal_p(s_fa_match_dp_t *match_dp)
+{
+    if (match_dp == NULL) {
+        return false;
+    } else if (match_dp->dp == NULL) {
+        return false;
+    } else if (match_dp->index > match_dp->size) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+static inline s_fa_match_dp_t *
+nfa_closure_match_dp_create(uint32 size)
+{
+    s_fa_match_dp_t *match_dp;
+
+    assert_exit(size > 0);
+
+    match_dp = dp_malloc(sizeof(*match_dp));
+    match_dp->dp = dp_malloc(sizeof(*match_dp->dp) * size);
+
+    match_dp->size = size;
+    match_dp->index = 0;
+
+    return match_dp;
+}
+
+static inline void
+nfa_closure_match_dp_destroy(s_fa_match_dp_t **match_dp)
+{
+    s_fa_match_dp_t *match_dp_tmp;
+
+    assert_exit(match_dp != NULL);
+    assert_exit(nfa_closure_match_dp_structure_legal_p(*match_dp));
+
+    match_dp_tmp = *match_dp;
+
+    dp_free(match_dp_tmp->dp);
+    dp_free(match_dp_tmp);
+
+    *match_dp = NULL;
+}
+
+static inline void
+nfa_closure_match_dp_append(s_nfa_t *nfa, s_fa_closure_t *closure)
+{
+    uint32 new_sz;
+    bool is_matched;
+    s_fa_match_dp_t *match_dp;
+
+    assert_exit(nfa_engine_structure_legal_p(nfa));
+    assert_exit(nfa_engine_graph_legal_p(nfa));
+    assert_exit(nfa_closure_structure_legal_p(closure));
+
+    match_dp = closure->match_dp;
+    is_matched = nfa_engine_closure_match_p(nfa, closure);
+
+    if (match_dp->index == match_dp->size) {
+        new_sz = match_dp->size * 2 + NFA_MATCH_BUF_MIN;
+        match_dp->dp = dp_realloc(match_dp->dp, sizeof(*match_dp->dp) * new_sz);
+        match_dp->size = new_sz;
+    }
+
+    match_dp->dp[match_dp->index++] = is_matched;
 }
 
 static inline s_fa_closure_t *
@@ -27,6 +98,7 @@ nfa_closure_create(s_range_uint32_t *range)
     closure->path_queue = array_queue_create();
     closure->collection = array_queue_create();
     closure->bitmap = bitmap_create(range->min, range->max);
+    closure->match_dp = nfa_closure_match_dp_create(NFA_MATCH_BUF_MIN);
 
     return closure;
 }
@@ -43,6 +115,8 @@ nfa_closure_destroy(s_fa_closure_t **closure)
     bitmap_destroy(&closure_tmp->bitmap);
     array_queue_destroy(&closure_tmp->path_queue);
     array_queue_destroy(&closure_tmp->collection);
+
+    nfa_closure_match_dp_destroy(&closure_tmp->match_dp);
     dp_free(closure_tmp);
 
     *closure = NULL;
@@ -168,30 +242,6 @@ nfa_closure_null_seek(s_fa_closure_t *closure)
     }
 }
 
-static inline void
-nfa_closure_copy(s_fa_closure_t *closure_dest, s_fa_closure_t *closure_src)
-{
-    void *element;
-    s_array_iterator_t *iterator;
-    s_array_queue_t *collection_src;
-    s_array_queue_t *collection_dest;
-
-    assert_exit(nfa_closure_structure_legal_p(closure_src));
-    assert_exit(nfa_closure_structure_legal_p(closure_dest));
-
-    collection_src = closure_src->collection;
-    collection_dest = closure_dest->collection;
-
-    array_queue_cleanup(collection_dest);
-    iterator = array_queue_iterator_obtain(collection_src);
-    iterator->fp_index_initial(collection_src);
-
-    while (iterator->fp_next_exist_p(collection_src)) {
-        element = iterator->fp_next_obtain(collection_src);
-        array_queue_enter(collection_dest, element);
-    }
-}
-
 /*
  * Seek the collection set of nfa engine in 1 step move with char c or NULL_CHAR.
  * 1. Found all status in 1 step move with char c
@@ -209,75 +259,28 @@ nfa_closure_seek(s_fa_closure_t *closure, char c)
     nfa_closure_null_seek(closure);    // Seek and Merge all status of moving NULL_CHAR
 }
 
-static inline s_fa_closure_dp_t *
-nfa_closure_dp_create(uint32 dp_size)
-{
-    s_fa_closure_dp_t *closure_dp;
-
-    assert_exit(dp_size > 0);
-
-    closure_dp = dp_malloc(sizeof(*closure_dp));
-    closure_dp->dp = dp_malloc(sizeof(*closure_dp->dp) * dp_size);
-
-    closure_dp->size = dp_size;
-    closure_dp->index = 0;
-
-    return closure_dp;
-}
-
-static inline bool
-nfa_closure_dp_structure_legal_p(s_fa_closure_dp_t *closure_dp)
-{
-    if (closure_dp == NULL) {
-        return false;
-    } else if (closure_dp->dp == NULL) {
-        return false;
-    } else if (closure_dp->index >= closure_dp->size) {
-        return false;
-    } else {
-        return true;
-    }
-}
-
-static inline void
-nfa_closure_dp_destroy(s_fa_closure_dp_t **closure_dp)
+static inline uint32
+nfa_closure_match_dp_backtrack(s_fa_closure_t *closure)
 {
     uint32 i;
-    s_fa_closure_t *closure;
-    s_fa_closure_dp_t *closure_dp_tmp;
-
-    assert_exit(closure_dp != NULL);
-    assert_exit(nfa_closure_dp_structure_legal_p(*closure_dp));
-
-    closure_dp_tmp = *closure_dp;
-
-    i = 0;
-    while (i < closure_dp_tmp->index) {
-        closure = closure_dp_tmp->dp[i];
-        nfa_closure_destroy(&closure);
-        i++;
-    }
-
-    dp_free(closure_dp_tmp->dp);
-    dp_free(closure_dp_tmp);
-
-    *closure_dp = NULL;
-}
-
-static inline void
-nfa_closure_dp_add(s_fa_closure_dp_t *closure_dp, s_fa_closure_t *closure)
-{
-    uint32 new_size;
+    uint32 match_size;
+    s_fa_match_dp_t *match_dp;
 
     assert_exit(nfa_closure_structure_legal_p(closure));
-    assert_exit(nfa_closure_dp_structure_legal_p(closure_dp));
 
-    if (closure_dp->index == closure_dp->size) {
-        new_size = closure_dp->size * 2 + NFA_DP_CLOSURE_MIN;
-        closure_dp->dp = dp_realloc(closure_dp->dp, new_size * sizeof(void *));
-        closure_dp->size = new_size;
+    match_dp = closure->match_dp;
+    match_size = closure->match_dp->index;
+
+    while (match_size != 0) {
+        i = match_size - 1;
+
+        if (match_dp->dp[i]) {
+            return match_size;
+        }
+
+        match_size--;
     }
 
-    closure_dp->dp[closure_dp->index++] = closure;
+    return NFA_SZ_UNMATCH;
 }
 

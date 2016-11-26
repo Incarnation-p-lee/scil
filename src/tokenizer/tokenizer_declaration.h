@@ -42,6 +42,7 @@ static inline void tokenizer_file_process(char **file_list, uint32 count);
 static inline void tokenizer_file_token_process(s_tokenizer_file_t *tkz_file);
 static inline void tokenizer_io_block_destroy(s_io_block_t *io_block);
 static inline void tokenizer_io_block_language_c_match(s_tokenizer_language_t *tkz_language, s_token_t *token_head, s_io_block_t *io_block);
+static inline void tokenizer_io_block_language_c_match(s_tokenizer_language_t *tkz_language, s_token_t *token_head, s_io_block_t *io_block);
 static inline void tokenizer_io_block_print(s_io_block_t *io_block);
 static inline void tokenizer_io_block_process(s_tokenizer_language_t *tkz_language, s_token_t *token_head, s_io_block_t *io_block);
 static inline void tokenizer_io_buffer_destroy(s_tokenizer_io_buffer_t *tkz_io_buffer);

@@ -3,18 +3,14 @@ token_language_c_nfa_match(s_nfa_t *nfa, char *buf)
 {
     assert_exit(nfa && buf);
 
-    if (nfa_engine_pattern_match_p(nfa, buf)) {
-        return dp_strlen(buf);
-    } else {
-        return NFA_SZ_UNMATCH;
-    }
+    return nfa_engine_pattern_match(nfa, buf);
 }
 
 uint32
 token_language_c_operator_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
 {
     s_token_t *token;
-    uint32 match_length;
+    uint32 match_size;
 
     if (!buf) {
         return TK_LANG_UNMATCH;
@@ -23,15 +19,15 @@ token_language_c_operator_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
     } else if (!token_structure_legal_p(token_head)) {
         return TK_LANG_UNMATCH;
     } else {
-        match_length = token_language_c_nfa_match(nfa, buf);
+        match_size = token_language_c_nfa_match(nfa, buf);
 
-        if (match_length == NFA_SZ_INVALID) {
+        if (match_size == NFA_SZ_INVALID) {
             scil_log_print_and_exit("Error occurs in 'token_language_c_nfa_match'.\n");
-        } else if (match_length) {
-            token = token_language_c_optr_create(buf);
+        } else if (match_size) {
+            token = token_language_c_optr_create(buf, match_size);
             token_list_insert_before(token_head, token);
         }
-        return match_length;
+        return match_size;
     }
 }
 
@@ -39,7 +35,7 @@ uint32
 token_language_c_identifier_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
 {
     s_token_t *token;
-    uint32 match_length;
+    uint32 match_size;
 
     if (!buf) {
         return TK_LANG_UNMATCH;
@@ -48,16 +44,16 @@ token_language_c_identifier_match(s_nfa_t *nfa, s_token_t *token_head, char *buf
     } else if (!token_structure_legal_p(token_head)) {
         return TK_LANG_UNMATCH;
     } else {
-        match_length = token_language_c_nfa_match(nfa, buf);
+        match_size = token_language_c_nfa_match(nfa, buf);
 
-        if (match_length == NFA_SZ_INVALID) {
+        if (match_size == NFA_SZ_INVALID) {
             scil_log_print_and_exit("Error occurs in 'token_language_c_nfa_match'.\n");
-        } else if (match_length) {
-            token = token_language_c_idtr_create(buf, match_length);
+        } else if (match_size) {
+            token = token_language_c_idtr_create(buf, match_size);
             token_list_insert_before(token_head, token);
         }
 
-        return match_length;
+        return match_size;
     }
 }
 
@@ -84,7 +80,7 @@ uint32
 token_language_c_constant_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
 {
     s_token_t *token;
-    uint32 match_length;
+    uint32 match_size;
 
     if (!buf) {
         return TK_LANG_UNMATCH;
@@ -93,16 +89,16 @@ token_language_c_constant_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
     } else if (!token_structure_legal_p(token_head)) {
         return TK_LANG_UNMATCH;
     } else {
-        match_length = token_language_c_nfa_match(nfa, buf);
+        match_size = token_language_c_nfa_match(nfa, buf);
 
-        if (match_length == NFA_SZ_INVALID) {
+        if (match_size == NFA_SZ_INVALID) {
             scil_log_print_and_exit("Error occurs in 'token_language_c_nfa_match'.\n");
-        } else if (match_length) {
-            token = token_language_c_cnst_create(buf, match_length);
+        } else if (match_size) {
+            token = token_language_c_cnst_create(buf, match_size);
             token_list_insert_before(token_head, token);
         }
 
-        return match_length;
+        return match_size;
     }
 }
 
@@ -110,7 +106,7 @@ uint32
 token_language_c_punctuation_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
 {
     s_token_t *token;
-    uint32 match_length;
+    uint32 match_size;
 
     if (!buf) {
         return TK_LANG_UNMATCH;
@@ -119,31 +115,28 @@ token_language_c_punctuation_match(s_nfa_t *nfa, s_token_t *token_head, char *bu
     } else if (!token_structure_legal_p(token_head)) {
         return TK_LANG_UNMATCH;
     } else {
-        match_length = token_language_c_nfa_match(nfa, buf);
+        match_size = token_language_c_nfa_match(nfa, buf);
 
-        if (match_length == NFA_SZ_INVALID) {
+        if (match_size == NFA_SZ_INVALID) {
             scil_log_print_and_exit("Error occurs in 'token_language_c_nfa_match'.\n");
-        } else if (match_length) {
-            assert_exit(2 >= match_length);
+        } else if (match_size) {
+            assert_exit(2 >= match_size);
 
             token = token_language_c_pctt_create(buf[0]);
             token_list_insert_before(token_head, token);
         }
 
-        return match_length;
+        return match_size;
     }
 }
 
 static inline s_token_t *
-token_language_c_optr_create(char *name)
+token_language_c_optr_create(char *name, uint32 size)
 {
-    uint32 size;
     s_token_t *token;
     s_token_language_c_optr_t *optr;
 
     assert_exit(name);
-
-    size = dp_strlen(name);
 
     token = dp_malloc(sizeof(*token));
     token->type = TK_LEX_OPTR;
@@ -151,7 +144,8 @@ token_language_c_optr_create(char *name)
 
     optr = token->data;
     optr->name = dp_malloc(sizeof(char) * (size + 1));
-    dp_strcpy(optr->name, name);
+    dp_memcpy(optr->name, name, sizeof(*optr->name) * size);
+    optr->name[size] = NULL_CHAR;
 
     doubly_linked_list_initial(&token->list);
     TK_LANGUAGE_C_PRINT(token);
@@ -160,25 +154,21 @@ token_language_c_optr_create(char *name)
 }
 
 static inline s_token_t *
-token_language_c_idtr_create(char *buf, uint32 size)
+token_language_c_idtr_create(char *name, uint32 size)
 {
     s_token_t *token;
     s_token_language_c_idtr_t *idtr;
 
-    assert_exit(buf && size);
-
-    if (TK_SENTINEL != buf[size - 1]) {
-        size++;
-    }
+    assert_exit(name && size);
 
     token = dp_malloc(sizeof(*token));
     token->type = TK_LEX_IDTR;
     token->data = idtr = dp_malloc(sizeof(s_token_language_c_idtr_t));
 
     idtr->is_keyword = false;
-    idtr->name = dp_malloc(sizeof(*idtr->name) * size);
-    dp_memcpy(idtr->name, buf, sizeof(*idtr->name) * size);
-    idtr->name[size - 1] = NULL_CHAR;
+    idtr->name = dp_malloc(sizeof(*idtr->name) * (size + 1));
+    dp_memcpy(idtr->name, name, sizeof(*idtr->name) * size);
+    idtr->name[size] = NULL_CHAR;
 
     doubly_linked_list_initial(&token->list);
     TK_LANGUAGE_C_PRINT(token);
