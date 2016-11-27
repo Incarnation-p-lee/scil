@@ -200,38 +200,28 @@ tokenizer_language_c_token_match(s_tokenizer_language_t *tkz_language,
 {
     uint32 match_size;
     s_nfa_t *nfa_engine;
-    s_token_t *last_token;
 
     assert_exit(buf);
     assert_exit(token_structure_legal_p(token_head));
     assert_exit(tokenizer_language_structure_legal_p(tkz_language));
 
     nfa_engine = tkz_language->identifier;
-    match_size = token_language_c_identifier_match(nfa_engine, token_head, buf);
-    if (match_size != NFA_SZ_UNMATCH) {
-        last_token = token_list_node_previous(token_head);
-        token_language_c_keyword_seek(tkz_language->keyword_trie, last_token);
-        return match_size;
-    }
+    match_size = token_language_c_identifier_match(nfa_engine,
+        tkz_language->keyword_trie, token_head, buf);
+    RETURN_FIR_IF_NE(match_size, NFA_SZ_UNMATCH);
 
     nfa_engine = tkz_language->operator;
     match_size = token_language_c_operator_match(nfa_engine, token_head, buf);
-    if (match_size != NFA_SZ_UNMATCH) {
-        return match_size;
-    }
+    RETURN_FIR_IF_NE(match_size, NFA_SZ_UNMATCH);
 
     nfa_engine = tkz_language->constant;
     match_size = token_language_c_constant_match(nfa_engine, token_head, buf);
-    if (match_size != NFA_SZ_UNMATCH) {
-        return match_size;
-    }
+    RETURN_FIR_IF_NE(match_size, NFA_SZ_UNMATCH);
 
     nfa_engine = tkz_language->punctuation;
     match_size = token_language_c_punctuation_match(nfa_engine, token_head, buf);
-    if (match_size != NFA_SZ_UNMATCH) {
-        return match_size;
-    }
+    RETURN_FIR_IF_NE(match_size, NFA_SZ_UNMATCH);
 
-    return 0;
+    return NFA_SZ_UNMATCH;
 }
 

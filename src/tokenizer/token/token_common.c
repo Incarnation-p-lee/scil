@@ -1,6 +1,18 @@
 bool
 token_structure_legal_p(s_token_t *token)
 {
+    return token_structure_legal_ip(token);
+}
+
+bool
+token_structure_illegal_p(s_token_t *token)
+{
+    return token_structure_illegal_ip(token);
+}
+
+static inline bool
+token_structure_legal_ip(s_token_t *token)
+{
     if (!token) {
         return false;
     } else if (!token->data && token->type != TK_LEX_HEAD) {
@@ -12,10 +24,16 @@ token_structure_legal_p(s_token_t *token)
     }
 }
 
+static inline bool
+token_structure_illegal_ip(s_token_t *token)
+{
+    return !token_structure_legal_ip(token);
+}
+
 s_token_t *
 token_list_node_previous(s_token_t *token)
 {
-    if (!token_structure_legal_p(token)) {
+    if (TOKEN_STRUCTURE_ILLEGAL_P(token)) {
         return PTR_INVALID;
     } else {
         return token_list_node_previous_i(token);
@@ -43,7 +61,7 @@ token_list_node_previous_i(s_token_t *token)
 s_token_t *
 token_list_node_next(s_token_t *token)
 {
-    if (!token_structure_legal_p(token)) {
+    if (TOKEN_STRUCTURE_ILLEGAL_P(token)) {
         return PTR_INVALID;
     } else {
         return token_list_node_next_i(token);

@@ -16,7 +16,7 @@ token_language_c_operator_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
         return TK_LANG_MATCH_INVALID;
     } else if (nfa_engine_structure_illegal_p(nfa)) {
         return TK_LANG_MATCH_INVALID;
-    } else if (!token_structure_legal_p(token_head)) {
+    } else if (TOKEN_STRUCTURE_ILLEGAL_P(token_head)) {
         return TK_LANG_MATCH_INVALID;
     } else {
         match_size = token_language_c_nfa_match(nfa, buf);
@@ -32,7 +32,8 @@ token_language_c_operator_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
 }
 
 uint32
-token_language_c_identifier_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
+token_language_c_identifier_match(s_nfa_t *nfa, s_trie_tree_t *keyword_trie,
+    s_token_t *token_head, char *buf)
 {
     s_token_t *token;
     uint32 match_size;
@@ -41,7 +42,9 @@ token_language_c_identifier_match(s_nfa_t *nfa, s_token_t *token_head, char *buf
         return TK_LANG_MATCH_INVALID;
     } else if (nfa_engine_structure_illegal_p(nfa)) {
         return TK_LANG_MATCH_INVALID;
-    } else if (!token_structure_legal_p(token_head)) {
+    } else if (TOKEN_STRUCTURE_ILLEGAL_P(token_head)) {
+        return TK_LANG_MATCH_INVALID;
+    } else if (!trie_tree_structure_legal_p(keyword_trie)) {
         return TK_LANG_MATCH_INVALID;
     } else {
         match_size = token_language_c_nfa_match(nfa, buf);
@@ -50,6 +53,7 @@ token_language_c_identifier_match(s_nfa_t *nfa, s_token_t *token_head, char *buf
             scil_log_print_and_exit("Error in 'token_language_c_nfa_match'.\n");
         } else if (match_size) {
             token = token_language_c_idtr_create(buf, match_size);
+            token_language_c_keyword_seek(keyword_trie, token);
             token_list_insert_before(token_head, token);
         }
 
@@ -57,22 +61,19 @@ token_language_c_identifier_match(s_nfa_t *nfa, s_token_t *token_head, char *buf
     }
 }
 
-void
+static inline void
 token_language_c_keyword_seek(s_trie_tree_t *keyword_trie, s_token_t *token)
 {
     s_token_language_c_idtr_t *tk_idtr;
 
-    if (!token_structure_legal_p(token)) {
-        return;
-    } else if (!trie_tree_structure_legal_p(keyword_trie)) {
-        return;
-    } else {
-        tk_idtr = token->data;
-        if (token_language_c_keyword_match_p(keyword_trie, tk_idtr->name)) {
-            tk_idtr->is_keyword = true;
-            token->type = TK_LEX_KWRD;
-            TK_LANGUAGE_C_PRINT(token);
-        }
+    assert_exit(token_structure_legal_p(token));
+    assert_exit(trie_tree_structure_legal_p(keyword_trie));
+
+    tk_idtr = token->data;
+    if (token_language_c_keyword_match_p(keyword_trie, tk_idtr->name)) {
+        tk_idtr->is_keyword = true;
+        token->type = TK_LEX_KWRD;
+        TK_LANGUAGE_C_PRINT(token);
     }
 }
 
@@ -86,7 +87,7 @@ token_language_c_constant_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
         return TK_LANG_MATCH_INVALID;
     } else if (nfa_engine_structure_illegal_p(nfa)) {
         return TK_LANG_MATCH_INVALID;
-    } else if (!token_structure_legal_p(token_head)) {
+    } else if (TOKEN_STRUCTURE_ILLEGAL_P(token_head)) {
         return TK_LANG_MATCH_INVALID;
     } else {
         match_size = token_language_c_nfa_match(nfa, buf);
@@ -112,7 +113,7 @@ token_language_c_punctuation_match(s_nfa_t *nfa, s_token_t *token_head, char *bu
         return TK_LANG_MATCH_INVALID;
     } else if (nfa_engine_structure_illegal_p(nfa)) {
         return TK_LANG_MATCH_INVALID;
-    } else if (!token_structure_legal_p(token_head)) {
+    } else if (TOKEN_STRUCTURE_ILLEGAL_P(token_head)) {
         return TK_LANG_MATCH_INVALID;
     } else {
         match_size = token_language_c_nfa_match(nfa, buf);
@@ -297,7 +298,7 @@ token_language_c_destroy(s_token_t *token_list)
     s_token_t *token_node;
     s_token_t *token_next;
 
-    if (token_structure_legal_p(token_list)) {
+    if (TOKEN_STRUCTURE_LEGAL_P(token_list)) {
         token_node = token_list;
         do {
             token_next = token_list_node_next_i(token_node);
