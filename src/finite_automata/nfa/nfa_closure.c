@@ -284,3 +284,11 @@ nfa_closure_match_dp_backtrack(s_fa_closure_t *closure)
     return NFA_SZ_UNMATCH;
 }
 
+static inline bool
+nfa_closure_empty_p(s_fa_closure_t *closure)
+{
+    assert_exit(nfa_closure_structure_legal_p(closure));
+
+    return array_queue_empty_p(closure->collection);
+}
+

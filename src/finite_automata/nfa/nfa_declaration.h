@@ -5,13 +5,19 @@
 
 
 bool nfa_engine_pattern_match_p(s_nfa_t *nfa, char *pn);
+bool nfa_engine_structure_illegal_p(s_nfa_t *nfa);
 bool nfa_engine_structure_legal_p(s_nfa_t *nfa);
 s_nfa_t * nfa_engine_create(char *regular);
+static inline bool nfa_closure_empty_p(s_fa_closure_t *closure);
 static inline bool nfa_closure_match_dp_structure_legal_p(s_fa_match_dp_t *match_dp);
 static inline bool nfa_closure_structure_legal_p(s_fa_closure_t *closure);
 static inline bool nfa_engine_closure_match_p(s_nfa_t *nfa, s_fa_closure_t *closure);
 static inline bool nfa_engine_graph_dfs_reached_p(s_nfa_t *nfa, s_open_addressing_hash_t *hash, s_fa_status_t *status);
+static inline bool nfa_engine_graph_illegal_p(s_nfa_t *nfa);
 static inline bool nfa_engine_graph_legal_p(s_nfa_t *nfa);
+static inline bool nfa_engine_structure_illegal_ip(s_nfa_t *nfa);
+static inline bool nfa_engine_structure_legal_ip(s_nfa_t *nfa);
+static inline bool nfa_status_structure_illegal_p(s_fa_status_t *status);
 static inline bool nfa_status_structure_legal_p(s_fa_status_t *status);
 static inline bool nfa_status_terminal_p(s_fa_status_t *status);
 static inline s_fa_closure_t * nfa_closure_create(s_range_uint32_t *range);
@@ -47,7 +53,7 @@ static inline void nfa_engine_destroy_print(s_nfa_t *nfa);
 static inline void nfa_engine_graph_dfs_print(s_fa_status_t *status, s_open_addressing_hash_t *hash);
 static inline void nfa_engine_graph_print(s_nfa_t *nfa);
 static inline void nfa_engine_graph_print_status(s_fa_status_t *status);
-static inline void nfa_engine_patern_match_char_mov(s_fa_closure_t *closure, char c);
+static inline void nfa_engine_pattern_match_char_mov(s_fa_closure_t *closure, char c);
 static inline void nfa_engine_re_copy(s_nfa_t *nfa, char *re);
 static inline void nfa_engine_status_destroy_dfs(s_fa_status_t *status, s_open_addressing_hash_t *hash);
 static inline void nfa_label_cleanup(void);

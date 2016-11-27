@@ -9,6 +9,7 @@
 #include "nfa.h"
 #include "nfa_data.h"
 #include "nfa_print.h"
+#include "nfa_define.h"
 #include "nfa_declaration.h"
 
 #if defined DEBUG

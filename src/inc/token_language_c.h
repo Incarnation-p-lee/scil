@@ -21,6 +21,7 @@ typedef struct token_language_c_cnst s_token_language_c_cnst_t;
 typedef struct token_language_c_pctt s_token_language_c_pctt_t;
 
 #define TK_LANG_UNMATCH              0
+#define TK_LANG_MATCH_INVALID        ((uint32)-1)
 
 struct token_language_c_optr {
     char *name;

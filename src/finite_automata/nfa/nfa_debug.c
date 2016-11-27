@@ -148,8 +148,66 @@ nfa_engine_closure_match_print(s_nfa_t *nfa, s_fa_closure_t *closure)
     status = nfa->terminal;
 
     if (bitmap_bit_set_p(bitmap, status->label)) {
-        scil_log_print(">> Matched *TERMINAL* %04d in closure at '%c'\n",
+        scil_log_print("## Matched *TERMINAL* %04d in closure at '%c'\n",
             status->label, closure->c);
     }
+}
+
+static inline bool
+nfa_engine_graph_legal_p(s_nfa_t *nfa)
+{
+    bool legal;
+    s_open_addressing_hash_t *hash;
+
+    assert_exit(nfa_engine_structure_legal_p(nfa));
+
+    hash = open_addressing_hash_create(NFA_LABEL_HASH_SIZE);
+    legal = nfa_engine_graph_dfs_reached_p(nfa, hash, nfa->start);
+    open_addressing_hash_destroy(&hash);
+
+    return legal;
+}
+
+static inline bool
+nfa_engine_graph_illegal_p(s_nfa_t *nfa)
+{
+    return !nfa_engine_graph_legal_p(nfa);
+}
+
+static inline bool
+nfa_engine_graph_dfs_reached_p(s_nfa_t *nfa,
+    s_open_addressing_hash_t *hash, s_fa_status_t *status)
+{
+    void *key;
+    s_fa_edge_t *edge;
+    s_fa_edge_t *edge_head;
+    s_fa_status_t *succ;
+
+    assert_exit(hash);
+    assert_exit(nfa_status_structure_legal_p(status));
+    assert_exit(nfa_engine_structure_legal_p(nfa));
+
+    key = (void *)(ptr_t)status->label;
+    assert_exit(PTR_INVALID != open_addressing_hash_find(hash, key));
+
+    if (!open_addressing_hash_find(hash, key)) {
+        open_addressing_hash_insert(hash, key);
+        if (status == nfa->terminal) {
+            return true;
+        }
+
+        edge = edge_head = status->adj_list;
+        do {
+            succ = edge->succ;
+            if (succ == nfa->start) {
+                return false; /* Start status should not have enter edge */
+            } else if (nfa_engine_graph_dfs_reached_p(nfa, hash, succ)) {
+                return true;
+            }
+            edge = nfa_edge_next(edge);
+        } while (edge_head != edge);
+    }
+
+    return false;
 }
 

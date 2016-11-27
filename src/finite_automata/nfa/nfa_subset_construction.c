@@ -30,6 +30,12 @@ nfa_status_structure_legal_p(s_fa_status_t *status)
     }
 }
 
+static inline bool
+nfa_status_structure_illegal_p(s_fa_status_t *status)
+{
+    return !nfa_status_structure_legal_p(status);
+}
+
 /*
  * RE: a|b
  */
