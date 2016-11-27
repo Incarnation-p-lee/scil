@@ -2,6 +2,8 @@
 
 ### Simple Compiler Implementation for Learning
 
+#### _TOKENIZER_
+
 ##### Build Binary
 ```
 Build Script Usage:
@@ -93,5 +95,8 @@ PCTT }
 
 ##### Debug log
    If specific DEBUG macro, will create one file named tokenizer.elf.log. It will print something the tokenizer has done.
+
+---------------------
+
 
    
