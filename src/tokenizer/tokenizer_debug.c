@@ -88,3 +88,10 @@ tokenizer_io_block_print(s_io_block_t *io_block)
     dp_free(buf);
 }
 
+static inline void
+tokenizer_language_c_buffer_print(char *buf)
+{
+    assert_exit(buf);
+    scil_log_print("== TKZ matching '%s'\n", buf);
+}
+

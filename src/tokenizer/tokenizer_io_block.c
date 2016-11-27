@@ -126,7 +126,9 @@ tokenizer_io_block_language_c_match(s_tokenizer_language_t *tkz_language,
     rest_size = dp_strlen(buf);
 
     while (rest_size != 0) {
+        TOKENIZER_LANGUAGE_C_BUFFER_PRINT(buf);
         match_size = tokenizer_language_c_token_match(tkz_language, token_head, buf);
+
         if (match_size == NFA_SZ_UNMATCH) {
             scil_log_print_and_exit("Cannot detect any token of '%s'.\n", io_block->block_buf);
         } else {

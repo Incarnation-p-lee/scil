@@ -84,29 +84,26 @@ nfa_status_terminal_p(s_fa_status_t *status)
 }
 
 static inline void
-nfa_closure_title_print(char c, char *buf)
+nfa_closure_title_print(char c)
 {
-    assert_exit(buf);
-
     if (c == NULL_CHAR) {
-        scil_log_print(">> NFA closure collection *START* of '%s'\n", buf);
+        scil_log_print(">> NFA closure collection *START*\n");
     } else {
-        scil_log_print(">> NFA closure collection '%c' of '%s'\n", c, buf);
+        scil_log_print(">> NFA closure collection '%c'\n", c);
     }
 }
 
 static inline void
-nfa_closure_print(s_fa_closure_t *closure, char *buf)
+nfa_closure_print(s_fa_closure_t *closure)
 {
     uint32 i;
     s_fa_status_t *status;
     s_array_queue_t *collection;
     s_array_iterator_t *iterator;
 
-    assert_exit(buf);
     assert_exit(nfa_closure_structure_legal_p(closure));
 
-    nfa_closure_title_print(closure->c, buf);
+    nfa_closure_title_print(closure->c);
 
     collection = closure->collection;
     if (array_queue_empty_p(collection)) {

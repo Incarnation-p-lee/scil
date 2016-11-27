@@ -19,6 +19,7 @@ token_language_c_operator_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
     } else if (TOKEN_STRUCTURE_ILLEGAL_P(token_head)) {
         return TK_LANG_MATCH_INVALID;
     } else {
+        TOKEN_LANGUAGE_C_OPTR_PRINT(buf);
         match_size = token_language_c_nfa_match(nfa, buf);
 
         if (match_size == NFA_SZ_INVALID) {
@@ -47,6 +48,7 @@ token_language_c_identifier_match(s_nfa_t *nfa, s_trie_tree_t *keyword_trie,
     } else if (!trie_tree_structure_legal_p(keyword_trie)) {
         return TK_LANG_MATCH_INVALID;
     } else {
+        TOKEN_LANGUAGE_C_IDTR_PRINT(buf);
         match_size = token_language_c_nfa_match(nfa, buf);
 
         if (match_size == NFA_SZ_INVALID) {
@@ -90,6 +92,7 @@ token_language_c_constant_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
     } else if (TOKEN_STRUCTURE_ILLEGAL_P(token_head)) {
         return TK_LANG_MATCH_INVALID;
     } else {
+        TOKEN_LANGUAGE_C_CNST_PRINT(buf);
         match_size = token_language_c_nfa_match(nfa, buf);
 
         if (match_size == NFA_SZ_INVALID) {
@@ -116,6 +119,7 @@ token_language_c_punctuation_match(s_nfa_t *nfa, s_token_t *token_head, char *bu
     } else if (TOKEN_STRUCTURE_ILLEGAL_P(token_head)) {
         return TK_LANG_MATCH_INVALID;
     } else {
+        TOKEN_LANGUAGE_C_PCTT_PRINT(buf);
         match_size = token_language_c_nfa_match(nfa, buf);
 
         if (match_size == NFA_SZ_INVALID) {

@@ -40,10 +40,10 @@ static inline void nfa_closure_match_dp_append(s_nfa_t *nfa, s_fa_closure_t *clo
 static inline void nfa_closure_match_dp_destroy(s_fa_match_dp_t **match_dp);
 static inline void nfa_closure_null_seek(s_fa_closure_t *closure);
 static inline void nfa_closure_null_status_seek(s_fa_closure_t *closure, s_fa_status_t *status);
-static inline void nfa_closure_print(s_fa_closure_t *closure, char *buf);
+static inline void nfa_closure_print(s_fa_closure_t *closure);
 static inline void nfa_closure_queue_copy_to_path(s_fa_closure_t *closure);
 static inline void nfa_closure_seek(s_fa_closure_t *closure, char c);
-static inline void nfa_closure_title_print(char c, char *buf);
+static inline void nfa_closure_title_print(char c);
 static inline void nfa_edge_map_destroy(s_nfa_edge_map_t *map);
 static inline void nfa_engine_closure_match_print(s_nfa_t *nfa, s_fa_closure_t *closure);
 static inline void nfa_engine_create_operator(s_array_stack_t *stack, char c);

@@ -45,6 +45,7 @@ static inline void tokenizer_io_block_language_c_match(s_tokenizer_language_t *t
 static inline void tokenizer_io_block_print(s_io_block_t *io_block);
 static inline void tokenizer_io_block_process(s_tokenizer_language_t *tkz_language, s_token_t *token_head, s_io_block_t *io_block);
 static inline void tokenizer_io_buffer_destroy(s_tokenizer_io_buffer_t *tkz_io_buffer);
+static inline void tokenizer_language_c_buffer_print(char *buf);
 static inline void tokenizer_language_c_destroy(s_tokenizer_language_t *tkz_language);
 static inline void tokenizer_language_c_init(s_tokenizer_language_t *tkz_language);
 static inline void tokenizer_language_c_keyword_trie_destroy(s_tokenizer_language_t *tkz_language);

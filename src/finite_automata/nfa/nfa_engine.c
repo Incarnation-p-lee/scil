@@ -250,7 +250,7 @@ nfa_engine_pattern_match_ip(s_nfa_t *nfa, char *pn)
     nfa_closure_init(nfa, closure);
 
     c = pn;
-    NFA_CLOSURE_PRINT(closure, pn);
+    NFA_CLOSURE_PRINT(closure);
 
     while (*c) {
         nfa_engine_pattern_match_char_mov(closure, *c);
@@ -260,7 +260,7 @@ nfa_engine_pattern_match_ip(s_nfa_t *nfa, char *pn)
             return false;
         }
 
-        NFA_CLOSURE_PRINT(closure, pn);
+        NFA_CLOSURE_PRINT(closure);
         c++;
     }
 
@@ -283,7 +283,7 @@ nfa_engine_pattern_match_i(s_nfa_t *nfa, char *pn)
 
     closure = nfa_closure_create(&nfa->label_range);
     nfa_closure_init(nfa, closure);
-    NFA_CLOSURE_PRINT(closure, pn);
+    NFA_CLOSURE_PRINT(closure);
 
     c = pn;
     while (*c) {
@@ -293,7 +293,7 @@ nfa_engine_pattern_match_i(s_nfa_t *nfa, char *pn)
             break;
         }
 
-        NFA_CLOSURE_PRINT(closure, pn);
+        NFA_CLOSURE_PRINT(closure);
         nfa_closure_match_dp_append(nfa, closure);
         c++;
     }

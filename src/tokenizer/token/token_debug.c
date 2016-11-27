@@ -58,3 +58,35 @@ token_language_c_pctt_char_p(char c)
     }
 }
 
+static inline void
+token_language_c_identifier_print(char *buf)
+{
+    assert_exit(buf);
+
+    scil_log_print("== TK try identifier on '%s'\n", buf);
+}
+
+static inline void
+token_language_c_operator_print(char *buf)
+{
+    assert_exit(buf);
+
+    scil_log_print("== TK try operator on '%s'\n", buf);
+}
+
+static inline void
+token_language_c_constant_print(char *buf)
+{
+    assert_exit(buf);
+
+    scil_log_print("== TK try constant on '%s'\n", buf);
+}
+
+static inline void
+token_language_c_punctuation_print(char *buf)
+{
+    assert_exit(buf);
+
+    scil_log_print("== TK try punctuation on '%s'\n", buf);
+}
+
