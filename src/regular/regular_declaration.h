@@ -15,6 +15,8 @@ bool regular_char_wildcard_unary_p(char c);
 char * regular_convert_to_reverse_polish(char *re);
 char regular_char_translate_resume(char c);
 static inline bool regular_char_and_needed_p(char last, char c);
+static inline bool regular_char_and_prefix_p(char prefix);
+static inline bool regular_char_and_suffix_p(char suffix);
 static inline bool regular_char_data_extra_p(char c);
 static inline bool regular_recover_buffer_structure_legal_p(s_regular_recover_buffer_t *recover);
 static inline bool regular_reverse_polish_legal_p(char *polish);
