@@ -1,5 +1,5 @@
 static inline void
-token_language_c_log_print(s_token_t *token)
+token_language_c_log_print(s_tk_t *token)
 {
     s_token_language_c_idtr_t *idtr;
     s_token_language_c_optr_t *optr;

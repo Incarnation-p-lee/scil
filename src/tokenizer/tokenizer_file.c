@@ -31,7 +31,7 @@ tokenizer_file_create(char *fname)
     tkz_file->filename = dp_malloc(dp_strlen(fname) + 1);
     dp_strcpy(tkz_file->filename, fname);
 
-    tkz_file->tk_list = dp_malloc(sizeof(s_token_t));
+    tkz_file->tk_list = dp_malloc(sizeof(s_tk_t));
     tkz_file->tk_list->data = NULL;
     tkz_file->tk_list->type = TK_LEX_HEAD;
     doubly_linked_list_initial(&tkz_file->tk_list->list);
@@ -71,7 +71,7 @@ tokenizer_file_structure_legal_p(s_tokenizer_file_t *tkz_file_list)
 static inline void
 tokenizer_file_token_process(s_tokenizer_file_t *tkz_file)
 {
-    s_token_t *tk_head;
+    s_tk_t *tk_head;
     s_io_buffer_t *io_buffer;
     s_tokenizer_language_t *tkz_language;
     s_tokenizer_io_buffer_t *tkz_io_buffer;
@@ -93,7 +93,7 @@ tokenizer_file_token_process(s_tokenizer_file_t *tkz_file)
 
 static inline void
 tokenizer_file_io_buffer_process(s_io_buffer_t *io_buffer,
-    s_tokenizer_language_t *tkz_language, s_token_t *token_head)
+    s_tokenizer_language_t *tkz_language, s_tk_t *token_head)
 {
     char *c;
     uint32 limit;

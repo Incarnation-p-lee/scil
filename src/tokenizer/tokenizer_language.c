@@ -196,7 +196,7 @@ tokenizer_language_c_keyword_trie_init(s_tokenizer_language_t *tkz_language)
 
 static inline uint32
 tokenizer_language_c_token_match(s_tokenizer_language_t *tkz_language,
-    s_token_t *token_head, char *buf)
+    s_tk_t *token_head, char *buf)
 {
     uint32 match_size;
     s_nfa_t *nfa_engine;

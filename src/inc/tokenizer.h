@@ -53,7 +53,7 @@ struct tokenizer_language {
 
 struct tokenizer_file {
     char                    *filename;
-    s_token_t               *tk_list;
+    s_tk_t                  *tk_list;
     s_tokenizer_io_buffer_t *tkz_io_buffer;
     s_tokenizer_language_t  *tkz_language;
 };

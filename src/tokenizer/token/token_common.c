@@ -1,17 +1,17 @@
 bool
-token_structure_legal_p(s_token_t *token)
+token_structure_legal_p(s_tk_t *token)
 {
     return token_structure_legal_ip(token);
 }
 
 bool
-token_structure_illegal_p(s_token_t *token)
+token_structure_illegal_p(s_tk_t *token)
 {
     return token_structure_illegal_ip(token);
 }
 
 static inline bool
-token_structure_legal_ip(s_token_t *token)
+token_structure_legal_ip(s_tk_t *token)
 {
     if (!token) {
         return false;
@@ -25,13 +25,13 @@ token_structure_legal_ip(s_token_t *token)
 }
 
 static inline bool
-token_structure_illegal_ip(s_token_t *token)
+token_structure_illegal_ip(s_tk_t *token)
 {
     return !token_structure_legal_ip(token);
 }
 
-s_token_t *
-token_list_node_previous(s_token_t *token)
+s_tk_t *
+token_list_node_previous(s_tk_t *token)
 {
     if (TOKEN_STRUCTURE_ILLEGAL_P(token)) {
         return PTR_INVALID;
@@ -42,7 +42,7 @@ token_list_node_previous(s_token_t *token)
 }
 
 static inline void
-token_list_insert_before(s_token_t *token_head, s_token_t *inserted)
+token_list_insert_before(s_tk_t *token_head, s_tk_t *inserted)
 {
     assert_exit(token_structure_legal_p(token_head));
     assert_exit(token_structure_legal_p(inserted));
@@ -50,16 +50,16 @@ token_list_insert_before(s_token_t *token_head, s_token_t *inserted)
     doubly_linked_list_insert_before(&token_head->list, &inserted->list);
 }
 
-static inline s_token_t *
-token_list_node_previous_i(s_token_t *token)
+static inline s_tk_t *
+token_list_node_previous_i(s_tk_t *token)
 {
     assert_exit(token_structure_legal_p(token));
 
-    return CONTAINS_OF(token->list.previous, s_token_t, list);
+    return CONTAINS_OF(token->list.previous, s_tk_t, list);
 }
 
-s_token_t *
-token_list_node_next(s_token_t *token)
+s_tk_t *
+token_list_node_next(s_tk_t *token)
 {
     if (TOKEN_STRUCTURE_ILLEGAL_P(token)) {
         return PTR_INVALID;
@@ -68,11 +68,11 @@ token_list_node_next(s_token_t *token)
     }
 }
 
-static inline s_token_t *
-token_list_node_next_i(s_token_t *token)
+static inline s_tk_t *
+token_list_node_next_i(s_tk_t *token)
 {
     assert_exit(token_structure_legal_p(token));
 
-    return CONTAINS_OF(token->list.next, s_token_t, list);
+    return CONTAINS_OF(token->list.next, s_tk_t, list);
 }
 

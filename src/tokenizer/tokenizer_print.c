@@ -1,8 +1,8 @@
 static inline void
 tokenizer_file_print(s_tokenizer_file_t *tkz_file)
 {
-    s_token_t *tk_head;
-    s_token_t *tk_iterator;
+    s_tk_t *tk_head;
+    s_tk_t *tk_iterator;
     e_tokenizer_language_type_t tkz_language_type;
 
     assert_exit(tokenizer_file_structure_legal_p(tkz_file));

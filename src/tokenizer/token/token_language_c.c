@@ -7,9 +7,9 @@ token_language_c_nfa_match(s_nfa_t *nfa, char *buf)
 }
 
 uint32
-token_language_c_operator_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
+token_language_c_operator_match(s_nfa_t *nfa, s_tk_t *token_head, char *buf)
 {
-    s_token_t *token;
+    s_tk_t *token;
     uint32 match_size;
 
     if (!buf) {
@@ -34,9 +34,9 @@ token_language_c_operator_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
 
 uint32
 token_language_c_identifier_match(s_nfa_t *nfa, s_trie_tree_t *keyword_trie,
-    s_token_t *token_head, char *buf)
+    s_tk_t *token_head, char *buf)
 {
-    s_token_t *token;
+    s_tk_t *token;
     uint32 match_size;
 
     if (!buf) {
@@ -64,7 +64,7 @@ token_language_c_identifier_match(s_nfa_t *nfa, s_trie_tree_t *keyword_trie,
 }
 
 static inline void
-token_language_c_keyword_seek(s_trie_tree_t *keyword_trie, s_token_t *token)
+token_language_c_keyword_seek(s_trie_tree_t *keyword_trie, s_tk_t *token)
 {
     s_token_language_c_idtr_t *tk_idtr;
 
@@ -80,9 +80,9 @@ token_language_c_keyword_seek(s_trie_tree_t *keyword_trie, s_token_t *token)
 }
 
 uint32
-token_language_c_constant_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
+token_language_c_constant_match(s_nfa_t *nfa, s_tk_t *token_head, char *buf)
 {
-    s_token_t *token;
+    s_tk_t *token;
     uint32 match_size;
 
     if (!buf) {
@@ -107,9 +107,9 @@ token_language_c_constant_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
 }
 
 uint32
-token_language_c_punctuation_match(s_nfa_t *nfa, s_token_t *token_head, char *buf)
+token_language_c_punctuation_match(s_nfa_t *nfa, s_tk_t *token_head, char *buf)
 {
-    s_token_t *token;
+    s_tk_t *token;
     uint32 match_size;
 
     if (!buf) {
@@ -135,10 +135,10 @@ token_language_c_punctuation_match(s_nfa_t *nfa, s_token_t *token_head, char *bu
     }
 }
 
-static inline s_token_t *
+static inline s_tk_t *
 token_language_c_optr_create(char *name, uint32 size)
 {
-    s_token_t *token;
+    s_tk_t *token;
     s_token_language_c_optr_t *optr;
 
     assert_exit(name);
@@ -158,10 +158,10 @@ token_language_c_optr_create(char *name, uint32 size)
     return token;
 }
 
-static inline s_token_t *
+static inline s_tk_t *
 token_language_c_idtr_create(char *name, uint32 size)
 {
-    s_token_t *token;
+    s_tk_t *token;
     s_token_language_c_idtr_t *idtr;
 
     assert_exit(name && size);
@@ -181,10 +181,10 @@ token_language_c_idtr_create(char *name, uint32 size)
     return token;
 }
 
-static inline s_token_t *
+static inline s_tk_t *
 token_language_c_cnst_create(char *buf, uint32 size)
 {
-    s_token_t *token;
+    s_tk_t *token;
     s_token_language_c_cnst_t *cnst;
 
     assert_exit(buf && size);
@@ -203,10 +203,10 @@ token_language_c_cnst_create(char *buf, uint32 size)
     return token;
 }
 
-static inline s_token_t *
+static inline s_tk_t *
 token_language_c_pctt_create(char c)
 {
-    s_token_t *token;
+    s_tk_t *token;
     s_token_language_c_pctt_t *pctt;
 
     assert_exit(token_language_c_pctt_char_p(c));
@@ -258,7 +258,7 @@ token_language_c_keyword_match_p(s_trie_tree_t *keyword_trie, char *name)
 }
 
 static inline void
-token_language_c_node_destroy(s_token_t *token_node)
+token_language_c_node_destroy(s_tk_t *token_node)
 {
      s_token_language_c_idtr_t *token_idtr;
      s_token_language_c_optr_t *token_optr;
@@ -297,10 +297,10 @@ token_language_c_node_destroy(s_token_t *token_node)
 }
 
 void
-token_language_c_destroy(s_token_t *token_list)
+token_language_c_destroy(s_tk_t *token_list)
 {
-    s_token_t *token_node;
-    s_token_t *token_next;
+    s_tk_t *token_node;
+    s_tk_t *token_next;
 
     if (TOKEN_STRUCTURE_LEGAL_P(token_list)) {
         token_node = token_list;

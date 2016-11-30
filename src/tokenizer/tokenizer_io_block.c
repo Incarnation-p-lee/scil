@@ -69,7 +69,7 @@ tokenizer_io_block_fill(s_io_block_t *io_block, char *buf)
  */
 static inline void
 tokenizer_io_block_process(s_tokenizer_language_t *tkz_language,
-    s_token_t *token_head, s_io_block_t *io_block)
+    s_tk_t *token_head, s_io_block_t *io_block)
 {
     assert_exit(token_structure_legal_p(token_head));
     assert_exit(tokenizer_io_block_structure_legal_p(io_block));
@@ -112,7 +112,7 @@ tokenizer_io_block_data_size(char *buf)
 
 static inline void
 tokenizer_io_block_language_c_match(s_tokenizer_language_t *tkz_language,
-    s_token_t *token_head, s_io_block_t *io_block)
+    s_tk_t *token_head, s_io_block_t *io_block)
 {
     char *buf;
     uint32 rest_size;
