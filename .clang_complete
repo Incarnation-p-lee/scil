@@ -1,0 +1,26 @@
+-DDEBUG
+-DLIBC
+-DX86_64
+-I/usr/include/clang/3.5
+-include src/log/log.h
+-include src/regular/regular_expression.h
+-include src/finite_automata/nfa/nfa_print.h
+-include src/finite_automata/nfa/nfa_data.h
+-include src/finite_automata/nfa/nfa_define.h
+-include src/inc/depends.h
+-include src/inc/token_language_c.h
+-include src/inc/tokenizer.h
+-include src/inc/token.h
+-include src/inc/define.h
+-include src/inc/regular.h
+-include src/inc/finite_automata.h
+-include src/inc/data_structure_interface.h
+-include src/inc/nfa.h
+-include src/tokenizer/tokenizer_define.h
+-include src/tokenizer/tokenizer_language.h
+-include src/tokenizer/tokenizer_print.h
+-include src/tokenizer/token/token_language.h
+-include src/tokenizer/token/token_data.h
+-include src/tokenizer/token/token_define.h
+-include src/test/test.h
+-include src/common/common.h
