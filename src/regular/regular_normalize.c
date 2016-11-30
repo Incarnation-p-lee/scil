@@ -3,23 +3,23 @@ regular_normalize(char *re)
 {
     char *normal;
     uint32 bytes_count;
-    s_regular_recover_buffer_t *recover;
+    s_regular_recover_t *recover;
 
     assert_exit(re);
 
     bytes_count = dp_strlen(re) * 2 + RE_RECOVER_MIN;
-    recover = regular_recover_buffer_create(bytes_count);
+    recover = regular_recover_create(bytes_count);
 
     regular_range_recover(recover, re);
     normal = regular_char_and_insert(recover->buf);
 
-    regular_recover_buffer_destroy(recover);
+    regular_recover_destroy(recover);
 
     return normal;
 }
 
 static inline bool
-regular_recover_buffer_structure_legal_p(s_regular_recover_buffer_t *recover)
+regular_recover_structure_legal_p(s_regular_recover_t *recover)
 {
     if (recover == NULL) {
         return false;
@@ -34,10 +34,10 @@ regular_recover_buffer_structure_legal_p(s_regular_recover_buffer_t *recover)
     }
 }
 
-static inline s_regular_recover_buffer_t *
-regular_recover_buffer_create(uint32 bytes_count)
+static inline s_regular_recover_t *
+regular_recover_create(uint32 bytes_count)
 {
-    s_regular_recover_buffer_t *recover;
+    s_regular_recover_t *recover;
 
     assert_exit(bytes_count >= RE_RECOVER_MIN);
 
@@ -51,16 +51,16 @@ regular_recover_buffer_create(uint32 bytes_count)
 }
 
 static inline void
-regular_recover_buffer_destroy(s_regular_recover_buffer_t *recover)
+regular_recover_destroy(s_regular_recover_t *recover)
 {
-    assert_exit(regular_recover_buffer_structure_legal_p(recover));
+    assert_exit(regular_recover_structure_legal_p(recover));
 
     dp_free(recover->buf);
     dp_free(recover);
 }
 
 static inline uint32
-regular_range_unfold_i(s_regular_recover_buffer_t *recover, char *re)
+regular_range_unfold_i(s_regular_recover_t *recover, char *re)
 {
     char *c;
     char start, last;
@@ -68,7 +68,7 @@ regular_range_unfold_i(s_regular_recover_buffer_t *recover, char *re)
 
     assert_exit(re);
     assert_exit(re[1] == RE_DT_SML_SUB_CHAR);
-    assert_exit(regular_recover_buffer_structure_legal_p(recover));
+    assert_exit(regular_recover_structure_legal_p(recover));
 
     c = re;   /* 'A-Z' */
     start = c[RE_RANGE_START];
@@ -88,14 +88,14 @@ regular_range_unfold_i(s_regular_recover_buffer_t *recover, char *re)
 }
 
 static inline uint32
-regular_range_unfold(s_regular_recover_buffer_t *recover, char *re)
+regular_range_unfold(s_regular_recover_t *recover, char *re)
 {
     char *c, advanced;
     uint32 forward_bytes;
 
     assert_exit(re);
     assert_exit(re[0] == RE_WILD_MBKT_L);
-    assert_exit(regular_recover_buffer_structure_legal_p(recover));
+    assert_exit(regular_recover_structure_legal_p(recover));
 
     c = re + 1;   /* skip '[' of [A */
     recover->buf[recover->index++] = RE_WILD_BKT_L;
@@ -124,12 +124,12 @@ regular_range_unfold(s_regular_recover_buffer_t *recover, char *re)
  * 2. Convert RE [A-Z] to (A|B|C|...|Z)
  */
 static inline void
-regular_range_recover(s_regular_recover_buffer_t *recover, char *re)
+regular_range_recover(s_regular_recover_t *recover, char *re)
 {
     char *c;
 
     assert_exit(re);
-    assert_exit(regular_recover_buffer_structure_legal_p(recover));
+    assert_exit(regular_recover_structure_legal_p(recover));
 
     c = re;
     while (*c) {

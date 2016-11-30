@@ -1,16 +1,16 @@
 #ifndef HAVE_DEFINED_REGULAR_H
 #define HAVE_DEFINED_REGULAR_H
 
-#define RE_RECOVER_MIN         8u
-#define RE_RANGE_START         0u
-#define RE_RANGE_LAST          2u
-#define RE_RANGE_SIZE          (RE_RANGE_LAST + 1 - RE_RANGE_START)
+#define RE_RECOVER_MIN           8u
+#define RE_RANGE_START           0u
+#define RE_RANGE_LAST            2u
+#define RE_RANGE_SIZE            (RE_RANGE_LAST + 1 - RE_RANGE_START)
 
-typedef enum regular_wildcard         e_regular_wildcard_t;
-typedef struct regular_recover_buffer s_regular_recover_buffer_t;
+typedef enum regular_wildcard    e_regular_wildcard_t;
+typedef enum regular_data_symbol e_regular_data_symbol_t;
+typedef struct regular_recover   s_regular_recover_t;
 
-
-struct regular_recover_buffer {
+struct regular_recover {
     char *buf;
     uint32 size;  /* bytes count */
     uint32 index;
