@@ -1,17 +1,13 @@
-static inline s_nfa_edge_map_t *
-nfa_edge_map_create(char c)
+static inline s_nfa_t *
+nfa_char_data_create(char c)
 {
-    s_nfa_edge_map_t *map;
+    assert_exit(regular_char_data_p(c));
 
     if (regular_char_translated_p(c)) {
         c = regular_char_translate_resume(c);
     }
 
-    map = dp_malloc(sizeof(*map));
-    map->c = c;
-    map->nfa = nfa_subset_rule_basic(c);
-
-    return map;
+    return nfa_subset_rule_basic(c);
 }
 
 static inline s_fa_edge_t *
@@ -20,27 +16,6 @@ nfa_edge_next(s_fa_edge_t *edge)
     assert_exit(edge);
 
     return CONTAINS_OF(edge->list.next, s_fa_edge_t, list);
-}
-
-static inline void
-nfa_edge_map_destroy(s_nfa_edge_map_t *map)
-{
-    assert_exit(NULL != map);
-
-    map->nfa = NULL;
-    dp_free(map);
-}
-
-static inline s_nfa_t *
-nfa_edge_map_nfa_obtain(s_nfa_edge_map_t *map)
-{
-    assert_exit(NULL != map);
-
-    if (!map->nfa) {
-        map->nfa = nfa_subset_rule_basic(map->c);
-    }
-
-    return map->nfa;
 }
 
 static inline uint32

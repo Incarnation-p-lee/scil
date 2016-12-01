@@ -1,4 +1,7 @@
-// Implementation of McMaughton-Yamda-Thompson algorithm
+/*
+ * Implementation of McMaughton-Yamda-Thompson algorithm
+ */
+
 static inline s_nfa_t *
 nfa_subset_rule_basic(char c)
 {
@@ -56,15 +59,11 @@ static inline void
 nfa_subset_rule_induction_binary(s_array_stack_t *stack,  e_regular_wildcard_t opt)
 {
     s_nfa_t *nfa, *nfa_tmp;
-    s_nfa_edge_map_t *map, *map_tmp;
 
     assert_exit(stack);
 
-    map_tmp = array_stack_pop(stack);
-    map = array_stack_pop(stack);
-
-    nfa_tmp = nfa_edge_map_nfa_obtain(map_tmp);
-    nfa = nfa_edge_map_nfa_obtain(map);
+    nfa_tmp = array_stack_pop(stack);
+    nfa = array_stack_pop(stack);
 
     switch (opt) {
         case RE_WILD_AND:
@@ -78,8 +77,7 @@ nfa_subset_rule_induction_binary(s_array_stack_t *stack,  e_regular_wildcard_t o
             break;
     }
 
-    nfa_edge_map_destroy(map_tmp);
-    array_stack_push(stack, map);
+    array_stack_push(stack, nfa);
     assert_exit(nfa_engine_structure_legal_p(nfa));
 }
 
@@ -87,12 +85,10 @@ static inline void
 nfa_subset_rule_induction_unary(s_array_stack_t *stack, e_regular_wildcard_t opt)
 {
     s_nfa_t *nfa;
-    s_nfa_edge_map_t *map;
 
     assert_exit(stack);
 
-    map = array_stack_pop(stack);
-    nfa = nfa_edge_map_nfa_obtain(map);
+    nfa = array_stack_pop(stack);
 
     switch (opt) {
         case RE_WILD_STAR:
@@ -109,7 +105,7 @@ nfa_subset_rule_induction_unary(s_array_stack_t *stack, e_regular_wildcard_t opt
             break;
     }
 
-    array_stack_push(stack, map);
+    array_stack_push(stack, nfa);
     assert_exit(nfa_engine_structure_legal_p(nfa));
 }
 

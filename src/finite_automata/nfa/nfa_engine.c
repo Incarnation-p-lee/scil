@@ -58,7 +58,6 @@ nfa_engine_create_i(char *polish)
 {
     char *c;
     s_nfa_t *nfa;
-    s_nfa_edge_map_t *map;
     s_array_stack_t *stack;
 
     assert_exit(polish);
@@ -70,26 +69,24 @@ nfa_engine_create_i(char *polish)
 
     while (*c) {
         if (regular_char_data_p(*c)) {
-            map = nfa_edge_map_create(*c);
-            array_stack_push(stack, map);
+            nfa = nfa_char_data_create(*c);
+            array_stack_push(stack, nfa);
         } else {
             nfa_engine_create_operator(stack, *c);
         }
         c++;
     }
 
-    map = array_stack_pop(stack);
+    nfa = array_stack_pop(stack);
     assert_exit(array_stack_empty_p(stack));
 
-    nfa = map->nfa;
     nfa_simplify(nfa);
     nfa_label_range_set(nfa);
 
-    nfa_edge_map_destroy(map);
     array_stack_destroy(&stack);
-
     assert_exit(nfa_engine_structure_legal_p(nfa));
     assert_exit(nfa_engine_graph_legal_p(nfa));
+
     return nfa;
 }
 
