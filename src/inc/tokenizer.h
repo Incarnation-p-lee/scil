@@ -18,12 +18,12 @@
 #define TKZ_LOG_SUFFIX               ".log"
 #define TKZ_IO_BLOCK_SIZE            256
 
-typedef struct tokenizer_io_buffer   s_tokenizer_io_buffer_t;
+typedef struct tokenizer_io_buffer   s_tkz_io_buffer_t;
 typedef struct io_buffer             s_io_buffer_t;
 typedef struct io_block              s_io_block_t;
-typedef struct tokenizer_language    s_tokenizer_language_t;
-typedef struct tokenizer_file        s_tokenizer_file_t;
-typedef enum tokenizer_language_type e_tokenizer_language_type_t;
+typedef struct tokenizer_language    s_tkz_lang_t;
+typedef struct tokenizer_file        s_tkz_file_t;
+typedef enum tokenizer_language_type e_tkz_lang_type_t;
 
 enum tokenizer_language_type {
     TKZ_LANG_C,
@@ -43,22 +43,31 @@ struct tokenizer_io_buffer {
 };
 
 struct tokenizer_language {
-    e_tokenizer_language_type_t type;
-    s_trie_tree_t               *keyword_trie;
-    s_nfa_t                     *operator;
-    s_nfa_t                     *identifier;
-    s_nfa_t                     *constant;
-    s_nfa_t                     *punctuation;
+    e_tkz_lang_type_t type;
+    s_trie_tree_t     *keyword_trie;
+    s_nfa_t           *operator;
+    s_nfa_t           *identifier;
+    s_nfa_t           *constant;
+    s_nfa_t           *punctuation;
 };
 
 struct tokenizer_file {
-    char                    *filename;
-    s_tk_t                  *tk_list;
-    s_tokenizer_io_buffer_t *tkz_io_buffer;
-    s_tokenizer_language_t  *tkz_language;
+    char              *filename;
+    s_tk_t            *tk_list;
+    s_tkz_io_buffer_t *tkz_io_buffer;
+    s_tkz_lang_t      *tkz_language;
 };
 
 /*
+ * Abbreviation Table
+ * +------------------+
+ * | tkz  | tokenizer |
+ * +------+-----------+
+ * | tk   | token     |
+ * +------+-----------+
+ * | lang | language  |
+ * +------+-----------+
+ *
  * TOKENIZER data structure layout
  * tokenizer_file
  *              |- filename

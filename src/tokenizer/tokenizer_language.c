@@ -1,5 +1,5 @@
 static inline bool
-tokenizer_language_type_legal_p(e_tokenizer_language_type_t language_type)
+tokenizer_language_type_legal_p(e_tkz_lang_type_t language_type)
 {
     switch (language_type) {
         case TKZ_LANG_C:
@@ -10,7 +10,7 @@ tokenizer_language_type_legal_p(e_tokenizer_language_type_t language_type)
     }
 }
 
-static inline e_tokenizer_language_type_t
+static inline e_tkz_lang_type_t
 tokenizer_language_filename_to_type(char *filename)
 {
     char *c;
@@ -30,12 +30,12 @@ tokenizer_language_filename_to_type(char *filename)
     }
 }
 
-static inline s_tokenizer_language_t *
+static inline s_tkz_lang_t *
 tokenizer_language_obtain(char *filename)
 {
     uint32 index;
-    e_tokenizer_language_type_t type;
-    s_tokenizer_language_t *tkz_language;
+    e_tkz_lang_type_t type;
+    s_tkz_lang_t *tkz_language;
 
     assert_exit(filename);
 
@@ -51,10 +51,10 @@ tokenizer_language_obtain(char *filename)
     return tkz_language;
 }
 
-static inline s_tokenizer_language_t *
-tokenizer_language_create(e_tokenizer_language_type_t type)
+static inline s_tkz_lang_t *
+tokenizer_language_create(e_tkz_lang_type_t type)
 {
-    s_tokenizer_language_t *tkz_language;
+    s_tkz_lang_t *tkz_language;
 
     assert_exit(tokenizer_language_type_legal_p(type));
 
@@ -67,7 +67,7 @@ tokenizer_language_create(e_tokenizer_language_type_t type)
 }
 
 static inline bool
-tokenizer_language_type_p(e_tokenizer_language_type_t tkz_language_type)
+tokenizer_language_type_p(e_tkz_lang_type_t tkz_language_type)
 {
     switch (tkz_language_type) {
         case TKZ_LANG_C:
@@ -79,7 +79,7 @@ tokenizer_language_type_p(e_tokenizer_language_type_t tkz_language_type)
 }
 
 static inline bool
-tokenizer_language_structure_legal_p(s_tokenizer_language_t *tkz_language)
+tokenizer_language_structure_legal_p(s_tkz_lang_t *tkz_language)
 {
     if (!tkz_language) {
         return false;
@@ -94,7 +94,7 @@ tokenizer_language_structure_legal_p(s_tokenizer_language_t *tkz_language)
 static inline void
 tokenizer_language_cache_cleanup(void)
 {
-    s_tokenizer_language_t **tkz_iterator;
+    s_tkz_lang_t **tkz_iterator;
 
     tkz_iterator = tkz_language_set;
 
@@ -107,7 +107,7 @@ tokenizer_language_cache_cleanup(void)
 }
 
 static inline void
-tokenizer_language_destroy(s_tokenizer_language_t *tkz_language)
+tokenizer_language_destroy(s_tkz_lang_t *tkz_language)
 {
     assert_exit(tokenizer_language_structure_legal_p(tkz_language));
 
@@ -122,7 +122,7 @@ tokenizer_language_destroy(s_tokenizer_language_t *tkz_language)
 }
 
 static inline void
-tokenizer_language_c_destroy(s_tokenizer_language_t *tkz_language)
+tokenizer_language_c_destroy(s_tkz_lang_t *tkz_language)
 {
     assert_exit(tokenizer_language_structure_legal_p(tkz_language));
 
@@ -133,7 +133,7 @@ tokenizer_language_c_destroy(s_tokenizer_language_t *tkz_language)
 }
 
 static inline void
-tokenizer_language_c_keyword_trie_destroy(s_tokenizer_language_t *tkz_language)
+tokenizer_language_c_keyword_trie_destroy(s_tkz_lang_t *tkz_language)
 {
     assert_exit(tkz_language);
 
@@ -141,7 +141,7 @@ tokenizer_language_c_keyword_trie_destroy(s_tokenizer_language_t *tkz_language)
 }
 
 static inline void
-tokenizer_language_c_nfa_engine_destroy(s_tokenizer_language_t *tkz_language)
+tokenizer_language_c_nfa_engine_destroy(s_tkz_lang_t *tkz_language)
 {
     assert_exit(tkz_language);
 
@@ -152,7 +152,7 @@ tokenizer_language_c_nfa_engine_destroy(s_tokenizer_language_t *tkz_language)
 }
 
 static inline void
-tokenizer_language_init(s_tokenizer_language_t *tkz_language)
+tokenizer_language_init(s_tkz_lang_t *tkz_language)
 {
     assert_exit(tkz_language);
 
@@ -167,7 +167,7 @@ tokenizer_language_init(s_tokenizer_language_t *tkz_language)
 }
 
 static inline void
-tokenizer_language_c_init(s_tokenizer_language_t *tkz_language)
+tokenizer_language_c_init(s_tkz_lang_t *tkz_language)
 {
     assert_exit(tkz_language);
 
@@ -176,7 +176,7 @@ tokenizer_language_c_init(s_tokenizer_language_t *tkz_language)
 }
 
 static inline void
-tokenizer_language_c_nfa_engine_init(s_tokenizer_language_t *tkz_language)
+tokenizer_language_c_nfa_engine_init(s_tkz_lang_t *tkz_language)
 {
     assert_exit(tkz_language);
 
@@ -187,7 +187,7 @@ tokenizer_language_c_nfa_engine_init(s_tokenizer_language_t *tkz_language)
 }
 
 static inline void
-tokenizer_language_c_keyword_trie_init(s_tokenizer_language_t *tkz_language)
+tokenizer_language_c_keyword_trie_init(s_tkz_lang_t *tkz_language)
 {
     assert_exit(tkz_language);
 
@@ -195,7 +195,7 @@ tokenizer_language_c_keyword_trie_init(s_tokenizer_language_t *tkz_language)
 }
 
 static inline uint32
-tokenizer_language_c_token_match(s_tokenizer_language_t *tkz_language,
+tokenizer_language_c_token_match(s_tkz_lang_t *tkz_language,
     s_tk_t *token_head, char *buf)
 {
     uint32 match_size;

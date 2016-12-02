@@ -9,7 +9,7 @@ token_char_double_quote_p(char c)
 }
 
 bool
-token_char_comment_p(char *buf, e_tokenizer_language_type_t tkz_type)
+token_char_comment_p(char *buf, e_tkz_lang_type_t tkz_type)
 {
     if (!buf) {
         return false;
@@ -20,7 +20,7 @@ token_char_comment_p(char *buf, e_tokenizer_language_type_t tkz_type)
 }
 
 bool
-token_char_single_comment_p(char *buf, e_tokenizer_language_type_t tkz_type)
+token_char_single_comment_p(char *buf, e_tkz_lang_type_t tkz_type)
 {
     if (!buf) {
         return false;
@@ -35,7 +35,7 @@ token_char_single_comment_p(char *buf, e_tokenizer_language_type_t tkz_type)
 }
 
 bool
-token_char_multiple_comment_head_p(char *buf, e_tokenizer_language_type_t tkz_type)
+token_char_multiple_comment_head_p(char *buf, e_tkz_lang_type_t tkz_type)
 {
     if (!buf) {
         return false;
@@ -50,7 +50,7 @@ token_char_multiple_comment_head_p(char *buf, e_tokenizer_language_type_t tkz_ty
 }
 
 bool
-token_char_multiple_comment_tail_p(char *buf, e_tokenizer_language_type_t tkz_type)
+token_char_multiple_comment_tail_p(char *buf, e_tkz_lang_type_t tkz_type)
 {
     if (!buf) {
         return false;

@@ -1,5 +1,5 @@
 void
-token_print(s_tk_t *token, e_tokenizer_language_type_t tkz_language_type)
+token_print(s_tk_t *token, e_tkz_lang_type_t tkz_language_type)
 {
     if (token_structure_legal_p(token)) {
         switch (tkz_language_type) {

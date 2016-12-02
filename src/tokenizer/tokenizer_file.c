@@ -2,7 +2,7 @@ static inline void
 tokenizer_file_process(char **file_list, uint32 count)
 {
     char **fname;
-    s_tokenizer_file_t *tkz_file;
+    s_tkz_file_t *tkz_file;
 
     assert_exit(file_list && count);
 
@@ -19,10 +19,10 @@ tokenizer_file_process(char **file_list, uint32 count)
     tokenizer_language_cache_cleanup();
 }
 
-static inline s_tokenizer_file_t *
+static inline s_tkz_file_t *
 tokenizer_file_create(char *fname)
 {
-    s_tokenizer_file_t *tkz_file;
+    s_tkz_file_t *tkz_file;
 
     assert_exit(fname);
 
@@ -43,7 +43,7 @@ tokenizer_file_create(char *fname)
 }
 
 static inline void
-tokenizer_file_destroy(s_tokenizer_file_t *tkz_file)
+tokenizer_file_destroy(s_tkz_file_t *tkz_file)
 {
     assert_exit(tokenizer_file_structure_legal_p(tkz_file));
 
@@ -57,7 +57,7 @@ tokenizer_file_destroy(s_tokenizer_file_t *tkz_file)
 }
 
 static inline bool
-tokenizer_file_structure_legal_p(s_tokenizer_file_t *tkz_file_list)
+tokenizer_file_structure_legal_p(s_tkz_file_t *tkz_file_list)
 {
     if (!tkz_file_list) {
         return false;
@@ -69,13 +69,13 @@ tokenizer_file_structure_legal_p(s_tokenizer_file_t *tkz_file_list)
 }
 
 static inline void
-tokenizer_file_token_process(s_tokenizer_file_t *tkz_file)
+tokenizer_file_token_process(s_tkz_file_t *tkz_file)
 {
     s_tk_t *tk_head;
     s_io_buffer_t *io_buffer;
-    s_tokenizer_language_t *tkz_language;
-    s_tokenizer_io_buffer_t *tkz_io_buffer;
-    e_tokenizer_language_type_t tkz_language_type;
+    s_tkz_lang_t *tkz_language;
+    s_tkz_io_buffer_t *tkz_io_buffer;
+    e_tkz_lang_type_t tkz_language_type;
 
     assert_exit(tokenizer_file_structure_legal_p(tkz_file));
 
@@ -93,7 +93,7 @@ tokenizer_file_token_process(s_tokenizer_file_t *tkz_file)
 
 static inline void
 tokenizer_file_io_buffer_process(s_io_buffer_t *io_buffer,
-    s_tokenizer_language_t *tkz_language, s_tk_t *token_head)
+    s_tkz_lang_t *tkz_language, s_tk_t *token_head)
 {
     char *c;
     uint32 limit;
