@@ -40,12 +40,12 @@ nfa_engine_create_operator(s_array_stack_t *stack, char c)
     switch (c) {
         case RE_WILD_OR:
         case RE_WILD_AND:
-            nfa_subset_rule_induction_binary(stack, c);
+            nfa_subset_rule_binary(stack, c);
             break;
         case RE_WILD_STAR:
         case RE_WILD_PLUS:
         case RE_WILD_QUST:
-            nfa_subset_rule_induction_unary(stack, c);
+            nfa_subset_rule_unary(stack, c);
             break;
         default:
             assert_exit(false);
@@ -119,7 +119,7 @@ nfa_engine_create(char *regular)
 
     assert_exit(regular);
 
-    polish = regular_convert_to_reverse_polish(regular);
+    polish = regular_polish_process(regular);
 
     nfa = nfa_engine_create_i(polish);
     nfa_engine_re_copy(nfa, regular);

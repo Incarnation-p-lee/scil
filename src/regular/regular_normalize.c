@@ -117,7 +117,6 @@ regular_range_unfold(s_regular_recover_t *recover, char *re)
     return forward_bytes;
 }
 
-
 /*
  * Recover will process 2 things at one iteration.
  * 1. Encode TRANS wildcard.
@@ -133,7 +132,7 @@ regular_range_recover(s_regular_recover_t *recover, char *re)
 
     c = re;
     while (*c) {
-        if (*c == RE_WILD_TRANS) {
+        if (*c == RE_WILD_TRANS) { // Encoding translated wildard
             assert_exit(regular_char_wildcard_p(c[1]));
             recover->buf[recover->index++] = c[1] | TRANS_MASK;
             c++;
@@ -178,11 +177,7 @@ regular_char_and_suffix_p(char suffix)
 static inline bool
 regular_char_and_needed_p(char last, char c)
 {
-    if (regular_char_and_prefix_p(last) && regular_char_and_suffix_p(c)) {
-        return true;
-    } else {
-        return false;
-    }
+    return regular_char_and_prefix_p(last) && regular_char_and_suffix_p(c);
 }
 
 /*

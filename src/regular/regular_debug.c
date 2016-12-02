@@ -26,7 +26,7 @@ regular_stack_top_wildcard_unary_p(s_array_stack_t *stack)
 }
 
 static inline bool
-regular_reverse_polish_legal_p(char *polish)
+regular_polish_legal_p(char *polish)
 {
     char *c;
     char tmp;
@@ -77,7 +77,7 @@ regular_range_recover_print(char *regular)
 
     assert_exit(regular);
 
-    scil_log_print("<After regular expression range expand>\n    '");
+    scil_log_print(">> After regular expression range expand\n    '");
 
     c = regular;
     while (*c) {
@@ -99,7 +99,7 @@ regular_char_and_insert_print(char *regular)
 
     assert_exit(regular);
 
-    scil_log_print("<After regular expression opt and insert>\n    '");
+    scil_log_print(">> After regular expression opt and insert\n    '");
 
     c = regular;
     while (*c) {
@@ -115,13 +115,13 @@ regular_char_and_insert_print(char *regular)
 }
 
 static inline void
-regular_convert_to_reverse_polish_print(char *regular)
+regular_convert_to_polish_print(char *regular)
 {
     char *c, tmp;
 
     assert_exit(regular);
 
-    scil_log_print("<After regular expression convert to reverse polish>\n    '");
+    scil_log_print(">> After regular expression convert to polish\n    '");
 
     c = regular;
     while (*c) {

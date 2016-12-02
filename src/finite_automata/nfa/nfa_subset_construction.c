@@ -43,7 +43,7 @@ nfa_status_structure_illegal_p(s_fa_status_t *status)
  * RE: a|b
  */
 static inline void
-nfa_subset_rule_induction_or(s_nfa_t *s, s_nfa_t *t)
+nfa_subset_rule_or(s_nfa_t *s, s_nfa_t *t)
 {
     assert_exit(nfa_engine_structure_legal_p(s));
     assert_exit(nfa_engine_structure_legal_p(t));
@@ -56,7 +56,7 @@ nfa_subset_rule_induction_or(s_nfa_t *s, s_nfa_t *t)
 }
 
 static inline void
-nfa_subset_rule_induction_binary(s_array_stack_t *stack,  e_regular_wildcard_t opt)
+nfa_subset_rule_binary(s_array_stack_t *stack,  e_regular_wildcard_t opt)
 {
     s_nfa_t *nfa, *nfa_tmp;
 
@@ -67,10 +67,10 @@ nfa_subset_rule_induction_binary(s_array_stack_t *stack,  e_regular_wildcard_t o
 
     switch (opt) {
         case RE_WILD_AND:
-            nfa_subset_rule_induction_and(nfa, nfa_tmp);
+            nfa_subset_rule_and(nfa, nfa_tmp);
             break;
         case RE_WILD_OR:
-            nfa_subset_rule_induction_or(nfa, nfa_tmp);
+            nfa_subset_rule_or(nfa, nfa_tmp);
             break;
         default:
             assert_exit(false);
@@ -82,7 +82,7 @@ nfa_subset_rule_induction_binary(s_array_stack_t *stack,  e_regular_wildcard_t o
 }
 
 static inline void
-nfa_subset_rule_induction_unary(s_array_stack_t *stack, e_regular_wildcard_t opt)
+nfa_subset_rule_unary(s_array_stack_t *stack, e_regular_wildcard_t opt)
 {
     s_nfa_t *nfa;
 
@@ -92,13 +92,13 @@ nfa_subset_rule_induction_unary(s_array_stack_t *stack, e_regular_wildcard_t opt
 
     switch (opt) {
         case RE_WILD_STAR:
-            nfa_subset_rule_induction_star(nfa);
+            nfa_subset_rule_star(nfa);
             break;
         case RE_WILD_PLUS:
-            nfa_subset_rule_induction_plus(nfa);
+            nfa_subset_rule_plus(nfa);
             break;
         case RE_WILD_QUST:
-            nfa_subset_rule_induction_question(nfa);
+            nfa_subset_rule_question(nfa);
             break;
         default:
             assert_exit(false);
@@ -113,7 +113,7 @@ nfa_subset_rule_induction_unary(s_array_stack_t *stack, e_regular_wildcard_t opt
  * RE: ab
  */
 static inline void
-nfa_subset_rule_induction_and(s_nfa_t *s, s_nfa_t *t)
+nfa_subset_rule_and(s_nfa_t *s, s_nfa_t *t)
 {
     assert_exit(nfa_engine_structure_legal_p(s));
     assert_exit(nfa_engine_structure_legal_p(t));
@@ -129,7 +129,7 @@ nfa_subset_rule_induction_and(s_nfa_t *s, s_nfa_t *t)
  * RE: a*
  */
 static inline void
-nfa_subset_rule_induction_star(s_nfa_t *s)
+nfa_subset_rule_star(s_nfa_t *s)
 {
     s_fa_status_t *start;
     s_fa_status_t *terminal;
@@ -152,7 +152,7 @@ nfa_subset_rule_induction_star(s_nfa_t *s)
  * RE: a+
  */
 static inline void
-nfa_subset_rule_induction_plus(s_nfa_t *s)
+nfa_subset_rule_plus(s_nfa_t *s)
 {
     s_fa_status_t *start;
     s_fa_status_t *terminal;
@@ -174,7 +174,7 @@ nfa_subset_rule_induction_plus(s_nfa_t *s)
  * RE: a?
  */
 static inline void
-nfa_subset_rule_induction_question(s_nfa_t *s)
+nfa_subset_rule_question(s_nfa_t *s)
 {
     s_fa_status_t *start;
     s_fa_status_t *terminal;

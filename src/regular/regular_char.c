@@ -11,12 +11,10 @@ regular_char_translated_p(char c)
 char
 regular_char_translate_resume(char c)
 {
-    if (!regular_char_translated_p(c)) {
-        return c;
-    } else if (!regular_char_wildcard_p(c & TRANS_UNMASK)) {
-        return c;
-    } else {
+    if (regular_char_translated_p(c)) {
         return c & TRANS_UNMASK;
+    } else {
+        return c;
     }
 }
 
@@ -41,7 +39,7 @@ regular_char_wildcard_p(char c)
 }
 
 static inline bool
-regular_char_data_extra_p(char c)
+regular_char_data_symbol_p(char c)
 {
     switch (c) {
         case RE_DT_SML_B_SLASH_CHAR:    /* '\' */
@@ -78,7 +76,7 @@ regular_char_data_p(char c)
     } else if (regular_char_translated_p(c)) {
         return true;
     } else {
-        return regular_char_data_extra_p(c);
+        return regular_char_data_symbol_p(c);
     }
 }
 

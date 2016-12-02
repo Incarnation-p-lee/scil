@@ -10,6 +10,6 @@
 #endif
 
 #include "regular_char.c"
-#include "regular_convert.c"
+#include "regular_polish.c"
 #include "regular_normalize.c"
 
