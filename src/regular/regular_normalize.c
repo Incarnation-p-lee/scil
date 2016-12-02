@@ -8,18 +8,18 @@ regular_normalize(char *re)
     assert_exit(re);
 
     bytes_count = dp_strlen(re) * 2 + RE_RECOVER_MIN;
-    recover = regular_recover_create(bytes_count);
+    recover = regular_normalize_recover_create(bytes_count);
 
-    regular_range_recover(recover, re);
-    normal = regular_char_and_insert(recover->buf);
+    regular_normalize_range_recover(recover, re);
+    normal = regular_normalize_char_and_insert(recover->buf);
 
-    regular_recover_destroy(recover);
+    regular_normalize_recover_destroy(recover);
 
     return normal;
 }
 
 static inline bool
-regular_recover_structure_legal_p(s_regular_recover_t *recover)
+regular_normalize_recover_structure_legal_p(s_regular_recover_t *recover)
 {
     if (recover == NULL) {
         return false;
@@ -35,7 +35,7 @@ regular_recover_structure_legal_p(s_regular_recover_t *recover)
 }
 
 static inline s_regular_recover_t *
-regular_recover_create(uint32 bytes_count)
+regular_normalize_recover_create(uint32 bytes_count)
 {
     s_regular_recover_t *recover;
 
@@ -51,16 +51,16 @@ regular_recover_create(uint32 bytes_count)
 }
 
 static inline void
-regular_recover_destroy(s_regular_recover_t *recover)
+regular_normalize_recover_destroy(s_regular_recover_t *recover)
 {
-    assert_exit(regular_recover_structure_legal_p(recover));
+    assert_exit(regular_normalize_recover_structure_legal_p(recover));
 
     dp_free(recover->buf);
     dp_free(recover);
 }
 
 static inline uint32
-regular_range_unfold_i(s_regular_recover_t *recover, char *re)
+regular_normalize_range_unfold_i(s_regular_recover_t *recover, char *re)
 {
     char *c;
     char start, last;
@@ -68,7 +68,7 @@ regular_range_unfold_i(s_regular_recover_t *recover, char *re)
 
     assert_exit(re);
     assert_exit(re[1] == RE_DT_SML_SUB_CHAR);
-    assert_exit(regular_recover_structure_legal_p(recover));
+    assert_exit(regular_normalize_recover_structure_legal_p(recover));
 
     c = re;   /* 'A-Z' */
     start = c[RE_RANGE_START];
@@ -88,14 +88,14 @@ regular_range_unfold_i(s_regular_recover_t *recover, char *re)
 }
 
 static inline uint32
-regular_range_unfold(s_regular_recover_t *recover, char *re)
+regular_normalize_range_unfold(s_regular_recover_t *recover, char *re)
 {
     char *c, advanced;
     uint32 forward_bytes;
 
     assert_exit(re);
     assert_exit(re[0] == RE_WILD_MBKT_L);
-    assert_exit(regular_recover_structure_legal_p(recover));
+    assert_exit(regular_normalize_recover_structure_legal_p(recover));
 
     c = re + 1;   /* skip '[' of [A */
     recover->buf[recover->index++] = RE_WILD_BKT_L;
@@ -107,7 +107,7 @@ regular_range_unfold(s_regular_recover_t *recover, char *re)
             recover->buf[recover->index++] = RE_WILD_OR;
             c++;
         } else {                             /* Handle '-' in [], like [A-Z] */
-            c += regular_range_unfold_i(recover, c);
+            c += regular_normalize_range_unfold_i(recover, c);
         }
     }
 
@@ -123,12 +123,12 @@ regular_range_unfold(s_regular_recover_t *recover, char *re)
  * 2. Convert RE [A-Z] to (A|B|C|...|Z)
  */
 static inline void
-regular_range_recover(s_regular_recover_t *recover, char *re)
+regular_normalize_range_recover(s_regular_recover_t *recover, char *re)
 {
     char *c;
 
     assert_exit(re);
-    assert_exit(regular_recover_structure_legal_p(recover));
+    assert_exit(regular_normalize_recover_structure_legal_p(recover));
 
     c = re;
     while (*c) {
@@ -139,7 +139,7 @@ regular_range_recover(s_regular_recover_t *recover, char *re)
         } else if (*c != RE_WILD_MBKT_L) {
             recover->buf[recover->index++] = *c;
         } else {    /* *c == RE_WILD_MBKT_L */
-            c += regular_range_unfold(recover, c);
+            c += regular_normalize_range_unfold(recover, c);
         }
         c++;
     }
@@ -148,43 +148,11 @@ regular_range_recover(s_regular_recover_t *recover, char *re)
     REGULAR_RANG_RECOVER_PRINT(recover->buf);
 }
 
-static inline bool
-regular_char_and_prefix_p(char prefix)
-{
-    if (regular_char_data_p(prefix)) {
-        return true;
-    } else if (regular_char_wildcard_unary_p(prefix)) {
-        return true;
-    } else if (regular_char_bracket_right_p(prefix)) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-static inline bool
-regular_char_and_suffix_p(char suffix)
-{
-    if (regular_char_bracket_left_p(suffix)) {
-        return true;
-    } else if (regular_char_data_p(suffix)) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-static inline bool
-regular_char_and_needed_p(char last, char c)
-{
-    return regular_char_and_prefix_p(last) && regular_char_and_suffix_p(c);
-}
-
 /*
  * Convert RE abc => a&b&c
  */
 static inline char *
-regular_char_and_insert(char *re)
+regular_normalize_char_and_insert(char *re)
 {
     uint32 index, size;
     char last, *insert, *c;

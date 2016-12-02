@@ -131,3 +131,35 @@ regular_char_wildcard_binary_p(char c)
     }
 }
 
+static inline bool
+regular_char_and_prefix_p(char prefix)
+{
+    if (regular_char_data_p(prefix)) {
+        return true;
+    } else if (regular_char_wildcard_unary_p(prefix)) {
+        return true;
+    } else if (regular_char_bracket_right_p(prefix)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+static inline bool
+regular_char_and_suffix_p(char suffix)
+{
+    if (regular_char_bracket_left_p(suffix)) {
+        return true;
+    } else if (regular_char_data_p(suffix)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+static inline bool
+regular_char_and_needed_p(char last, char c)
+{
+    return regular_char_and_prefix_p(last) && regular_char_and_suffix_p(c);
+}
+
