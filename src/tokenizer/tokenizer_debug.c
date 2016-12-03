@@ -1,5 +1,5 @@
 static inline void
-tokenizer_file_open_print(char *fname)
+tkz_file_open_print(char *fname)
 {
     assert_exit(fname);
 
@@ -38,7 +38,7 @@ io_buffer_print(s_io_buffer_t *buffer)
 }
 
 static inline void
-tokenizer_logfile_open(char *binary_name)
+tkz_logfile_open(char *binary_name)
 {
     uint32 len;
     char *logfile_name, *c;
@@ -61,7 +61,7 @@ tokenizer_logfile_open(char *binary_name)
 }
 
 static inline void
-tokenizer_logfile_close(void)
+tkz_logfile_close(void)
 {
     memory_track_counters_print();
     libds_log_file_close();
@@ -69,14 +69,14 @@ tokenizer_logfile_close(void)
 }
 
 static inline void
-tokenizer_io_block_print(s_io_block_t *io_block)
+tkz_io_block_print(s_io_block_t *io_block)
 {
     char *buf;
     uint32 size;
 
-    assert_exit(tokenizer_io_block_structure_legal_p(io_block));
+    assert_exit(tkz_io_block_structure_legal_p(io_block));
 
-    size = tokenizer_io_block_data_size(io_block->block_buf);
+    size = tkz_io_block_data_size(io_block->block_buf);
     buf = dp_malloc(io_block->size);
 
     dp_memcpy(buf, io_block->block_buf, size);
@@ -89,7 +89,7 @@ tokenizer_io_block_print(s_io_block_t *io_block)
 }
 
 static inline void
-tokenizer_language_c_buffer_print(char *buf)
+tkz_lang_c_buffer_print(char *buf)
 {
     assert_exit(buf);
     scil_log_print("== TKZ matching '%s'\n", buf);

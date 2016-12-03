@@ -1,18 +1,17 @@
 static inline s_io_block_t *
-tokenizer_io_block_create(void)
+tkz_io_block_create(void)
 {
     s_io_block_t *io_block;
 
     io_block = dp_malloc(sizeof(*io_block));
     io_block->block_buf = dp_malloc(sizeof(char) * TKZ_IO_BLOCK_SIZE);
-    io_block->iterate_buf = dp_malloc(sizeof(char) * TKZ_IO_BLOCK_SIZE);
     io_block->size = TKZ_IO_BLOCK_SIZE;
 
     return io_block;
 }
 
 static inline bool
-tokenizer_io_block_structure_legal_p(s_io_block_t *io_block)
+tkz_io_block_structure_legal_p(s_io_block_t *io_block)
 {
     if (!io_block) {
         return false;
@@ -20,37 +19,33 @@ tokenizer_io_block_structure_legal_p(s_io_block_t *io_block)
         return false;
     } else if (!io_block->block_buf) {
         return false;
-    } else if (!io_block->iterate_buf) {
-        return false;
     } else {
         return true;
     }
 }
 
 static inline void
-tokenizer_io_block_destroy(s_io_block_t *io_block)
+tkz_io_block_destroy(s_io_block_t *io_block)
 {
-    assert_exit(tokenizer_io_block_structure_legal_p(io_block));
+    assert_exit(tkz_io_block_structure_legal_p(io_block));
 
-    dp_free(io_block->iterate_buf);
     dp_free(io_block->block_buf);
     dp_free(io_block);
 }
 
 static inline uint32
-tokenizer_io_block_fill(s_io_block_t *io_block, char *buf)
+tkz_io_block_fill(s_io_block_t *io_block, char *buf)
 {
     uint32 index_last;
     uint32 io_block_size;
 
     assert_exit(buf);
-    assert_exit(tokenizer_io_block_structure_legal_p(io_block));
+    assert_exit(tkz_io_block_structure_legal_p(io_block));
 
-    io_block_size = tokenizer_io_block_data_size(buf);
+    io_block_size = tkz_io_block_data_size(buf);
 
     if (io_block_size > io_block->size) {
         io_block->block_buf = dp_realloc(io_block->block_buf, io_block_size);
-        io_block->iterate_buf = dp_realloc(io_block->iterate_buf, io_block_size);
         io_block->size = io_block_size;
     }
 
@@ -68,16 +63,16 @@ tokenizer_io_block_fill(s_io_block_t *io_block, char *buf)
  * and that chunk of buffer end with TK_SENTINEL/NULL_CHAR.
  */
 static inline void
-tokenizer_io_block_process(s_tkz_lang_t *tkz_language,
-    s_tk_t *token_head, s_io_block_t *io_block)
+tkz_io_block_process(s_tkz_lang_t *tkz_lang,
+    s_tk_t *tk_head, s_io_block_t *io_block)
 {
-    assert_exit(token_structure_legal_p(token_head));
-    assert_exit(tokenizer_io_block_structure_legal_p(io_block));
-    assert_exit(tokenizer_language_structure_legal_p(tkz_language));
+    assert_exit(tk_structure_legal_p(tk_head));
+    assert_exit(tkz_io_block_structure_legal_p(io_block));
+    assert_exit(tkz_lang_structure_legal_p(tkz_lang));
 
-    switch (tkz_language->type) {
+    switch (tkz_lang->type) {
         case TKZ_LANG_C:
-            tokenizer_io_block_language_c_match(tkz_language, token_head, io_block);
+            tkz_io_block_lang_c_match(tkz_lang, tk_head, io_block);
             break;
         default:
             assert_exit(false);
@@ -93,7 +88,7 @@ tokenizer_io_block_process(s_tkz_lang_t *tkz_language,
  *              sentinel or null_char
  */
 static inline uint32
-tokenizer_io_block_data_size(char *buf)
+tkz_io_block_data_size(char *buf)
 {
     char *c;
     uint32 data_size;
@@ -111,23 +106,23 @@ tokenizer_io_block_data_size(char *buf)
 }
 
 static inline void
-tokenizer_io_block_language_c_match(s_tkz_lang_t *tkz_language,
-    s_tk_t *token_head, s_io_block_t *io_block)
+tkz_io_block_lang_c_match(s_tkz_lang_t *tkz_lang,
+    s_tk_t *tk_head, s_io_block_t *io_block)
 {
     char *buf;
     uint32 rest_size;
     uint32 match_size;
 
-    assert_exit(token_structure_legal_p(token_head));
-    assert_exit(tokenizer_io_block_structure_legal_p(io_block));
-    assert_exit(tokenizer_language_structure_legal_p(tkz_language));
+    assert_exit(tk_structure_legal_p(tk_head));
+    assert_exit(tkz_io_block_structure_legal_p(io_block));
+    assert_exit(tkz_lang_structure_legal_p(tkz_lang));
 
     buf = io_block->block_buf;
     rest_size = dp_strlen(buf);
 
     while (rest_size != 0) {
-        TOKENIZER_LANGUAGE_C_BUFFER_PRINT(buf);
-        match_size = tokenizer_language_c_token_match(tkz_language, token_head, buf);
+        TKZ_LANG_C_BUFFER_PRINT(buf);
+        match_size = tkz_lang_c_tk_match(tkz_lang, tk_head, buf);
 
         if (match_size == NFA_SZ_UNMATCH) {
             scil_log_print_and_exit("Cannot detect any token of '%s'.\n", io_block->block_buf);

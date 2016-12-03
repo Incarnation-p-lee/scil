@@ -3,6 +3,27 @@
 
 #include "token.h"
 
+/*
+ * Abbreviation Table
+ * +--------------------+
+ * | tkz  | tokenizer   |
+ * +------+-------------+
+ * | tk   | token       |
+ * +------+-------------+
+ * | lang | language    |
+ * +------+-------------+
+ * | optr | operator    |
+ * +------+-------------+
+ * | idtr | identifier  |
+ * +------+-------------+
+ * | cnst | constant    |
+ * +------+-------------+
+ * | pctt | punctuation |
+ * +------+-------------+
+ * | kywd | keyword     |
+ * +------+-------------+
+ */
+
 #define FILENAME_LEN_MAX             256
 #define READ_BUF_BASE_SIZE           4096
 #define READ_BUF_EXTRA_SIZE          4
@@ -25,49 +46,7 @@ typedef struct tokenizer_language    s_tkz_lang_t;
 typedef struct tokenizer_file        s_tkz_file_t;
 typedef enum tokenizer_language_type e_tkz_lang_type_t;
 
-enum tokenizer_language_type {
-    TKZ_LANG_C,
-    TKZ_LANG_CPP,
-    TKZ_LANG_UNSUPPORTED,
-};
-
-struct tokenizer_io_buffer {
-    FILE          *fd;
-    // If the tail of secondary buffer is string un-terminated
-    // Example:
-    // printf("Hello, worl
-    // d");
-    bool          is_string;
-    s_io_buffer_t *primary;
-    s_io_buffer_t *secondary;
-};
-
-struct tokenizer_language {
-    e_tkz_lang_type_t type;
-    s_trie_tree_t     *keyword_trie;
-    s_nfa_t           *operator;
-    s_nfa_t           *identifier;
-    s_nfa_t           *constant;
-    s_nfa_t           *punctuation;
-};
-
-struct tokenizer_file {
-    char              *filename;
-    s_tk_t            *tk_list;
-    s_tkz_io_buffer_t *tkz_io_buffer;
-    s_tkz_lang_t      *tkz_language;
-};
-
 /*
- * Abbreviation Table
- * +------------------+
- * | tkz  | tokenizer |
- * +------+-----------+
- * | tk   | token     |
- * +------+-----------+
- * | lang | language  |
- * +------+-----------+
- *
  * TOKENIZER data structure layout
  * tokenizer_file
  *              |- filename
@@ -93,6 +72,40 @@ struct tokenizer_file {
  * NOTE:
  * 1. tkz_language points to one static data that holds all supported language
  */
+enum tokenizer_language_type {
+    TKZ_LANG_C,
+    TKZ_LANG_CPP,
+    TKZ_LANG_UNSUPPORTED,
+};
+
+/*
+ * is_string handle the tail of secondary buffer is string un-terminated
+ * Example:
+ * printf("Hello, worl
+ * d");
+ */
+struct tokenizer_io_buffer {
+    FILE          *fd;
+    bool          is_string;
+    s_io_buffer_t *primary;
+    s_io_buffer_t *secondary;
+};
+
+struct tokenizer_language {
+    e_tkz_lang_type_t type;
+    s_trie_tree_t     *keyword_trie;
+    s_nfa_t           *operator;
+    s_nfa_t           *identifier;
+    s_nfa_t           *constant;
+    s_nfa_t           *punctuation;
+};
+
+struct tokenizer_file {
+    char              *filename;
+    s_tk_t            *tk_list;
+    s_tkz_io_buffer_t *tkz_io_buffer;
+    s_tkz_lang_t      *tkz_language;
+};
 
 /*
  * Start indicate the read start index of buf
@@ -110,7 +123,6 @@ struct io_buffer {
 struct io_block {
     uint32 size;
     char   *block_buf;
-    char   *iterate_buf;
 };
 
 #endif

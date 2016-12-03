@@ -1,12 +1,12 @@
 static inline void
-token_language_c_log_print(s_tk_t *token)
+tk_lang_c_log_print(s_tk_t *token)
 {
-    s_token_language_c_idtr_t *idtr;
-    s_token_language_c_optr_t *optr;
-    s_token_language_c_pctt_t *pctt;
-    s_token_language_c_cnst_t *cnst;
+    s_tk_lang_c_idtr_t *idtr;
+    s_tk_lang_c_optr_t *optr;
+    s_tk_lang_c_pctt_t *pctt;
+    s_tk_lang_c_cnst_t *cnst;
 
-    assert_exit(token_structure_legal_p(token));
+    assert_exit(tk_structure_legal_p(token));
 
     scil_log_print("!! token ");
 
@@ -41,7 +41,7 @@ token_language_c_log_print(s_tk_t *token)
 }
 
 static inline bool
-token_language_c_pctt_char_p(char c)
+tk_lang_c_pctt_char_p(char c)
 {
     switch (c) {
         case ',':
@@ -59,7 +59,7 @@ token_language_c_pctt_char_p(char c)
 }
 
 static inline void
-token_language_c_identifier_print(char *buf)
+tk_lang_c_idtr_print(char *buf)
 {
     assert_exit(buf);
 
@@ -67,7 +67,7 @@ token_language_c_identifier_print(char *buf)
 }
 
 static inline void
-token_language_c_operator_print(char *buf)
+tk_lang_c_optr_print(char *buf)
 {
     assert_exit(buf);
 
@@ -75,7 +75,7 @@ token_language_c_operator_print(char *buf)
 }
 
 static inline void
-token_language_c_constant_print(char *buf)
+tk_lang_c_cnst_print(char *buf)
 {
     assert_exit(buf);
 
@@ -83,7 +83,7 @@ token_language_c_constant_print(char *buf)
 }
 
 static inline void
-token_language_c_punctuation_print(char *buf)
+tk_lang_c_pctt_print(char *buf)
 {
     assert_exit(buf);
 

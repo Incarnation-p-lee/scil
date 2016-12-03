@@ -1,7 +1,7 @@
 #ifndef TOKEN_DATA_H
 #define TOKEN_DATA_H
 
-static const char *token_language_c_keywords[] = {
+static const char *tk_lang_c_keywords[] = {
     "asm",
     "auto",
     "break",

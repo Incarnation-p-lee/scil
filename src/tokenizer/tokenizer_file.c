@@ -1,5 +1,5 @@
 static inline void
-tokenizer_file_process(char **file_list, uint32 count)
+tkz_file_process(char **file_list, uint32 count)
 {
     char **fname;
     s_tkz_file_t *tkz_file;
@@ -8,19 +8,19 @@ tokenizer_file_process(char **file_list, uint32 count)
 
     fname = file_list;
     while (fname < file_list + count) {
-        tkz_file = tokenizer_file_create(*fname);
-        tokenizer_file_token_process(tkz_file);
+        tkz_file = tkz_file_create(*fname);
+        tkz_file_tk_process(tkz_file);
 
-        tokenizer_file_print(tkz_file);
-        tokenizer_file_destroy(tkz_file);
+        tkz_file_print(tkz_file);
+        tkz_file_destroy(tkz_file);
         fname++;
     }
 
-    tokenizer_language_cache_cleanup();
+    tkz_lang_cache_cleanup();
 }
 
 static inline s_tkz_file_t *
-tokenizer_file_create(char *fname)
+tkz_file_create(char *fname)
 {
     s_tkz_file_t *tkz_file;
 
@@ -36,28 +36,28 @@ tokenizer_file_create(char *fname)
     tkz_file->tk_list->type = TK_LEX_HEAD;
     doubly_linked_list_initial(&tkz_file->tk_list->list);
 
-    tkz_file->tkz_language = tokenizer_language_obtain(fname);
-    tkz_file->tkz_io_buffer = tokenizer_io_buffer_create(fname);
+    tkz_file->tkz_language = tkz_lang_obtain(fname);
+    tkz_file->tkz_io_buffer = tkz_io_buffer_create(fname);
 
     return tkz_file;
 }
 
 static inline void
-tokenizer_file_destroy(s_tkz_file_t *tkz_file)
+tkz_file_destroy(s_tkz_file_t *tkz_file)
 {
-    assert_exit(tokenizer_file_structure_legal_p(tkz_file));
+    assert_exit(tkz_file_structure_legal_p(tkz_file));
 
     // No need to free static data for now
     tkz_file->tkz_language = NULL;
-    tokenizer_io_buffer_destroy(tkz_file->tkz_io_buffer);
-    token_language_c_destroy(tkz_file->tk_list);
+    tkz_io_buffer_destroy(tkz_file->tkz_io_buffer);
+    tk_lang_c_destroy(tkz_file->tk_list);
 
     dp_free(tkz_file->filename);
     dp_free(tkz_file);
 }
 
 static inline bool
-tokenizer_file_structure_legal_p(s_tkz_file_t *tkz_file_list)
+tkz_file_structure_legal_p(s_tkz_file_t *tkz_file_list)
 {
     if (!tkz_file_list) {
         return false;
@@ -69,50 +69,50 @@ tokenizer_file_structure_legal_p(s_tkz_file_t *tkz_file_list)
 }
 
 static inline void
-tokenizer_file_token_process(s_tkz_file_t *tkz_file)
+tkz_file_tk_process(s_tkz_file_t *tkz_file)
 {
     s_tk_t *tk_head;
+    s_tkz_lang_t *tkz_lang;
     s_io_buffer_t *io_buffer;
-    s_tkz_lang_t *tkz_language;
     s_tkz_io_buffer_t *tkz_io_buffer;
-    e_tkz_lang_type_t tkz_language_type;
+    e_tkz_lang_type_t tkz_lang_type;
 
-    assert_exit(tokenizer_file_structure_legal_p(tkz_file));
+    assert_exit(tkz_file_structure_legal_p(tkz_file));
 
     tk_head = tkz_file->tk_list;
-    tkz_language = tkz_file->tkz_language;
+    tkz_lang = tkz_file->tkz_language;
     tkz_io_buffer = tkz_file->tkz_io_buffer;
 
     io_buffer = tkz_io_buffer->secondary;
-    tkz_language_type = tkz_language->type;
+    tkz_lang_type = tkz_lang->type;
 
-    while (tokenizer_io_buffer_fill_buffer_p(tkz_io_buffer, tkz_language_type)) {
-        tokenizer_file_io_buffer_process(io_buffer, tkz_language, tk_head);
+    while (tkz_io_buffer_fill_buffer_p(tkz_io_buffer, tkz_lang_type)) {
+        tkz_file_io_buffer_process(io_buffer, tkz_lang, tk_head);
     }
 }
 
 static inline void
-tokenizer_file_io_buffer_process(s_io_buffer_t *io_buffer,
-    s_tkz_lang_t *tkz_language, s_tk_t *token_head)
+tkz_file_io_buffer_process(s_io_buffer_t *io_buffer,
+    s_tkz_lang_t *tkz_lang, s_tk_t *tk_head)
 {
     char *c;
     uint32 limit;
     s_io_block_t *io_block;
 
-    assert_exit(token_head);
-    assert_exit(tokenizer_language_structure_legal_p(tkz_language));
+    assert_exit(tk_head);
+    assert_exit(tkz_lang_structure_legal_p(tkz_lang));
     assert_exit(io_buffer_structure_legal_p(io_buffer));
 
     c = io_buffer->buf;
     limit = io_buffer->size;
-    io_block = tokenizer_io_block_create();
+    io_block = tkz_io_block_create();
 
     while (c < limit + io_buffer->buf) {
-        c += tokenizer_io_block_fill(io_block, c);
-        tokenizer_io_block_process(tkz_language, token_head, io_block);
+        c += tkz_io_block_fill(io_block, c);
+        tkz_io_block_process(tkz_lang, tk_head, io_block);
     }
     assert_exit(c == limit + io_buffer->buf);
 
-    tokenizer_io_block_destroy(io_block);
+    tkz_io_block_destroy(io_block);
 }
 

@@ -1,7 +1,7 @@
-#ifndef HAVE_DEFINED_TOKENIZER_LANGUAGE_H
-#define HAVE_DEFINED_TOKENIZER_LANGUAGE_H
+#ifndef HAVE_DEFINED_TOKENIZER_LANG_H
+#define HAVE_DEFINED_TOKENIZER_LANG_H
 
-static s_tkz_lang_t *tkz_language_set[TKZ_LANGUAGE_SET_SIZE];
+static s_tkz_lang_t *tkz_lang_set[TKZ_LANG_SET_SIZE];
 
 #endif
 

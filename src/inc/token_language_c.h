@@ -1,24 +1,19 @@
-#ifndef HAVE_DEFINED_TOKEN_LANGUAGE_C_H
-#define HAVE_DEFINED_TOKEN_LANGUAGE_C_H
+#ifndef HAVE_DEFINED_TOKEN_LANG_C_H
+#define HAVE_DEFINED_TOKEN_LANG_C_H
 
-/*
- * The C language token definition 
- * Abbreviation for token type as below
- *     kywd -> keyword
- *     optr -> operator
- *     idtr -> identifier
- *     cnst -> constant
- *     pctt -> punctuation
- */
-#define LANGUAGE_C_RE_IDTR "[A-Za-z_][a-zA-Z0-9_]*"
-#define LANGUAGE_C_RE_OPTR "((`+|-|`*|/|>|<|%|^|`&|~|`||=|>>|<<|!)=?)|(`?|.|:|->|`+`+|--)|`**"
-#define LANGUAGE_C_RE_CNST "([0-9]+)|(\"[a-zA-Z0-9_ #%,.\\]+\")"
-#define LANGUAGE_C_RE_PCTT "`[|`]|,|;|`(|`)|{|}"
+#define LANG_C_RE_IDTR \
+    "[A-Za-z_][a-zA-Z0-9_]*"
+#define LANG_C_RE_OPTR \
+    "((`+|-|`*|/|>|<|%|^|`&|~|`||=|>>|<<|!)=?)|(`?|.|:|->|`+`+|--)|`**"
+#define LANG_C_RE_CNST \
+    "([0-9]+)|(\"[a-zA-Z0-9_ #%,.\\]+\")"
+#define LANG_C_RE_PCTT \
+    "`[|`]|,|;|`(|`)|{|}"
 
-typedef struct token_language_c_optr s_token_language_c_optr_t;
-typedef struct token_language_c_idtr s_token_language_c_idtr_t;
-typedef struct token_language_c_cnst s_token_language_c_cnst_t;
-typedef struct token_language_c_pctt s_token_language_c_pctt_t;
+typedef struct token_language_c_optr s_tk_lang_c_optr_t;
+typedef struct token_language_c_idtr s_tk_lang_c_idtr_t;
+typedef struct token_language_c_cnst s_tk_lang_c_cnst_t;
+typedef struct token_language_c_pctt s_tk_lang_c_pctt_t;
 
 #define TK_LANG_UNMATCH              0
 #define TK_LANG_MATCH_INVALID        ((uint32)-1)

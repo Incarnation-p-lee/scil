@@ -1,5 +1,5 @@
 static inline void
-tokenizer_arguements_process(uint32 argc, char **argv)
+tkz_arguements_process(uint32 argc, char **argv)
 {
     uint32 i;
     char *option;
@@ -17,20 +17,20 @@ tokenizer_arguements_process(uint32 argc, char **argv)
         while (argv_tmp < argv + argc) {
             option = *argv_tmp;
             if (OPTION_CHAR == option[0]) {
-                tokenizer_arguements_option_process(option);
+                tkz_arguements_option_process(option);
             } else {
                 file_list[i++] = option;
             }
             argv_tmp++;
         }
 
-        tokenizer_file_process(file_list, i);
+        tkz_file_process(file_list, i);
         dp_free(file_list);
     }
 }
 
 static inline void
-tokenizer_arguements_option_process(char *option)
+tkz_arguements_option_process(char *option)
 {
     assert_exit(option);
 

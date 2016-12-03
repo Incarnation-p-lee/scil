@@ -1,27 +1,27 @@
 void
-token_print(s_tk_t *token, e_tkz_lang_type_t tkz_language_type)
+tk_print(s_tk_t *token, e_tkz_lang_type_t tkz_lang_type)
 {
-    if (token_structure_legal_p(token)) {
-        switch (tkz_language_type) {
+    if (tk_structure_legal_p(token)) {
+        switch (tkz_lang_type) {
             case TKZ_LANG_C:
-                token_language_c_print(token);
+                tk_lang_c_print(token);
                 break;
             default:
-                scil_log_print_and_exit("Unknown language type.\n");
+                scil_log_print_and_exit("Unknown lang type.\n");
                 break;
         }
     }
 }
 
 static inline void
-token_language_c_print(s_tk_t *token)
+tk_lang_c_print(s_tk_t *token)
 {
-    s_token_language_c_idtr_t *idtr;
-    s_token_language_c_optr_t *optr;
-    s_token_language_c_pctt_t *pctt;
-    s_token_language_c_cnst_t *cnst;
+    s_tk_lang_c_idtr_t *idtr;
+    s_tk_lang_c_optr_t *optr;
+    s_tk_lang_c_pctt_t *pctt;
+    s_tk_lang_c_cnst_t *cnst;
 
-    assert_exit(token_structure_legal_p(token));
+    assert_exit(tk_structure_legal_p(token));
 
     switch (token->type) {
         case TK_LEX_HEAD:
