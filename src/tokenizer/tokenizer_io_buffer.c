@@ -1,213 +1,357 @@
 static inline s_io_buffer_t *
-io_buffer_create(void)
+io_buf_create(void)
 {
-    s_io_buffer_t *io_buffer;
+    s_io_buffer_t *io_buf;
 
-    io_buffer = dp_malloc(sizeof(*io_buffer));
+    io_buf = dp_malloc(sizeof(*io_buf));
 
-    io_buffer->index = 0;
-    io_buffer->buf[0] = NULL_CHAR;
+    io_buf->index = io_buf->size = 0;
+    io_buf->buf[0] = NULL_CHAR;
 
-    return io_buffer;
+    return io_buf;
 }
 
 static inline s_tkz_io_buffer_t *
-tkz_io_buffer_create(char *fname)
+tkz_io_buf_create(char *fname)
 {
-    s_tkz_io_buffer_t *tkz_io_buffer;
+    s_tkz_io_buffer_t *tkz_io_buf;
 
     assert_exit(fname);
 
-    tkz_io_buffer = dp_malloc(sizeof(*tkz_io_buffer));
-    tkz_io_buffer->fd = dp_fopen(fname, "r");
+    tkz_io_buf = dp_malloc(sizeof(*tkz_io_buf));
+    tkz_io_buf->fd = dp_fopen(fname, "r");
 
-    if (!tkz_io_buffer->fd) {
+    if (!tkz_io_buf->fd) {
         scil_log_print_and_exit("*Error* Failed to locate file %s\n", fname);
     } else {
         TKZ_FILE_OPEN_PRINT(fname);
     }
 
-    tkz_io_buffer->is_string = false;
-    tkz_io_buffer->primary = io_buffer_create();
-    tkz_io_buffer->secondary = io_buffer_create();
+    tkz_io_buf->is_string = false;
+    tkz_io_buf->primary = io_buf_create();
+    tkz_io_buf->secondary = io_buf_create();
 
-    return tkz_io_buffer;
+    return tkz_io_buf;
 }
 
 static inline void
-tkz_io_buffer_destroy(s_tkz_io_buffer_t *tkz_io_buffer)
+tkz_io_buf_destroy(s_tkz_io_buffer_t *tkz_io_buf)
 {
-    assert_exit(tkz_io_buffer_structure_legal_p(tkz_io_buffer));
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
 
-    dp_free(tkz_io_buffer->secondary);
-    dp_free(tkz_io_buffer->primary);
-    dp_fclose(tkz_io_buffer->fd);
-    dp_free(tkz_io_buffer);
+    dp_free(tkz_io_buf->secondary);
+    dp_free(tkz_io_buf->primary);
+    dp_fclose(tkz_io_buf->fd);
+    dp_free(tkz_io_buf);
 }
 
 static inline bool
-tkz_io_buffer_structure_legal_p(s_tkz_io_buffer_t *tkz_io_buffer)
+tkz_io_buf_loaded_p(s_tkz_io_buffer_t *tkz_io_buf,
+    e_tkz_lang_type_t tkz_type)
 {
-    if (!tkz_io_buffer) {
-        return false;
-    } else if (!tkz_io_buffer->fd) {
-        return false;
-    } else if (!io_buffer_structure_legal_p(tkz_io_buffer->primary)) {
-        return false;
-    } else if (!io_buffer_structure_legal_p(tkz_io_buffer->secondary)) {
-        return false;
-    } else {
-        return true;
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
+
+    return tkz_io_buf_secondary_fill_p(tkz_io_buf, tkz_type);
+}
+
+static inline void
+tkz_io_buf_index_advance(s_tkz_io_buffer_t *tkz_io_buf, uint32 count)
+{
+    uint32 rest;
+
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
+
+    rest = count;
+    while (rest != 0) {
+        if (tkz_io_buf_fill_p(tkz_io_buf)) {
+            rest--;
+            tkz_io_buf->primary->index++;
+        } else {
+            scil_log_print_and_exit("Reach the end of file.\n");
+        }
     }
 }
 
-static inline bool
-io_buffer_structure_legal_p(s_io_buffer_t *io_buffer)
+static inline char *
+tkz_io_buf_current(s_tkz_io_buffer_t *tkz_io_buf)
 {
-    if (!io_buffer) {
-        return false;
-    } else if (io_buffer->index > READ_BUF_SIZE) {
-        return false;
-    } else {
-        return true;
-    }
-}
-
-static inline bool
-tkz_io_buffer_fill_buffer_p(s_tkz_io_buffer_t *tkz_io_buffer,
-    e_tkz_lang_type_t tkz_type)
-{
-    assert_exit(tkz_io_buffer_structure_legal_p(tkz_io_buffer));
-
-    return tkz_io_buffer_secondary_fill_p(tkz_io_buffer, tkz_type);
-}
-
-static inline uint32
-tkz_io_buffer_skip_multiple_comment(s_tkz_io_buffer_t *tkz_io_buffer, uint32 index,
-    e_tkz_lang_type_t tkz_type)
-{
-    uint32 i;
     char *buf;
+
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
+
+    buf = tkz_io_buf->primary->buf;
+    buf += tkz_io_buf->primary->index;
+
+    return buf;
+}
+
+static inline bool
+tkz_io_buf_single_comment_head_p(s_tkz_io_buffer_t *tkz_io_buf,
+    e_tkz_lang_type_t tkz_type)
+{
+    char *buf;
+
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
+
+    buf = tkz_io_buf_current(tkz_io_buf);
+
+    return tk_char_single_comment_p(buf, tkz_type);
+}
+
+static inline char
+tkz_io_buf_single_comment_end(e_tkz_lang_type_t tkz_type)
+{
+    return tk_char_single_comment_end(tkz_type);
+}
+
+static inline bool
+tkz_io_buf_multiple_comment_head_p(s_tkz_io_buffer_t *tkz_io_buf,
+    e_tkz_lang_type_t tkz_type)
+{
+    char *buf;
+
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
+
+    buf = tkz_io_buf_current(tkz_io_buf);
+
+    return tk_char_multiple_comment_head_p(buf, tkz_type);
+}
+
+static inline bool
+tkz_io_buf_multiple_comment_tail_p(s_tkz_io_buffer_t *tkz_io_buf,
+    e_tkz_lang_type_t tkz_type)
+{
+    char *buf;
+
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
+
+    buf = tkz_io_buf_current(tkz_io_buf);
+
+    return tk_char_multiple_comment_tail_p(buf, tkz_type);
+}
+
+static inline bool
+tkz_io_buf_comment_p(s_tkz_io_buffer_t *tkz_io_buf,
+    e_tkz_lang_type_t tkz_type)
+{
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
+
+    return tkz_io_buf_single_comment_head_p(tkz_io_buf, tkz_type)
+        || tkz_io_buf_multiple_comment_head_p(tkz_io_buf, tkz_type);
+}
+
+static inline char
+tkz_io_buf_char_get(s_tkz_io_buffer_t *tkz_io_buf)
+{
+    char *buf;
+
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
+
+    buf = tkz_io_buf->primary->buf;
+
+    return buf[tkz_io_buf->primary->index];
+}
+
+static inline void
+tkz_io_buf_multiple_comment_skip(s_tkz_io_buffer_t *tkz_io_buf,
+    e_tkz_lang_type_t tkz_type)
+{
     s_array_stack_t *stack;
 
-    assert_exit(index < READ_BUF_SIZE);
-    assert_exit(tkz_io_buffer_structure_legal_p(tkz_io_buffer));
-    assert_exit(tk_char_multiple_comment_head_p(tkz_io_buffer->primary->buf + index, tkz_type));
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
+    assert_exit(tkz_io_buf_multiple_comment_head_p(tkz_io_buf, tkz_type));
 
-    i = index + 2;
-    buf = tkz_io_buffer->primary->buf;
+    tkz_io_buf_index_advance(tkz_io_buf, 2u); /* Advance 2 char */
+
     stack = array_stack_create();
-    array_stack_push(stack, stack);
+    array_stack_push(stack, stack); /* Fix-Me no stack need */
 
     while (!array_stack_empty_p(stack)) {
-        if (tk_char_multiple_comment_head_p(buf + i, tkz_type)) {
+        if (tkz_io_buf_multiple_comment_head_p(tkz_io_buf, tkz_type)) {
             array_stack_push(stack, stack);
-            i += 2;
-        } else if (tk_char_multiple_comment_tail_p(buf + i, tkz_type)) {
+            tkz_io_buf_index_advance(tkz_io_buf, 2u);
+        } else if (tkz_io_buf_multiple_comment_tail_p(tkz_io_buf, tkz_type)) {
             array_stack_pop(stack);
-            i += 2;
+            tkz_io_buf_index_advance(tkz_io_buf, 2u);
         } else {
-            tkz_io_buffer->primary->index = i;
-            if (tkz_io_buffer_reach_limit_p(tkz_io_buffer->primary)) {
-                if (tkz_io_buffer_primary_fill_p(tkz_io_buffer)) {
-                    i = tkz_io_buffer->primary->index;
-                } else {
-                    scil_log_print_and_exit("Unmatched multiple comments pair.\n");
-                }
-            } else {
-                i++;
-            }
+            tkz_io_buf_index_advance(tkz_io_buf, 1u);
         }
     }
 
     array_stack_destroy(&stack);
-    return i;
 }
 
-static inline uint32
-tkz_io_buffer_skip_comment(s_tkz_io_buffer_t *tkz_io_buffer, uint32 index,
-    e_tkz_lang_type_t tkz_type)
-{
-    assert_exit(index < READ_BUF_SIZE);
-    assert_exit(tkz_io_buffer_structure_legal_p(tkz_io_buffer));
-    assert_exit(tk_char_comment_p(tkz_io_buffer->primary->buf + index, tkz_type));
+/*
+ *
+ */
 
-    if (tk_char_single_comment_p(tkz_io_buffer->primary->buf + index, tkz_type)) {
-        return tkz_io_buffer_skip_single_comment(tkz_io_buffer, index, tkz_type);
+static inline bool
+tkz_io_buf_secondary_full_p(s_tkz_io_buffer_t *tkz_io_buf)
+{
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
+
+    if (tkz_io_buf->secondary->size < READ_BUF_BASE_SIZE) {
+        return false;
     } else {
-        return tkz_io_buffer_skip_multiple_comment(tkz_io_buffer, index, tkz_type);
+        return true;
     }
-}
-
-static inline uint32
-tkz_io_buffer_skip_single_comment(s_tkz_io_buffer_t *tkz_io_buffer, uint32 index,
-    e_tkz_lang_type_t tkz_type)
-{
-    uint32 i;
-    s_io_buffer_t *primary;
-
-    assert_exit(index < READ_BUF_SIZE);
-    assert_exit(tkz_io_buffer_structure_legal_p(tkz_io_buffer));
-
-    // Fix-Me
-    if (!tk_char_single_comment_p(tkz_io_buffer->primary->buf + index, tkz_type)) {
-        return 0;
-    }
-
-    i = index;
-    primary = tkz_io_buffer->primary;
-
-    while (TK_NEWLINE != primary->buf[i]) {
-        primary->index = i;
-        if (tkz_io_buffer_reach_limit_p(primary)) {
-            if (tkz_io_buffer_primary_fill_p(tkz_io_buffer)) {
-                i = primary->index;
-            } else {
-                return i;
-            }
-        } else {
-            i++;
-        }
-    }
-
-    assert_exit(i + 1 < READ_BUF_SIZE);
-    return i + 1;
-}
-
-static inline uint32
-tkz_io_buffer_secondary_resume(s_io_buffer_t *secondary)
-{
-    uint32 index, k;
-
-    assert_exit(io_buffer_structure_legal_p(secondary));
-
-    k = 0;
-    index = secondary->size;
-    while (secondary->buf[index]) {
-        secondary->buf[k++] = secondary->buf[index++];
-    }
-    assert_exit(index <= READ_BUF_SIZE);
-
-    secondary->buf[k] = TK_SENTINEL;
-    secondary->size = k;
-
-    return k;
 }
 
 static inline bool
-tkz_io_buffer_fill_secondary_tail_p(s_io_buffer_t *secondary, uint32 index)
+tkz_io_buf_secondary_empty_p(s_tkz_io_buffer_t *tkz_io_buf)
 {
-    assert_exit(index < READ_BUF_SIZE);
-    assert_exit(io_buffer_structure_legal_p(secondary));
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
 
-    if (index == 0) {
+    if (tkz_io_buf->secondary->size == 0) {
+        return true;
+    } else {
         return false;
-    } else { // Make the rest part of buffer begin with NULL_CHAR
-        secondary->buf[index] = secondary->buf[index + 1] = NULL_CHAR;
+    }
+}
+
+static inline void
+tkz_io_buf_secondary_char_append(s_tkz_io_buffer_t *tkz_io_buf, char c)
+{
+    s_io_buffer_t *secondary;
+
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
+    assert_exit(tkz_io_buf_secondary_limit_reached_p(tkz_io_buf));
+
+    secondary = tkz_io_buf->secondary;
+
+    secondary->buf[secondary->size] = c;
+    secondary->size++;
+}
+
+static inline void
+tkz_io_buf_secondary_char_fill(s_tkz_io_buffer_t *tkz_io_buf)
+{
+    s_io_buffer_t *primary;
+    s_io_buffer_t *secondary;
+
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
+    assert_exit(!tkz_io_buf_secondary_full_p(tkz_io_buf));
+
+    primary = tkz_io_buf->primary;
+    secondary = tkz_io_buf->secondary;
+
+    secondary->buf[secondary->size] = primary->buf[primary->index];
+    primary->index++;
+    secondary->size++;
+}
+
+static inline bool
+tkz_io_buf_double_quote_p(s_tkz_io_buffer_t *tkz_io_buf)
+{
+    char c;
+
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
+
+    c = tkz_io_buf_char_get(tkz_io_buf);
+
+    return tk_char_double_quote_p(c);
+}
+
+static inline void
+tkz_io_buf_skip_single_comment(s_tkz_io_buffer_t *tkz_io_buf,
+    e_tkz_lang_type_t tkz_type)
+{
+    char comment_end;
+
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
+    assert_exit(tkz_io_buf_single_comment_head_p(tkz_io_buf, tkz_type));
+
+    comment_end = tkz_io_buf_single_comment_end(tkz_type);
+
+    while (tkz_io_buf_char_get(tkz_io_buf) != comment_end) {
+        tkz_io_buf_index_advance(tkz_io_buf, 1u);
+    }
+}
+
+static inline void
+tkz_io_buf_skip_comment(s_tkz_io_buffer_t *tkz_io_buf,
+    e_tkz_lang_type_t tkz_type)
+{
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
+    assert_exit(tkz_io_buf_comment_p(tkz_io_buf, tkz_type));
+
+    if (tkz_io_buf_single_comment_head_p(tkz_io_buf, tkz_type)) {
+        tkz_io_buf_skip_single_comment(tkz_io_buf, tkz_type);
+    } else {
+        tkz_io_buf_multiple_comment_skip(tkz_io_buf, tkz_type);
+    }
+}
+
+static inline void
+tkz_io_buf_secondary_resume(s_tkz_io_buffer_t *tkz_io_buf)
+{
+    uint32 i, k, limit;
+    s_io_buffer_t *secondary;
+
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
+
+    secondary = tkz_io_buf->secondary;
+    i = secondary->index;
+
+    if (secondary->index == secondary->size) {
+        secondary->size = 0;
+    } else {
+        k = 0;
+        limit = secondary->size - 1; /* skip last NULL_CHAR */
+
+        while (i < limit) {
+            secondary->buf[k] = secondary->buf[i];
+            i++;
+            k++;
+        }
+
+        secondary->size = k;
+    }
+}
+
+static inline bool
+tkz_io_buf_fill_secondary_tail_p(s_tkz_io_buffer_t *tkz_io_buf)
+{
+    s_io_buffer_t *secondary;
+
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
+
+    secondary = tkz_io_buf->secondary;
+
+    if (secondary->size == 0) {
+        return false;
+    } else {
+        tkz_io_buf_secondary_char_append(tkz_io_buf, NULL_CHAR);
 
         IO_BUFFER_PRINT(secondary);
         return true;
     }
+}
+
+static inline void
+tkz_io_buf_secondary_append_with_space(s_tkz_io_buffer_t *tkz_io_buf,
+    bool is_last_space)
+{
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
+    assert_exit(!tkz_io_buf_secondary_full_p(tkz_io_buf));
+
+    if (is_last_space && !tkz_io_buf_secondary_empty_p(tkz_io_buf)) {
+        tkz_io_buf_secondary_char_append(tkz_io_buf, TK_SENTINEL);
+    }
+
+    tkz_io_buf_secondary_char_fill(tkz_io_buf);
+}
+
+static inline void
+tkz_io_buf_secondary_index_set(s_tkz_io_buffer_t *tkz_io_buf)
+{
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
+
+    /* 
+     * *HACK*
+     * index of secondary buffer indicate the index of next data begin
+     */
+    tkz_io_buf->secondary->index = tkz_io_buf->secondary->size + 1;
 }
 
 /*
@@ -215,57 +359,45 @@ tkz_io_buffer_fill_secondary_tail_p(s_io_buffer_t *secondary, uint32 index)
  * From primary -> secondary buffer
  */
 static inline bool
-tkz_io_buffer_secondary_fill_p(s_tkz_io_buffer_t *tkz_io_buffer,
+tkz_io_buf_secondary_fill_p(s_tkz_io_buffer_t *tkz_io_buf,
     e_tkz_lang_type_t tkz_type)
 {
-    char last;
-    uint32 index, k;
-    s_io_buffer_t *primary, *secondary;
+    bool is_last_space;
 
-    assert_exit(tkz_io_buffer_structure_legal_p(tkz_io_buffer));
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
 
-    last = NULL_CHAR;
-    primary = tkz_io_buffer->primary;
-    secondary = tkz_io_buffer->secondary;
-    index = tkz_io_buffer_secondary_resume(secondary);
+    is_last_space = false;
+    tkz_io_buf_secondary_resume(tkz_io_buf);
 
-    while (tkz_io_buffer_primary_fill_p(tkz_io_buffer)) {
-        k = primary->index;
-        while (!tkz_io_buffer_reach_limit_p(primary)) {
-            if (tk_char_double_quote_p(primary->buf[k])) {
-                tkz_io_buffer->is_string = !tkz_io_buffer->is_string;
-                secondary->buf[index++] = primary->buf[k++];
-            } else if (tkz_io_buffer->is_string && index <= READ_BUF_INDEX_LAST) {
-                secondary->buf[index++] = primary->buf[k++];
-            } else if (dp_isspace(primary->buf[k])) {
-                last = primary->buf[k++];
-                secondary->size = index + 1;              // include the sentinel
-            } else if (tk_char_comment_p(primary->buf + k, tkz_type)) {
-                k = tkz_io_buffer_skip_comment(tkz_io_buffer, k, tkz_type);
-            } else if (index <= READ_BUF_INDEX_LAST) {    // index may +2
-                if (dp_isspace(last) && index != 0) {
-                    secondary->buf[index++] = TK_SENTINEL;
-                }
-                secondary->buf[index++] = last = primary->buf[k++];
-            } else {
-                primary->index = k;
-                secondary->buf[index] = NULL_CHAR;
-                IO_BUFFER_PRINT(secondary);
-                return true;
-            }
-            primary->index = k;
+    while (tkz_io_buf_fill_p(tkz_io_buf)) {
+        if (tkz_io_buf_secondary_full_p(tkz_io_buf)) {
+            break;
+        } else if (tkz_io_buf_double_quote_p(tkz_io_buf)) {
+            tkz_io_buf->is_string = !tkz_io_buf->is_string;
+            tkz_io_buf_secondary_char_fill(tkz_io_buf);
+        } else if (tkz_io_buf->is_string) {
+            tkz_io_buf_secondary_char_fill(tkz_io_buf);
+        } else if (dp_isspace(tkz_io_buf_char_get(tkz_io_buf))) {
+            is_last_space = true;
+            tkz_io_buf_index_advance(tkz_io_buf, 1);
+            tkz_io_buf_secondary_index_set(tkz_io_buf);
+        } else if (tkz_io_buf_comment_p(tkz_io_buf, tkz_type)) {
+            tkz_io_buf_skip_comment(tkz_io_buf, tkz_type);
+        } else {
+            tkz_io_buf_secondary_append_with_space(tkz_io_buf, is_last_space);
+            is_last_space = false;
         }
     }
 
-    return tkz_io_buffer_fill_secondary_tail_p(secondary, index);
+    return tkz_io_buf_fill_secondary_tail_p(tkz_io_buf);
 }
 
 static inline bool
-tkz_io_buffer_reach_limit_p(s_io_buffer_t *buffer)
+tkz_io_buf_limited_p(s_io_buffer_t *buffer)
 {
-    assert_exit(io_buffer_structure_legal_p(buffer));
+    assert_exit(io_buf_structure_legal_p(buffer));
 
-    if (buffer->buf[buffer->index] == NULL_CHAR) {
+    if (buffer->index == buffer->size) {
         return true;
     } else {
         return false;
@@ -273,37 +405,47 @@ tkz_io_buffer_reach_limit_p(s_io_buffer_t *buffer)
 }
 
 static inline bool
-tkz_io_buffer_primary_fill_p(s_tkz_io_buffer_t *tkz_io_buffer)
+tkz_io_buf_primary_limited_p(s_tkz_io_buffer_t *tkz_io_buf)
+{
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
+
+    return tkz_io_buf_limited_p(tkz_io_buf->primary);
+}
+
+static inline bool
+tkz_io_buf_fill_p(s_tkz_io_buffer_t *tkz_io_buf)
 {
     char *buf;
     uint32 len;
     uint32 rest;
     uint32 offset;
 
-    assert_exit(tkz_io_buffer_structure_legal_p(tkz_io_buffer));
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
 
-    if (!tkz_io_buffer_reach_limit_p(tkz_io_buffer->primary)) {
+    if (!tkz_io_buf_primary_limited_p(tkz_io_buf)) {
         return true;
-    } else if (dp_feof(tkz_io_buffer->fd)) {
+    } else if (dp_feof(tkz_io_buf->fd)) {
         return false;
     } else {
-        buf = tkz_io_buffer->primary->buf;
-        tkz_io_buffer->primary->index = offset = 0;
+        buf = tkz_io_buf->primary->buf;
+        tkz_io_buf->primary->index = offset = 0;
         rest = READ_BUF_BASE_SIZE;
 
-        while (rest != 0 && !dp_feof(tkz_io_buffer->fd)) {
-            len = dp_fread(buf + offset, 1, rest, tkz_io_buffer->fd);
+        while (rest != 0 && !dp_feof(tkz_io_buf->fd)) {
+            len = dp_fread(buf + offset, 1, rest, tkz_io_buf->fd);
             assert_exit(len <= rest);
             offset += len;
             rest -= len;
         }
 
         if (rest == 0 && buf[offset - 1] == TKZ_LANG_C_COMMENT) {
-            dp_fread(buf + offset, 1, 1, tkz_io_buffer->fd);;
+            dp_fread(buf + offset, 1, 1, tkz_io_buf->fd);;
             offset++;
         }
 
         buf[offset] = NULL_CHAR;
+        tkz_io_buf->primary->size = offset;
+
         return true;
     }
 }

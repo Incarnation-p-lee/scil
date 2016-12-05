@@ -37,7 +37,7 @@ tkz_file_create(char *fname)
     doubly_linked_list_initial(&tkz_file->tk_list->list);
 
     tkz_file->tkz_language = tkz_lang_obtain(fname);
-    tkz_file->tkz_io_buffer = tkz_io_buffer_create(fname);
+    tkz_file->tkz_io_buffer = tkz_io_buf_create(fname);
 
     return tkz_file;
 }
@@ -47,25 +47,13 @@ tkz_file_destroy(s_tkz_file_t *tkz_file)
 {
     assert_exit(tkz_file_structure_legal_p(tkz_file));
 
-    // No need to free static data for now
+    /* No need to free static data for now */
     tkz_file->tkz_language = NULL;
-    tkz_io_buffer_destroy(tkz_file->tkz_io_buffer);
+    tkz_io_buf_destroy(tkz_file->tkz_io_buffer);
     tk_lang_c_destroy(tkz_file->tk_list);
 
     dp_free(tkz_file->filename);
     dp_free(tkz_file);
-}
-
-static inline bool
-tkz_file_structure_legal_p(s_tkz_file_t *tkz_file_list)
-{
-    if (!tkz_file_list) {
-        return false;
-    } else if (!tkz_file_list->filename) {
-        return false;
-    } else {
-        return true;
-    }
 }
 
 static inline void
@@ -86,13 +74,13 @@ tkz_file_tk_process(s_tkz_file_t *tkz_file)
     io_buffer = tkz_io_buffer->secondary;
     tkz_lang_type = tkz_lang->type;
 
-    while (tkz_io_buffer_fill_buffer_p(tkz_io_buffer, tkz_lang_type)) {
-        tkz_file_io_buffer_process(io_buffer, tkz_lang, tk_head);
+    while (tkz_io_buf_loaded_p(tkz_io_buffer, tkz_lang_type)) {
+        tkz_file_io_buf_process(io_buffer, tkz_lang, tk_head);
     }
 }
 
 static inline void
-tkz_file_io_buffer_process(s_io_buffer_t *io_buffer,
+tkz_file_io_buf_process(s_io_buffer_t *io_buffer,
     s_tkz_lang_t *tkz_lang, s_tk_t *tk_head)
 {
     char *c;
@@ -101,7 +89,7 @@ tkz_file_io_buffer_process(s_io_buffer_t *io_buffer,
 
     assert_exit(tk_head);
     assert_exit(tkz_lang_structure_legal_p(tkz_lang));
-    assert_exit(io_buffer_structure_legal_p(io_buffer));
+    assert_exit(io_buf_structure_legal_p(io_buffer));
 
     c = io_buffer->buf;
     limit = io_buffer->size;

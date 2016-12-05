@@ -1,7 +1,7 @@
 bool
 tk_char_double_quote_p(char c)
 {
-    if (TK_DOUBLE_QUOTE == c) {
+    if (c == TK_DOUBLE_QUOTE) {
         return true;
     } else {
         return false;
@@ -31,6 +31,17 @@ tk_char_single_comment_p(char *buf, e_tkz_lang_type_t tkz_type)
             default:
                 return false;
         }
+    }
+}
+
+char
+tk_char_single_comment_end(e_tkz_lang_type_t tkz_type)
+{
+    switch (tkz_type) {
+        case TKZ_LANG_C:
+            return tk_lang_c_single_comment_end();
+        default:
+            return NULL_CHAR;
     }
 }
 

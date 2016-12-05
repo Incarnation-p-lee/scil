@@ -1,35 +1,3 @@
-static inline bool
-nfa_closure_structure_legal_p(s_fa_closure_t *closure)
-{
-    if (!closure) {
-        return false;
-    } else if (!array_queue_structure_legal_p(closure->path_queue)) {
-        return false;
-    } else if (!array_queue_structure_legal_p(closure->collection)) {
-        return false;
-    } else if (!nfa_closure_match_dp_structure_legal_p(closure->match_dp)) {
-        return false;
-    } else if (bitmap_structure_illegal_p(closure->bitmap)) {
-        return false;
-    } else {
-        return true;
-    }
-}
-
-static inline bool
-nfa_closure_match_dp_structure_legal_p(s_fa_match_dp_t *match_dp)
-{
-    if (match_dp == NULL) {
-        return false;
-    } else if (match_dp->dp == NULL) {
-        return false;
-    } else if (match_dp->index > match_dp->size) {
-        return false;
-    } else {
-        return true;
-    }
-}
-
 static inline s_fa_match_dp_t *
 nfa_closure_match_dp_create(uint32 size)
 {

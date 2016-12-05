@@ -1,15 +1,3 @@
-static inline bool
-tkz_lang_type_legal_p(e_tkz_lang_type_t lang_type)
-{
-    switch (lang_type) {
-        case TKZ_LANG_C:
-        case TKZ_LANG_CPP:
-            return true;
-        default:
-            return false;
-    }
-}
-
 static inline e_tkz_lang_type_t
 tkz_lang_filename_to_type(char *filename)
 {
@@ -64,31 +52,6 @@ tkz_lang_create(e_tkz_lang_type_t type)
     tkz_lang_init(tkz_lang);
 
     return tkz_lang;
-}
-
-static inline bool
-tkz_lang_type_p(e_tkz_lang_type_t tkz_lang_type)
-{
-    switch (tkz_lang_type) {
-        case TKZ_LANG_C:
-        case TKZ_LANG_CPP:
-            return true;
-        default:
-            return false;
-    }
-}
-
-static inline bool
-tkz_lang_structure_legal_p(s_tkz_lang_t *tkz_lang)
-{
-    if (!tkz_lang) {
-        return false;
-    } else if (!tkz_lang->operator || !tkz_lang->identifier
-        || !tkz_lang->constant || !tkz_lang->punctuation) {
-        return false;
-    } else {
-        return tkz_lang_type_p(tkz_lang->type);
-    }
 }
 
 static inline void

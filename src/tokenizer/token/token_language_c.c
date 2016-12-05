@@ -312,6 +312,12 @@ tk_lang_c_destroy(s_tk_t *tk_list)
     }
 }
 
+static inline char
+tk_lang_c_single_comment_end(void)
+{
+    return TK_NEWLINE;
+}
+
 static inline bool
 tk_lang_c_single_comment_p(char *buf)
 {

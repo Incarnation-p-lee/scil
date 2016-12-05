@@ -136,3 +136,19 @@ regular_convert_to_polish_print(char *regular)
     scil_log_print("'\n\n");
 }
 
+static inline bool
+regular_normalize_recover_structure_legal_p(s_regular_recover_t *recover)
+{
+    if (recover == NULL) {
+        return false;
+    } else if (recover->buf == NULL) {
+        return false;
+    } else if (recover->size == 0) {
+        return false;
+    } else if (recover->index >= recover->size) {
+        return false;
+    } else {
+        return true;
+    }
+}
+

@@ -10,6 +10,7 @@ extern bool tk_char_multiple_comment_tail_p(char *buf, e_tkz_lang_type_t tkz_typ
 extern bool tk_char_single_comment_p(char *buf, e_tkz_lang_type_t tkz_type);
 extern bool tk_structure_illegal_p(s_tk_t *token);
 extern bool tk_structure_legal_p(s_tk_t *token);
+extern char tk_char_single_comment_end(e_tkz_lang_type_t tkz_type);
 extern s_tk_t * tk_list_node_next(s_tk_t *token);
 extern s_tk_t * tk_list_node_previous(s_tk_t *token);
 extern s_trie_tree_t * tk_lang_c_keyword_trie_create(void);

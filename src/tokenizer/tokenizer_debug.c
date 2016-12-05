@@ -13,19 +13,24 @@ io_buffer_print(s_io_buffer_t *buffer)
     uint32 k;
     char *buf;
 
-    assert_exit(io_buffer_structure_legal_p(buffer));
+    assert_exit(io_buf_structure_legal_p(buffer));
 
     i = k = 0;
     buf = buffer->buf;
-    scil_log_print("\n>> Print IO buffer %d\n[\n    ", buffer->size);
+    scil_log_print("\n>> Print IO buffer %d\n", buffer->size);
 
     while (buf[i]) {
+        if (k == 0) {
+            scil_log_print("    ");
+        }
+
         scil_log_print("%c", buf[i]);
         k++;
         i++;
+
         if (BUF_PRINT_LEN == k) {
             k = 0;
-            scil_log_print("\n    ");
+            scil_log_print("\n");
         }
     }
 
@@ -33,7 +38,8 @@ io_buffer_print(s_io_buffer_t *buffer)
         scil_log_print("\n");
     }
 
-    scil_log_print("]\n\n");
+    scil_log_print(">> End ==================================\n");
+
     assert_exit(i <= READ_BUF_SIZE);
 }
 
@@ -81,9 +87,8 @@ tkz_io_block_print(s_io_block_t *io_block)
 
     dp_memcpy(buf, io_block->block_buf, size);
 
-    scil_log_print("\n>> Print IO block %d\n[\n", size);
-    scil_log_print("    %s\n", buf);
-    scil_log_print("]\n\n");
+    scil_log_print("\n>> Print IO block %d\n", size);
+    scil_log_print("    %s\n\n", buf);
 
     dp_free(buf);
 }
@@ -93,5 +98,108 @@ tkz_lang_c_buffer_print(char *buf)
 {
     assert_exit(buf);
     scil_log_print("== TKZ matching '%s'\n", buf);
+}
+
+static inline bool
+tkz_file_structure_legal_p(s_tkz_file_t *tkz_file_list)
+{
+    if (!tkz_file_list) {
+        return false;
+    } else if (!tkz_file_list->filename) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+static inline bool
+tkz_io_block_structure_legal_p(s_io_block_t *io_block)
+{
+    if (!io_block) {
+        return false;
+    } else if (!io_block->size) {
+        return false;
+    } else if (!io_block->block_buf) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+static inline bool
+tkz_io_buf_secondary_limit_reached_p(s_tkz_io_buffer_t *tkz_io_buf)
+{
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
+
+    if (tkz_io_buf->secondary->size < READ_BUF_SIZE) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+static inline bool
+tkz_io_buf_structure_legal_p(s_tkz_io_buffer_t *tkz_io_buf)
+{
+    if (!tkz_io_buf) {
+        return false;
+    } else if (!tkz_io_buf->fd) {
+        return false;
+    } else if (!io_buf_structure_legal_p(tkz_io_buf->primary)) {
+        return false;
+    } else if (!io_buf_structure_legal_p(tkz_io_buf->secondary)) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+static inline bool
+tkz_lang_type_legal_p(e_tkz_lang_type_t lang_type)
+{
+    switch (lang_type) {
+        case TKZ_LANG_C:
+        case TKZ_LANG_CPP:
+            return true;
+        default:
+            return false;
+    }
+}
+
+static inline bool
+io_buf_structure_legal_p(s_io_buffer_t *io_buf)
+{
+    if (!io_buf) {
+        return false;
+    } else if (io_buf->index > READ_BUF_SIZE) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+static inline bool
+tkz_lang_structure_legal_p(s_tkz_lang_t *tkz_lang)
+{
+    if (!tkz_lang) {
+        return false;
+    } else if (!tkz_lang->operator || !tkz_lang->identifier
+        || !tkz_lang->constant || !tkz_lang->punctuation) {
+        return false;
+    } else {
+        return tkz_lang_type_p(tkz_lang->type);
+    }
+}
+
+static inline bool
+tkz_lang_type_p(e_tkz_lang_type_t tkz_lang_type)
+{
+    switch (tkz_lang_type) {
+        case TKZ_LANG_C:
+        case TKZ_LANG_CPP:
+            return true;
+        default:
+            return false;
+    }
 }
 

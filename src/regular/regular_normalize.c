@@ -18,22 +18,6 @@ regular_normalize(char *re)
     return normal;
 }
 
-static inline bool
-regular_normalize_recover_structure_legal_p(s_regular_recover_t *recover)
-{
-    if (recover == NULL) {
-        return false;
-    } else if (recover->buf == NULL) {
-        return false;
-    } else if (recover->size == 0) {
-        return false;
-    } else if (recover->index >= recover->size) {
-        return false;
-    } else {
-        return true;
-    }
-}
-
 static inline s_regular_recover_t *
 regular_normalize_recover_create(uint32 bytes_count)
 {

@@ -22,6 +22,8 @@
  * +------+-------------+
  * | kywd | keyword     |
  * +------+-------------+
+ * | buf  | buffer      |
+ * +------+-------------+
  */
 
 #define FILENAME_LEN_MAX             256
@@ -107,17 +109,10 @@ struct tokenizer_file {
     s_tkz_lang_t      *tkz_language;
 };
 
-/*
- * Start indicate the read start index of buf
- * If start == READ_BUF_SIZE || NULL_CHAR == buf[start]
- *     All data in buf has been read.
- */
 struct io_buffer {
-    union {
-        uint32 index;  // For primary buf
-        uint32 size;   // For secondary buf
-    };
-    char   buf[READ_BUF_BASE_SIZE + READ_BUF_EXTRA_SIZE];
+    uint32 index;  /* next index for access */
+    uint32 size;   /* size of legal data in bytes count */
+    char   buf[READ_BUF_SIZE];
 };
 
 struct io_block {

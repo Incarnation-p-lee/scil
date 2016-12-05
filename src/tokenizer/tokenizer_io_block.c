@@ -10,20 +10,6 @@ tkz_io_block_create(void)
     return io_block;
 }
 
-static inline bool
-tkz_io_block_structure_legal_p(s_io_block_t *io_block)
-{
-    if (!io_block) {
-        return false;
-    } else if (!io_block->size) {
-        return false;
-    } else if (!io_block->block_buf) {
-        return false;
-    } else {
-        return true;
-    }
-}
-
 static inline void
 tkz_io_block_destroy(s_io_block_t *io_block)
 {

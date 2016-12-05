@@ -35,9 +35,10 @@
                                        assert_print_exit(#exp, __FILE__, __FUNCTION__, __LINE__); \
                                    }                                                              \
                                } while (false)
-    #define inline
+    #define inline             __attribute__((noinline))
 #else
     #define assert_exit(exp)
+    // #define inline             __attribute__((noinline))
     #define inline             inline
 #endif
 
