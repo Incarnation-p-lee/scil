@@ -10,6 +10,7 @@ static inline bool tkz_file_structure_legal_p(s_tkz_file_t *tkz_file_list);
 static inline bool tkz_io_block_structure_legal_p(s_io_block_t *io_block);
 static inline bool tkz_io_buf_comment_p(s_tkz_io_buffer_t *tkz_io_buf, e_tkz_lang_type_t tkz_type);
 static inline bool tkz_io_buf_double_quote_p(s_tkz_io_buffer_t *tkz_io_buf);
+static inline bool tkz_io_buf_fill_ip(s_tkz_io_buffer_t *tkz_io_buf);
 static inline bool tkz_io_buf_fill_p(s_tkz_io_buffer_t *tkz_io_buf);
 static inline bool tkz_io_buf_fill_secondary_tail_p(s_tkz_io_buffer_t *tkz_io_buf);
 static inline bool tkz_io_buf_limited_p(s_io_buffer_t *buffer);

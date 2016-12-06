@@ -441,7 +441,7 @@ tkz_io_buf_primary_limited_p(s_tkz_io_buffer_t *tkz_io_buf)
 }
 
 static inline bool
-tkz_io_buf_fill_p(s_tkz_io_buffer_t *tkz_io_buf)
+tkz_io_buf_fill_ip(s_tkz_io_buffer_t *tkz_io_buf)
 {
     char *buf;
     uint32 len;
@@ -450,31 +450,42 @@ tkz_io_buf_fill_p(s_tkz_io_buffer_t *tkz_io_buf)
 
     assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
 
+    rest = READ_BUF_BASE_SIZE;
+    buf = tkz_io_buf->primary->buf;
+    offset = tkz_io_buf->primary->index = 0;
+
+    while (rest != 0 && !dp_feof(tkz_io_buf->fd)) {
+        len = dp_fread(buf + offset, 1, rest, tkz_io_buf->fd);
+        offset += len;
+        rest -= len;
+    }
+
+    if (offset == 0) {
+        return false; /* no data can be filled */
+    }
+
+    if (rest == 0 && buf[offset - 1] == TKZ_LANG_C_COMMENT) {
+        dp_fread(buf + offset, 1, 1, tkz_io_buf->fd);;
+        offset++;
+    }
+
+    buf[offset] = NULL_CHAR;
+    tkz_io_buf->primary->size = offset;
+
+    return true;
+}
+
+static inline bool
+tkz_io_buf_fill_p(s_tkz_io_buffer_t *tkz_io_buf)
+{
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
+
     if (!tkz_io_buf_primary_limited_p(tkz_io_buf)) {
         return true;
     } else if (dp_feof(tkz_io_buf->fd)) {
         return false;
     } else {
-        buf = tkz_io_buf->primary->buf;
-        tkz_io_buf->primary->index = offset = 0;
-        rest = READ_BUF_BASE_SIZE;
-
-        while (rest != 0 && !dp_feof(tkz_io_buf->fd)) {
-            len = dp_fread(buf + offset, 1, rest, tkz_io_buf->fd);
-            assert_exit(len <= rest);
-            offset += len;
-            rest -= len;
-        }
-
-        if (rest == 0 && buf[offset - 1] == TKZ_LANG_C_COMMENT) {
-            dp_fread(buf + offset, 1, 1, tkz_io_buf->fd);;
-            offset++;
-        }
-
-        buf[offset] = NULL_CHAR;
-        tkz_io_buf->primary->size = offset;
-
-        return true;
+        return tkz_io_buf_fill_ip(tkz_io_buf);
     }
 }
 
