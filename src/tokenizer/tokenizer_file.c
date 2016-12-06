@@ -61,46 +61,44 @@ tkz_file_tk_process(s_tkz_file_t *tkz_file)
 {
     s_tk_t *tk_head;
     s_tkz_lang_t *tkz_lang;
-    s_io_buffer_t *io_buffer;
-    s_tkz_io_buffer_t *tkz_io_buffer;
+    s_tkz_io_buffer_t *tkz_io_buf;
     e_tkz_lang_type_t tkz_lang_type;
 
     assert_exit(tkz_file_structure_legal_p(tkz_file));
 
     tk_head = tkz_file->tk_list;
     tkz_lang = tkz_file->tkz_language;
-    tkz_io_buffer = tkz_file->tkz_io_buffer;
+    tkz_io_buf = tkz_file->tkz_io_buffer;
 
-    io_buffer = tkz_io_buffer->secondary;
     tkz_lang_type = tkz_lang->type;
 
-    while (tkz_io_buf_loaded_p(tkz_io_buffer, tkz_lang_type)) {
-        tkz_file_io_buf_process(io_buffer, tkz_lang, tk_head);
+    while (tkz_io_buf_secondary_loaded_p(tkz_io_buf, tkz_lang_type)) {
+        tkz_file_io_buf_process(tkz_io_buf, tkz_lang, tk_head);
     }
 }
 
 static inline void
-tkz_file_io_buf_process(s_io_buffer_t *io_buffer,
+tkz_file_io_buf_process(s_tkz_io_buffer_t *tkz_io_buf,
     s_tkz_lang_t *tkz_lang, s_tk_t *tk_head)
 {
     char *c;
-    uint32 limit;
+    char *limit;
     s_io_block_t *io_block;
 
     assert_exit(tk_head);
     assert_exit(tkz_lang_structure_legal_p(tkz_lang));
-    assert_exit(io_buf_structure_legal_p(io_buffer));
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
 
-    c = io_buffer->buf;
-    limit = io_buffer->size;
     io_block = tkz_io_block_create();
+    c = tkz_io_buf_secondary_buf(tkz_io_buf);
+    limit = tkz_io_buf_secondary_buf_limit(tkz_io_buf);
 
-    while (c < limit + io_buffer->buf) {
+    while (c < limit) {
         c += tkz_io_block_fill(io_block, c);
         tkz_io_block_process(tkz_lang, tk_head, io_block);
     }
-    assert_exit(c == limit + io_buffer->buf);
 
+    assert_exit(c == limit);
     tkz_io_block_destroy(io_block);
 }
 

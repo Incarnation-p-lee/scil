@@ -127,14 +127,14 @@ tkz_io_block_structure_legal_p(s_io_block_t *io_block)
 }
 
 static inline bool
-tkz_io_buf_secondary_limit_reached_p(s_tkz_io_buffer_t *tkz_io_buf)
+tkz_io_buf_secondary_overflow_p(s_tkz_io_buffer_t *tkz_io_buf)
 {
     assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
 
     if (tkz_io_buf->secondary->size < READ_BUF_SIZE) {
-        return true;
-    } else {
         return false;
+    } else {
+        return true;
     }
 }
 

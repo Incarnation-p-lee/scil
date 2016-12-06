@@ -45,8 +45,38 @@ tkz_io_buf_destroy(s_tkz_io_buffer_t *tkz_io_buf)
     dp_free(tkz_io_buf);
 }
 
+static inline char *
+tkz_io_buf_secondary_buf(s_tkz_io_buffer_t *tkz_io_buf)
+{
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
+
+    return tkz_io_buf->secondary->buf;
+}
+
+static inline char *
+tkz_io_buf_secondary_buf_limit(s_tkz_io_buffer_t *tkz_io_buf)
+{
+    char *buf;
+    uint32 limit;
+
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
+
+    buf = tkz_io_buf_secondary_buf(tkz_io_buf);
+    limit = tkz_io_buf_secondary_limit(tkz_io_buf);
+
+    return buf + limit;
+}
+
+static inline uint32
+tkz_io_buf_secondary_limit(s_tkz_io_buffer_t *tkz_io_buf)
+{
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
+
+    return tkz_io_buf->secondary->index;
+}
+
 static inline bool
-tkz_io_buf_loaded_p(s_tkz_io_buffer_t *tkz_io_buf,
+tkz_io_buf_secondary_loaded_p(s_tkz_io_buffer_t *tkz_io_buf,
     e_tkz_lang_type_t tkz_type)
 {
     assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
@@ -181,10 +211,6 @@ tkz_io_buf_multiple_comment_skip(s_tkz_io_buffer_t *tkz_io_buf,
     array_stack_destroy(&stack);
 }
 
-/*
- *
- */
-
 static inline bool
 tkz_io_buf_secondary_full_p(s_tkz_io_buffer_t *tkz_io_buf)
 {
@@ -215,7 +241,7 @@ tkz_io_buf_secondary_char_append(s_tkz_io_buffer_t *tkz_io_buf, char c)
     s_io_buffer_t *secondary;
 
     assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
-    assert_exit(tkz_io_buf_secondary_limit_reached_p(tkz_io_buf));
+    assert_exit(!tkz_io_buf_secondary_overflow_p(tkz_io_buf));
 
     secondary = tkz_io_buf->secondary;
 
@@ -342,21 +368,26 @@ tkz_io_buf_secondary_append_with_space(s_tkz_io_buffer_t *tkz_io_buf,
     tkz_io_buf_secondary_char_fill(tkz_io_buf);
 }
 
-static inline void
-tkz_io_buf_secondary_index_set(s_tkz_io_buffer_t *tkz_io_buf)
-{
-    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
-
-    /* 
-     * *HACK*
-     * index of secondary buffer indicate the index of next data begin
-     */
-    tkz_io_buf->secondary->index = tkz_io_buf->secondary->size + 1;
-}
-
 /*
  * Secondary buffer will delete space and comments
  * From primary -> secondary buffer
+ *
+ * *HACK*
+ * When input char is space, will set index = size + 1.
+ * The index points to first char after sentinel char, but sentinel char
+ * is not set for now.
+ *
+ * Meanwhile, the index also equals the data size of all io_block.
+ * because the tail of secondary buf may be truncated.
+ *
+ * Example if current input char is space.
+ *         index = size + 1
+ *          |
+ *          v
+ * |a|b|c| |x|y|z|
+ *        ^
+ *        |
+ *       size
  */
 static inline bool
 tkz_io_buf_secondary_fill_p(s_tkz_io_buffer_t *tkz_io_buf,
@@ -380,7 +411,7 @@ tkz_io_buf_secondary_fill_p(s_tkz_io_buffer_t *tkz_io_buf,
         } else if (dp_isspace(tkz_io_buf_char_get(tkz_io_buf))) {
             is_last_space = true;
             tkz_io_buf_index_advance(tkz_io_buf, 1);
-            tkz_io_buf_secondary_index_set(tkz_io_buf);
+            tkz_io_buf->secondary->index = tkz_io_buf->secondary->size + 1;
         } else if (tkz_io_buf_comment_p(tkz_io_buf, tkz_type)) {
             tkz_io_buf_skip_comment(tkz_io_buf, tkz_type);
         } else {
