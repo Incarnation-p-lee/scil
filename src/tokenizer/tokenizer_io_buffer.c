@@ -186,29 +186,26 @@ static inline void
 tkz_io_buf_multiple_comment_skip(s_tkz_io_buffer_t *tkz_io_buf,
     e_tkz_lang_type_t tkz_type)
 {
-    s_array_stack_t *stack;
+    sint32 stack;
 
     assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
     assert_exit(tkz_io_buf_multiple_comment_head_p(tkz_io_buf, tkz_type));
 
     tkz_io_buf_index_advance(tkz_io_buf, 2u); /* Advance 2 char */
 
-    stack = array_stack_create();
-    array_stack_push(stack, stack); /* Fix-Me no stack need */
+    stack = 1; /* a emulated stack */
 
-    while (!array_stack_empty_p(stack)) {
+    while (stack != 0) {
         if (tkz_io_buf_multiple_comment_head_p(tkz_io_buf, tkz_type)) {
-            array_stack_push(stack, stack);
+            stack++;
             tkz_io_buf_index_advance(tkz_io_buf, 2u);
         } else if (tkz_io_buf_multiple_comment_tail_p(tkz_io_buf, tkz_type)) {
-            array_stack_pop(stack);
+            stack--;
             tkz_io_buf_index_advance(tkz_io_buf, 2u);
         } else {
             tkz_io_buf_index_advance(tkz_io_buf, 1u);
         }
     }
-
-    array_stack_destroy(&stack);
 }
 
 static inline bool
