@@ -29,44 +29,33 @@ static inline bool
 regular_polish_legal_p(char *polish)
 {
     char *c;
-    char tmp;
+    sint32 stack;
     bool is_legal;
-    s_array_stack_t *stack;
 
     assert_exit(polish);
 
+    stack = 0;
     c = polish;
-    tmp = NULL_CHAR;
-    stack = array_stack_create();
 
     while (*c) {
         if (regular_char_data_p(*c)) {
-            array_stack_push(stack, &tmp);
+            stack++;
         } else if (regular_char_translated_p(*c)) {
             assert_exit(regular_char_wildcard_p(c[1]));
-            array_stack_push(stack, &tmp);
             c++;
+            stack++;
         } else if (regular_char_wildcard_binary_p(*c)) {
-            array_stack_pop(stack);
-            array_stack_pop(stack);
-            array_stack_push(stack, &tmp);
+            stack--;
         } else if (regular_char_wildcard_unary_p(*c)) {
-            array_stack_pop(stack);
-            array_stack_push(stack, &tmp);
+            ;
         } else {
             assert_exit(false);
         }
         c++;
     }
 
-    array_stack_pop(stack);
-    if (array_stack_empty_p(stack)) {
-        is_legal = true;
-    } else {
-        is_legal = false;
-    }
+    is_legal = stack == 1 ? true : false;
 
-    array_stack_destroy(&stack);
     return is_legal;
 }
 
