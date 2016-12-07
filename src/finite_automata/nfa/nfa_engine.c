@@ -143,25 +143,27 @@ nfa_engine_status_destroy_dfs(s_fa_status_t *status, s_open_addressing_hash_t *h
     key = (void *)(ptr_t)status->label;
     assert_exit(PTR_INVALID != open_addressing_hash_find(hash, key));
 
-    if (!open_addressing_hash_find(hash, key)) {
-        open_addressing_hash_insert(hash, key);
-
-        if (status->adj_list) {
-            edge = edge_head = status->adj_list;
-            do {
-                key = (void *)(ptr_t)edge->label;
-                if (!open_addressing_hash_find(hash, key)) {
-                    nfa_engine_status_destroy_dfs(edge->succ, hash);
-                }
-
-                edge_next = nfa_edge_next(edge);
-                dp_free(edge);
-                edge = edge_next;
-            } while (edge_head != edge);
-        }
-
-        dp_free(status);
+    if (open_addressing_hash_find(hash, key)) {
+        return;
     }
+
+    open_addressing_hash_insert(hash, key);
+
+    if (status->adj_list) {
+        edge = edge_head = status->adj_list;
+        do {
+            key = (void *)(ptr_t)edge->label;
+            if (!open_addressing_hash_find(hash, key)) {
+                nfa_engine_status_destroy_dfs(edge->succ, hash);
+            }
+
+            edge_next = nfa_edge_next(edge);
+            dp_free(edge);
+            edge = edge_next;
+        } while (edge_head != edge);
+    }
+
+    dp_free(status);
 }
 
 static inline void
