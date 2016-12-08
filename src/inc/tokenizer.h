@@ -26,6 +26,8 @@
  * +------+-------------+
  */
 
+#define SCIL_MODULE_TKZ              "tkz"
+
 #define FILENAME_LEN_MAX             256
 #define READ_BUF_BASE_SIZE           4096
 #define READ_BUF_EXTRA_SIZE          4

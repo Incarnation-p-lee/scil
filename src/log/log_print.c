@@ -1,8 +1,9 @@
 void
-scil_log_initial(char *logfile_name)
+log_initial(char *logfile_name)
 {
     if (logfile_name) {
         log_file = dp_fopen(logfile_name, "w");
+
         if (!log_file) {
             dp_printf("Failed to create log file %s.\n", logfile_name);
             dp_exit(1);
@@ -11,7 +12,7 @@ scil_log_initial(char *logfile_name)
 }
 
 void
-scil_log_close(void)
+log_close(void)
 {
     if (log_file) {
         dp_fclose(log_file);
@@ -19,7 +20,7 @@ scil_log_close(void)
 }
 
 void
-scil_log_print(const char *format, ...)
+log_print(const char *format, ...)
 {
     dp_va_list vl;
 
@@ -32,7 +33,7 @@ scil_log_print(const char *format, ...)
 }
 
 void
-scil_log_print_and_exit(const char *format, ...)
+log_print_and_exit(const char *format, ...)
 {
     dp_va_list vl;
 
@@ -44,7 +45,7 @@ scil_log_print_and_exit(const char *format, ...)
         dp_va_end(vl);
 
         libds_log_file_close();
-        scil_log_close();
+        log_close();
         memory_cache_cleanup();
         dp_exit(1);
     }

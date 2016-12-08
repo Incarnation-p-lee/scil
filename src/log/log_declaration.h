@@ -3,9 +3,19 @@
 #ifndef LOG_DECLARATION_H
 #define LOG_DECLARATION_H
 
-void scil_log_close(void);
-void scil_log_initial(char *logfile_name);
-void scil_log_print(const char *format, ...);
-void scil_log_print_and_exit(const char *format, ...);
+bool log_option_nfa_verbose_p(void);
+bool log_option_regular_verbose_p(void);
+bool log_option_token_verbose_p(void);
+bool log_option_tokenizer_verbose_p(void);
+static inline char * log_config_module_option_space_skip(char *option);
+static inline void log_config_module_option_parse(FILE *fd);
+static inline void log_config_module_option_set(char *option);
+static inline void log_config_module_option_set_tail(char *option);
+static inline void log_config_module_seek(FILE *fd, char *module);
+void log_close(void);
+void log_config_initial(char *module);
+void log_initial(char *logfile_name);
+void log_print(const char *format, ...);
+void log_print_and_exit(const char *format, ...);
 
 #endif

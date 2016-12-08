@@ -134,8 +134,8 @@ test_nfa_engine_advance(void)
 
     nfa = nfa_engine_create("[A-Za-z_][A-Za-z_0-9]*");
     assert_caution(!nfa_engine_pattern_match_p(nfa, ""));
-    assert_caution(!nfa_engine_pattern_match_p(nfa, "0scil_log_initial"));
-    assert_caution(nfa_engine_pattern_match_p(nfa, "__scil_log_initial__"));
+    assert_caution(!nfa_engine_pattern_match_p(nfa, "0log_initial"));
+    assert_caution(nfa_engine_pattern_match_p(nfa, "__log_initial__"));
     assert_caution(nfa_engine_pattern_match_p(nfa, "__FUNCTION_TIME_O2__"));
     assert_caution(nfa_engine_pattern_match_p(nfa, "______________"));
     assert_caution(nfa_engine_pattern_match_p(nfa, "_01234567890__"));

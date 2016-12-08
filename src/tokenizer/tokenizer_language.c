@@ -13,7 +13,7 @@ tkz_lang_filename_to_type(char *filename)
     } else if (dp_strcmp(c, "cpp") == 0) {
         return TKZ_LANG_CPP;
     } else {
-        scil_log_print_and_exit("Unsupported lang source file %s\n", filename);
+        log_print_and_exit("Unsupported lang source file %s\n", filename);
         return TKZ_LANG_UNSUPPORTED;
     }
 }

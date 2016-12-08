@@ -16,10 +16,19 @@
 #define RETURN_FIR_IF_EQ(r, v) if ((r) == (v)) { \
                                    return r;     \
                                }
-
 #define RETURN_FIR_IF_NE(r, v) if ((r) != (v)) { \
                                    return r;     \
                                }
+
+#define RETURN_IF_EQ(r, v)     if ((r) == (v)) { \
+                                   return;       \
+                               }
+#define RETURN_IF_NE(r, v)     if ((r) != (v)) { \
+                                   return;       \
+                               }
+
+#define RETURN_IF_TRUE(b)      RETURN_IF_EQ(b, true)
+#define RETURN_IF_FALSE(b)     RETURN_IF_EQ(b, false)
 
 #define CONTAINS_OF(addr, type, member) \
                                (void *)((ptr_t)(addr) - (ptr_t)(&((type *)0)->member))

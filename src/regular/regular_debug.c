@@ -66,19 +66,21 @@ regular_range_recover_print(char *regular)
 
     assert_exit(regular);
 
-    scil_log_print(">> After regular expression range expand\n    '");
+    RETURN_IF_FALSE(log_option_regular_verbose_p());
+
+    log_print("[REGULAR] After regular expression range expand\n    '");
 
     c = regular;
     while (*c) {
         tmp = *c++;
         if (tmp & ENCODE_MASK) {
             tmp = tmp & DECODE_MASK;
-            scil_log_print("`");
+            log_print("`");
         }
-        scil_log_print("%c", tmp);
+        log_print("%c", tmp);
     }
 
-    scil_log_print("'\n\n");
+    log_print("'\n\n");
 }
 
 static inline void
@@ -88,19 +90,21 @@ regular_char_and_insert_print(char *regular)
 
     assert_exit(regular);
 
-    scil_log_print(">> After regular expression opt and insert\n    '");
+    RETURN_IF_FALSE(log_option_regular_verbose_p());
+
+    log_print("[REGULAR] After regular expression opt and insert\n    '");
 
     c = regular;
     while (*c) {
         tmp = *c++;
         if (tmp & ENCODE_MASK) {
             tmp = tmp & DECODE_MASK;
-            scil_log_print("`");
+            log_print("`");
         }
-        scil_log_print("%c", tmp);
+        log_print("%c", tmp);
     }
 
-    scil_log_print("'\n\n");
+    log_print("'\n\n");
 }
 
 static inline void
@@ -110,19 +114,21 @@ regular_convert_to_polish_print(char *regular)
 
     assert_exit(regular);
 
-    scil_log_print(">> After regular expression convert to polish\n    '");
+    RETURN_IF_FALSE(log_option_regular_verbose_p());
+
+    log_print("[REGULAR] After regular expression convert to polish\n    '");
 
     c = regular;
     while (*c) {
         tmp = *c++;
         if (tmp & ENCODE_MASK) {
             tmp = tmp & DECODE_MASK;
-            scil_log_print("`");
+            log_print("`");
         }
-        scil_log_print("%c", tmp);
+        log_print("%c", tmp);
     }
 
-    scil_log_print("'\n\n");
+    log_print("'\n\n");
 }
 
 static inline bool

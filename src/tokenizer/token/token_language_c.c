@@ -23,7 +23,7 @@ tk_lang_c_optr_match(s_nfa_t *nfa, s_tk_t *tk_head, char *buf)
         match_size = tk_lang_c_nfa_match(nfa, buf);
 
         if (match_size == NFA_SZ_INVALID) {
-            scil_log_print_and_exit("Error in 'tk_lang_c_nfa_match'.\n");
+            log_print_and_exit("Error in 'tk_lang_c_nfa_match'.\n");
         } else if (match_size) {
             token = tk_lang_c_optr_create(buf, match_size);
             tk_list_insert_before(tk_head, token);
@@ -52,7 +52,7 @@ tk_lang_c_idtr_match(s_nfa_t *nfa, s_trie_tree_t *keyword_trie,
         match_size = tk_lang_c_nfa_match(nfa, buf);
 
         if (match_size == NFA_SZ_INVALID) {
-            scil_log_print_and_exit("Error in 'tk_lang_c_nfa_match'.\n");
+            log_print_and_exit("Error in 'tk_lang_c_nfa_match'.\n");
         } else if (match_size) {
             token = tk_lang_c_idtr_create(buf, match_size);
             tk_lang_c_keyword_seek(keyword_trie, token);
@@ -96,7 +96,7 @@ tk_lang_c_cnst_match(s_nfa_t *nfa, s_tk_t *tk_head, char *buf)
         match_size = tk_lang_c_nfa_match(nfa, buf);
 
         if (match_size == NFA_SZ_INVALID) {
-            scil_log_print_and_exit("Error in 'tk_lang_c_nfa_match'.\n");
+            log_print_and_exit("Error in 'tk_lang_c_nfa_match'.\n");
         } else if (match_size) {
             token = tk_lang_c_cnst_create(buf, match_size);
             tk_list_insert_before(tk_head, token);
@@ -123,7 +123,7 @@ tk_lang_c_pctt_match(s_nfa_t *nfa, s_tk_t *tk_head, char *buf)
         match_size = tk_lang_c_nfa_match(nfa, buf);
 
         if (match_size == NFA_SZ_INVALID) {
-            scil_log_print_and_exit("Error in 'tk_lang_c_nfa_match'.\n");
+            log_print_and_exit("Error in 'tk_lang_c_nfa_match'.\n");
         } else if (match_size) {
             assert_exit(2 >= match_size);
 

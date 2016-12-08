@@ -7,16 +7,18 @@ nfa_engine_graph_print_status(s_fa_status_t *status)
 
     assert_exit(nfa_status_structure_legal_p(status));
 
+    RETURN_IF_FALSE(log_option_nfa_verbose_p());
+
     if (!status->adj_list) {
-        scil_log_print("    Status %p [%d] *TERMINAL* \n", status, status->label);
+        log_print("    Status %p [%d] *TERMINAL* \n", status, status->label);
     } else {
         edge_idx = 0;
         edge = edge_head = status->adj_list;
-        scil_log_print("    Status %p [%d]\n", status, status->label);
+        log_print("    Status %p [%d]\n", status, status->label);
 
         do {
             tmp = NULL_CHAR == edge->c ? NFA_MARK_CHAR : edge->c;
-            scil_log_print("        |-edges %02u [label %03d]: c = '%c' => succ = %p\n",
+            log_print("        |-edges %02u [label %03d]: c = '%c' => succ = %p\n",
                 edge_idx++, edge->label, tmp, edge->succ);
             edge = nfa_edge_next(edge);
         } while (edge_head != edge);
@@ -31,6 +33,8 @@ nfa_engine_graph_dfs_print(s_fa_status_t *status, s_open_addressing_hash_t *hash
 
     assert_exit(hash);
     assert_exit(nfa_status_structure_legal_p(status));
+
+    RETURN_IF_FALSE(log_option_nfa_verbose_p());
 
     key = (void *)(ptr_t)status->label;
     assert_exit(PTR_INVALID != open_addressing_hash_find(hash, key));
@@ -54,7 +58,9 @@ nfa_engine_destroy_print(s_nfa_t *nfa)
 {
     assert_exit(nfa_engine_structure_legal_p(nfa));
 
-    scil_log_print(">> DESTROY NFA engine '%s'\n\n", nfa->re);
+    RETURN_IF_FALSE(log_option_nfa_verbose_p());
+
+    log_print("[NFA] DESTROY engine '%s'\n\n", nfa->re);
 }
 
 static inline void
@@ -64,7 +70,9 @@ nfa_engine_graph_print(s_nfa_t *nfa)
 
     assert_exit(nfa_engine_structure_legal_p(nfa));
 
-    scil_log_print(">> NFA engine graph print for regular expression '%s'\n", nfa->re);
+    RETURN_IF_FALSE(log_option_nfa_verbose_p());
+
+    log_print("\n[NFA] engine graph print for regular expression '%s'\n", nfa->re);
 
     hash = open_addressing_hash_create(NFA_LABEL_HASH_SIZE);
     nfa_engine_graph_dfs_print(nfa->start, hash);
@@ -86,10 +94,12 @@ nfa_status_terminal_p(s_fa_status_t *status)
 static inline void
 nfa_closure_title_print(char c)
 {
+    RETURN_IF_FALSE(log_option_nfa_verbose_p());
+
     if (c == NULL_CHAR) {
-        scil_log_print(">> NFA closure collection *START*\n");
+        log_print("[NFA] closure collection *START*\n");
     } else {
-        scil_log_print(">> NFA closure collection '%c'\n", c);
+        log_print("[NFA] closure collection '%c'\n", c);
     }
 }
 
@@ -103,6 +113,8 @@ nfa_closure_print(s_fa_closure_t *closure)
 
     assert_exit(nfa_closure_structure_legal_p(closure));
 
+    RETURN_IF_FALSE(log_option_nfa_verbose_p());
+
     nfa_closure_title_print(closure->c);
 
     collection = closure->collection;
@@ -114,21 +126,21 @@ nfa_closure_print(s_fa_closure_t *closure)
     iterator->fp_index_initial(collection);
 
     i = 0;
-    scil_log_print("    ");
+    log_print("    ");
 
     while (iterator->fp_next_exist_p(collection)) {
         status = iterator->fp_next_obtain(collection);
-        scil_log_print("%04d, ", status->label);
+        log_print("%04d, ", status->label);
 
         i++;
         if (i == NFA_CLOSURE_PRINT_LEN) {
             i = 0;
-            scil_log_print("\n    ");
+            log_print("\n    ");
         }
     }
 
     if (i) {
-        scil_log_print("\n");
+        log_print("\n");
     }
 }
 
@@ -141,11 +153,13 @@ nfa_engine_closure_match_print(s_nfa_t *nfa, s_fa_closure_t *closure)
     assert_exit(nfa_engine_structure_legal_p(nfa));
     assert_exit(nfa_closure_structure_legal_p(closure));
 
+    RETURN_IF_FALSE(log_option_nfa_verbose_p());
+
     bitmap = closure->bitmap;
     status = nfa->terminal;
 
     if (bitmap_bit_set_p(bitmap, status->label)) {
-        scil_log_print("## Matched *TERMINAL* %04d in closure at '%c'\n",
+        log_print("[NFA] Matched *TERMINAL* %04d in closure at '%c'\n",
             status->label, closure->c);
     }
 }

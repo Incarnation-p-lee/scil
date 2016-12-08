@@ -17,6 +17,7 @@
 #define dp_isspace             isspace
 #define dp_printf              printf
 #define dp_feof                feof
+#define dp_fgets               fgets
 #define dp_strlen              strlen
 #define dp_isalpha             isalpha
 #define dp_fopen               fopen
@@ -33,8 +34,10 @@
 #define dp_memcpy              memcpy
 #define dp_strlen              strlen
 #define dp_strcpy              strcpy
+#define dp_strchr              strchr
 #define dp_strrchr             strrchr
 #define dp_strcmp              strcmp
+#define dp_strncmp             strncmp
 
 #if defined DEBUG
     #define dp_malloc          memory_track_malloc

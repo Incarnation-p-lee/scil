@@ -3,7 +3,9 @@ tkz_file_open_print(char *fname)
 {
     assert_exit(fname);
 
-    scil_log_print(">> Open source file %s\n", fname);
+    RETURN_IF_FALSE(log_option_tokenizer_verbose_p());
+
+    log_print("[TKZ] Open source file %s\n", fname);
 }
 
 static inline void
@@ -15,30 +17,32 @@ io_buffer_print(s_io_buffer_t *buffer)
 
     assert_exit(io_buf_structure_legal_p(buffer));
 
+    RETURN_IF_FALSE(log_option_tokenizer_verbose_p());
+
     i = k = 0;
     buf = buffer->buf;
-    scil_log_print("\n>> Print IO buffer %d\n", buffer->size);
+    log_print("\n[TKZ] Print IO buffer %d\n", buffer->size);
 
     while (buf[i]) {
         if (k == 0) {
-            scil_log_print("    ");
+            log_print("    ");
         }
 
-        scil_log_print("%c", buf[i]);
+        log_print("%c", buf[i]);
         k++;
         i++;
 
         if (BUF_PRINT_LEN == k) {
             k = 0;
-            scil_log_print("\n");
+            log_print("\n");
         }
     }
 
     if (k) {
-        scil_log_print("\n");
+        log_print("\n");
     }
 
-    scil_log_print(">> End ==================================\n");
+    log_print("[TKZ] End ==================================\n");
 
     assert_exit(i <= READ_BUF_SIZE);
 }
@@ -60,7 +64,8 @@ tkz_logfile_open(char *binary_name)
     dp_memcpy(logfile_name, c, len);
     dp_memcpy(logfile_name + len, TKZ_LOG_SUFFIX, sizeof(TKZ_LOG_SUFFIX));
 
-    scil_log_initial(logfile_name);
+    log_initial(logfile_name);
+    log_config_initial(SCIL_MODULE_TKZ);
     libds_log_file_create();
 
     dp_free(logfile_name);
@@ -71,7 +76,7 @@ tkz_logfile_close(void)
 {
     memory_track_counters_print();
     libds_log_file_close();
-    scil_log_close();
+    log_close();
 }
 
 static inline void
@@ -82,13 +87,15 @@ tkz_io_block_print(s_io_block_t *io_block)
 
     assert_exit(tkz_io_block_structure_legal_p(io_block));
 
+    RETURN_IF_FALSE(log_option_tokenizer_verbose_p());
+
     size = tkz_io_block_data_size(io_block->block_buf);
     buf = dp_malloc(io_block->size);
 
     dp_memcpy(buf, io_block->block_buf, size);
 
-    scil_log_print("\n>> Print IO block %d\n", size);
-    scil_log_print("    %s\n\n", buf);
+    log_print("\n[TKZ] Print IO block %d\n", size);
+    log_print("    %s\n\n", buf);
 
     dp_free(buf);
 }
@@ -97,7 +104,10 @@ static inline void
 tkz_lang_c_buffer_print(char *buf)
 {
     assert_exit(buf);
-    scil_log_print("== TKZ matching '%s'\n", buf);
+
+    RETURN_IF_FALSE(log_option_tokenizer_verbose_p());
+
+    log_print("[TKZ] matching '%s'\n", buf);
 }
 
 static inline bool

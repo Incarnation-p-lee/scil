@@ -7,7 +7,7 @@ tk_print(s_tk_t *token, e_tkz_lang_type_t tkz_lang_type)
                 tk_lang_c_print(token);
                 break;
             default:
-                scil_log_print_and_exit("Unknown lang type.\n");
+                log_print_and_exit("Unknown lang type.\n");
                 break;
         }
     }

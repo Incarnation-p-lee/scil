@@ -22,7 +22,7 @@ tkz_io_buf_create(char *fname)
     tkz_io_buf->fd = dp_fopen(fname, "r");
 
     if (!tkz_io_buf->fd) {
-        scil_log_print_and_exit("*Error* Failed to locate file %s\n", fname);
+        log_print_and_exit("*Error* Failed to locate file %s\n", fname);
     } else {
         TKZ_FILE_OPEN_PRINT(fname);
     }
@@ -97,7 +97,7 @@ tkz_io_buf_index_advance(s_tkz_io_buffer_t *tkz_io_buf, uint32 count)
             rest--;
             tkz_io_buf->primary->index++;
         } else {
-            scil_log_print_and_exit("Reach the end of file.\n");
+            log_print_and_exit("Reach the end of file.\n");
         }
     }
 }
