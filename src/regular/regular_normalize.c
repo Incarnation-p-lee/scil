@@ -43,10 +43,15 @@ regular_normalize_recover_destroy(s_regular_recover_t *recover)
     dp_free(recover);
 }
 
+/*
+ * Unfolding [A-Z] will ignore any wildcard.
+ * Example: [*&|] is not wildcard.
+ */
 static inline uint32
 regular_normalize_range_unfold_i(s_regular_recover_t *recover, char *re)
 {
     char *c;
+    char tmp_char;
     char start, last;
     uint32 extra_bytes;
 
@@ -63,7 +68,12 @@ regular_normalize_range_unfold_i(s_regular_recover_t *recover, char *re)
     recover->buf = dp_realloc(recover->buf, recover->size);
 
     while (start <= last) {
-        recover->buf[recover->index++] = start;
+        tmp_char = start;
+        if (regular_char_wildcard_p(tmp_char)) {
+            tmp_char = regular_char_wildcard_encode(start);
+        }
+
+        recover->buf[recover->index++] = tmp_char;
         recover->buf[recover->index++] = RE_WILD_OR;
         start++;
     }
@@ -81,7 +91,7 @@ regular_normalize_range_unfold(s_regular_recover_t *recover, char *re)
     assert_exit(re[0] == RE_WILD_MBKT_L);
     assert_exit(regular_normalize_recover_structure_legal_p(recover));
 
-    c = re + 1;   /* skip '[' of [A */
+    c = re + 1;  /* skip '[' of [A */
     recover->buf[recover->index++] = RE_WILD_BKT_L;
 
     while (RE_WILD_MBKT_R != *c && *c) {
@@ -90,12 +100,12 @@ regular_normalize_range_unfold(s_regular_recover_t *recover, char *re)
             recover->buf[recover->index++] = *c;
             recover->buf[recover->index++] = RE_WILD_OR;
             c++;
-        } else {                             /* Handle '-' in [], like [A-Z] */
+        } else { /* Handle '-' in [], like [A-Z] */
             c += regular_normalize_range_unfold_i(recover, c);
         }
     }
 
-    recover->buf[recover->index - 1] = RE_WILD_BKT_R;           /* overwrite last RE_WILD_OR */
+    recover->buf[recover->index - 1] = RE_WILD_BKT_R; /* overwrite last RE_WILD_OR */
     forward_bytes = (uint32)(c - re);
 
     return forward_bytes;
@@ -103,7 +113,7 @@ regular_normalize_range_unfold(s_regular_recover_t *recover, char *re)
 
 /*
  * Recover will process 2 things at one iteration.
- * 1. Encode TRANS wildcard.
+ * 1. Encode wildcard.
  * 2. Convert RE [A-Z] to (A|B|C|...|Z)
  */
 static inline void
@@ -116,13 +126,13 @@ regular_normalize_range_recover(s_regular_recover_t *recover, char *re)
 
     c = re;
     while (*c) {
-        if (*c == RE_WILD_TRANS) { // Encoding translated wildard
+        if (*c == RE_WILD_ENCODE) { /* Encode wildard as normal char */
             assert_exit(regular_char_wildcard_p(c[1]));
-            recover->buf[recover->index++] = c[1] | TRANS_MASK;
+            recover->buf[recover->index++] = regular_char_wildcard_encode(c[1]);
             c++;
         } else if (*c != RE_WILD_MBKT_L) {
             recover->buf[recover->index++] = *c;
-        } else {    /* *c == RE_WILD_MBKT_L */
+        } else {                   /* *c == RE_WILD_MBKT_L */
             c += regular_normalize_range_unfold(recover, c);
         }
         c++;

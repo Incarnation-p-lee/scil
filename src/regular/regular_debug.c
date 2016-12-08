@@ -40,7 +40,7 @@ regular_polish_legal_p(char *polish)
     while (*c) {
         if (regular_char_data_p(*c)) {
             stack++;
-        } else if (regular_char_translated_p(*c)) {
+        } else if (regular_char_wildcard_encoded_p(*c)) {
             assert_exit(regular_char_wildcard_p(c[1]));
             c++;
             stack++;
@@ -71,8 +71,8 @@ regular_range_recover_print(char *regular)
     c = regular;
     while (*c) {
         tmp = *c++;
-        if (tmp & TRANS_MASK) {
-            tmp = tmp & TRANS_UNMASK;
+        if (tmp & ENCODE_MASK) {
+            tmp = tmp & DECODE_MASK;
             scil_log_print("`");
         }
         scil_log_print("%c", tmp);
@@ -93,8 +93,8 @@ regular_char_and_insert_print(char *regular)
     c = regular;
     while (*c) {
         tmp = *c++;
-        if (tmp & TRANS_MASK) {
-            tmp = tmp & TRANS_UNMASK;
+        if (tmp & ENCODE_MASK) {
+            tmp = tmp & DECODE_MASK;
             scil_log_print("`");
         }
         scil_log_print("%c", tmp);
@@ -115,8 +115,8 @@ regular_convert_to_polish_print(char *regular)
     c = regular;
     while (*c) {
         tmp = *c++;
-        if (tmp & TRANS_MASK) {
-            tmp = tmp & TRANS_UNMASK;
+        if (tmp & ENCODE_MASK) {
+            tmp = tmp & DECODE_MASK;
             scil_log_print("`");
         }
         scil_log_print("%c", tmp);

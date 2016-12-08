@@ -7,12 +7,13 @@ extern bool regular_char_bracket_left_p(char c);
 extern bool regular_char_bracket_p(char c);
 extern bool regular_char_bracket_right_p(char c);
 extern bool regular_char_data_p(char c);
-extern bool regular_char_translated_p(char c);
 extern bool regular_char_wildcard_binary_p(char c);
+extern bool regular_char_wildcard_encoded_p(char c);
 extern bool regular_char_wildcard_p(char c);
 extern bool regular_char_wildcard_unary_p(char c);
 extern char * regular_polish_process(char *re);
-extern char regular_char_translate_resume(char c);
+extern char regular_char_wildcard_decode(char c);
+extern char regular_char_wildcard_encode(char c);
 
 #endif
 

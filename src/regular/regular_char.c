@@ -1,7 +1,7 @@
 bool
-regular_char_translated_p(char c)
+regular_char_wildcard_encoded_p(char c)
 {
-    if (TRANS_MASK == (c & TRANS_MASK)) {
+    if (ENCODE_MASK == (c & ENCODE_MASK)) {
         return true;
     } else {
         return false;
@@ -9,10 +9,20 @@ regular_char_translated_p(char c)
 }
 
 char
-regular_char_translate_resume(char c)
+regular_char_wildcard_encode(char c)
 {
-    if (regular_char_translated_p(c)) {
-        return c & TRANS_UNMASK;
+    if (regular_char_wildcard_p(c)) {
+        return c | ENCODE_MASK;
+    } else {
+        return c;
+    }
+}
+
+char
+regular_char_wildcard_decode(char c)
+{
+    if (regular_char_wildcard_encoded_p(c)) {
+        return c & DECODE_MASK;
     } else {
         return c;
     }
@@ -31,7 +41,7 @@ regular_char_wildcard_p(char c)
         case RE_WILD_QUST:    /* '?' */
         case RE_WILD_MBKT_L:  /* '[' */
         case RE_WILD_MBKT_R:  /* ']' */
-        case RE_WILD_TRANS:   /* '`' */
+        case RE_WILD_ENCODE:  /* '`' */
             return true;
         default:
             return false;
@@ -62,6 +72,9 @@ regular_char_data_symbol_p(char c)
         case RE_DT_SML_TILDE_CHAR:      /* '~' */
         case RE_DT_SML_UDRLINE_CHAR:    /* '_' */
         case RE_DT_SML_XOR_CHAR:        /* '^' */
+        case RE_DT_SML_DOLLAR_CHAR:     /* '$' */
+        case RE_DT_SML_S_QUOTE_CHAR:    /* ''' */
+        case RE_DT_SML_AT_CHAR:         /* '@' */
             return true;
         default:
             return false;
@@ -73,7 +86,7 @@ regular_char_data_p(char c)
 {
     if (dp_isalnum(c)) {
         return true;
-    } else if (regular_char_translated_p(c)) {
+    } else if (regular_char_wildcard_encoded_p(c)) {
         return true;
     } else {
         return regular_char_data_symbol_p(c);

@@ -253,7 +253,7 @@ tkz_io_buf_secondary_char_fill(s_tkz_io_buffer_t *tkz_io_buf)
     s_io_buffer_t *secondary;
 
     assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
-    assert_exit(!tkz_io_buf_secondary_full_p(tkz_io_buf));
+    assert_exit(!tkz_io_buf_secondary_overflow_p(tkz_io_buf));
 
     primary = tkz_io_buf->primary;
     secondary = tkz_io_buf->secondary;

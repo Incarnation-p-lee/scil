@@ -30,7 +30,7 @@ enum regular_wildcard {
     RE_WILD_QUST   = '?',
     RE_WILD_MBKT_L = '[',
     RE_WILD_MBKT_R = ']',
-    RE_WILD_TRANS  = '`',
+    RE_WILD_ENCODE = '`',
 };
 
 enum regular_data_symbol {
@@ -54,6 +54,9 @@ enum regular_data_symbol {
     RE_DT_SML_TILDE_CHAR   = '~',
     RE_DT_SML_UDRLINE_CHAR = '_',
     RE_DT_SML_XOR_CHAR     = '^',
+    RE_DT_SML_DOLLAR_CHAR  = '$',
+    RE_DT_SML_S_QUOTE_CHAR = '\'',
+    RE_DT_SML_AT_CHAR      = '@',
 };
 
 #endif

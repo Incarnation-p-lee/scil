@@ -1,8 +1,8 @@
 #ifndef REGULAR_EXPRESSION_H
 #define REGULAR_EXPRESSION_H
 
-#define TRANS_MASK                          ((char)0x80)
-#define TRANS_UNMASK                        (char)(~TRANS_MASK)
+#define ENCODE_MASK                          ((char)0x80)
+#define DECODE_MASK                        (char)(~ENCODE_MASK)
 
 #if defined DEBUG
     #define REGULAR_RANG_RECOVER_PRINT(x)   regular_range_recover_print(x)

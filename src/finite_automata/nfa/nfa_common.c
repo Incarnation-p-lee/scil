@@ -3,8 +3,8 @@ nfa_char_data_create(char c)
 {
     assert_exit(regular_char_data_p(c));
 
-    if (regular_char_translated_p(c)) {
-        c = regular_char_translate_resume(c);
+    if (regular_char_wildcard_encoded_p(c)) {
+        c = regular_char_wildcard_decode(c);
     }
 
     return nfa_subset_rule_basic(c);
@@ -35,7 +35,7 @@ nfa_label_range_set(s_nfa_t *nfa)
 {
     assert_exit(nfa_engine_structure_legal_p(nfa));
 
-    // For convention, the min of nfa label range is always NFA_LABEL_MIN.
+    /* For convention, the min of nfa label range is always NFA_LABEL_MIN. */
     nfa->label_range.min = NFA_LABEL_MIN;
     nfa->label_range.max = nfa_status_lalel;
 }
