@@ -156,9 +156,9 @@ mv -v *.o $obj_dir > $verbose
 ## generate linking Makefile and link to final target ##
 ########################################################
 echo "    Copy     .. Makefile"
-cp $src_dir/Makefile.in $obj_dir
+cp -v $src_dir/Makefile.in $obj_dir > $verbose
 echo "    Copy     .. libds.a"
-cp $libds_archive $obj_dir
+cp -v $libds_archive $obj_dir > $verbose
 
 echo "    Generate .. Makefile"
 perl script/produce_link_makefile.pl $obj_dir

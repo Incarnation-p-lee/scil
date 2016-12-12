@@ -25,6 +25,7 @@ enum token_type {
 struct token {
     e_tk_type_t            type;
     void                   *data;
+    uint32                 line_nmbr;
     s_doubly_linked_list_t list;
 };
 

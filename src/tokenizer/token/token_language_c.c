@@ -126,7 +126,6 @@ tk_lang_c_pctt_match(s_nfa_t *nfa, s_tk_t *tk_head, char *buf)
             log_print_and_exit("Error in 'tk_lang_c_nfa_match'.\n");
         } else if (match_size) {
             assert_exit(2 >= match_size);
-
             token = tk_lang_c_pctt_create(buf[0]);
             tk_list_insert_before(tk_head, token);
         }
