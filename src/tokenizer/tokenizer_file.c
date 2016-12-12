@@ -76,18 +76,20 @@ static inline void
 tkz_file_tk_io_buffer_process(s_tkz_io_buffer_t *tkz_io_buf,
     s_tkz_lang_t *tkz_lang, s_tk_t *tk_head)
 {
+    bool is_string;
     s_io_block_t *io_block;
 
     assert_exit(tk_structure_legal_p(tk_head));
     assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
 
+    is_string = false;
     io_block = tkz_io_block_create();
 
     while (tkz_io_buf_fill_p(tkz_io_buf)) {
         if (tkz_io_buf_double_quote_p(tkz_io_buf)) {
-            tkz_io_buf->is_string = !tkz_io_buf->is_string;
+            is_string = !is_string;
             tkz_io_block_char_fill(io_block, tkz_io_buf);
-        } else if (tkz_io_buf->is_string) {
+        } else if (is_string) {
             tkz_io_block_char_fill(io_block, tkz_io_buf);
         } else if (tkz_io_buf_comment_p(tkz_io_buf, tkz_lang->type)) {
             tkz_io_buf_skip_comment(tkz_io_buf, tkz_lang->type);

@@ -11,6 +11,14 @@ io_buf_create(void)
     return io_buf;
 }
 
+static inline void
+io_buf_destroy(s_io_buffer_t *io_buffer)
+{
+    assert_exit(io_buf_structure_legal_p(io_buffer));
+
+    dp_free(io_buffer);
+}
+
 static inline s_tkz_io_buffer_t *
 tkz_io_buf_create(char *fname)
 {
@@ -28,10 +36,7 @@ tkz_io_buf_create(char *fname)
     }
 
     tkz_io_buf->line_nmbr = 1;
-    tkz_io_buf->is_string = false;
-
-    tkz_io_buf->primary = io_buf_create();
-    tkz_io_buf->secondary = io_buf_create();
+    tkz_io_buf->io_buffer = io_buf_create();
 
     return tkz_io_buf;
 }
@@ -41,8 +46,7 @@ tkz_io_buf_destroy(s_tkz_io_buffer_t *tkz_io_buf)
 {
     assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
 
-    dp_free(tkz_io_buf->secondary);
-    dp_free(tkz_io_buf->primary);
+    io_buf_destroy(tkz_io_buf->io_buffer);
     dp_fclose(tkz_io_buf->fd);
     dp_free(tkz_io_buf);
 }
@@ -58,7 +62,7 @@ tkz_io_buf_index_advance(s_tkz_io_buffer_t *tkz_io_buf, uint32 count)
     while (rest != 0) {
         if (tkz_io_buf_fill_p(tkz_io_buf)) {
             rest--;
-            tkz_io_buf->primary->index++;
+            tkz_io_buf->io_buffer->index++;
         } else {
             log_print_and_exit("Reach the end of file.\n");
         }
@@ -72,8 +76,8 @@ tkz_io_buf_current(s_tkz_io_buffer_t *tkz_io_buf)
 
     assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
 
-    buf = tkz_io_buf->primary->buf;
-    buf += tkz_io_buf->primary->index;
+    buf = tkz_io_buf->io_buffer->buf;
+    buf += tkz_io_buf->io_buffer->index;
 
     return buf;
 }
@@ -140,9 +144,9 @@ tkz_io_buf_char_get(s_tkz_io_buffer_t *tkz_io_buf)
 
     assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
 
-    buf = tkz_io_buf->primary->buf;
+    buf = tkz_io_buf->io_buffer->buf;
 
-    return buf[tkz_io_buf->primary->index];
+    return buf[tkz_io_buf->io_buffer->index];
 }
 
 static inline bool
@@ -232,23 +236,15 @@ tkz_io_buf_skip_comment(s_tkz_io_buffer_t *tkz_io_buf,
 }
 
 static inline bool
-tkz_io_buf_limited_p(s_io_buffer_t *buffer)
+tkz_io_buf_limited_p(s_tkz_io_buffer_t *tkz_io_buf)
 {
-    assert_exit(io_buf_structure_legal_p(buffer));
+    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
 
-    if (buffer->index == buffer->size) {
+    if (tkz_io_buf->io_buffer->index == tkz_io_buf->io_buffer->size) {
         return true;
     } else {
         return false;
     }
-}
-
-static inline bool
-tkz_io_buf_primary_limited_p(s_tkz_io_buffer_t *tkz_io_buf)
-{
-    assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
-
-    return tkz_io_buf_limited_p(tkz_io_buf->primary);
 }
 
 static inline bool
@@ -262,8 +258,8 @@ tkz_io_buf_fill_ip(s_tkz_io_buffer_t *tkz_io_buf)
     assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
 
     rest = READ_BUF_BASE_SIZE;
-    buf = tkz_io_buf->primary->buf;
-    offset = tkz_io_buf->primary->index = 0;
+    buf = tkz_io_buf->io_buffer->buf;
+    offset = tkz_io_buf->io_buffer->index = 0;
 
     while (rest != 0 && !dp_feof(tkz_io_buf->fd)) {
         len = dp_fread(buf + offset, 1, rest, tkz_io_buf->fd);
@@ -281,7 +277,7 @@ tkz_io_buf_fill_ip(s_tkz_io_buffer_t *tkz_io_buf)
     }
 
     buf[offset] = NULL_CHAR;
-    tkz_io_buf->primary->size = offset;
+    tkz_io_buf->io_buffer->size = offset;
 
     return true;
 }
@@ -291,7 +287,7 @@ tkz_io_buf_fill_p(s_tkz_io_buffer_t *tkz_io_buf)
 {
     assert_exit(tkz_io_buf_structure_legal_p(tkz_io_buf));
 
-    if (!tkz_io_buf_primary_limited_p(tkz_io_buf)) {
+    if (!tkz_io_buf_limited_p(tkz_io_buf)) {
         return true;
     } else if (dp_feof(tkz_io_buf->fd)) {
         return false;

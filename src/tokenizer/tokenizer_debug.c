@@ -95,9 +95,7 @@ tkz_io_buf_structure_legal_p(s_tkz_io_buffer_t *tkz_io_buf)
         return false;
     } else if (!tkz_io_buf->fd) {
         return false;
-    } else if (!io_buf_structure_legal_p(tkz_io_buf->primary)) {
-        return false;
-    } else if (!io_buf_structure_legal_p(tkz_io_buf->secondary)) {
+    } else if (!io_buf_structure_legal_p(tkz_io_buf->io_buffer)) {
         return false;
     } else {
         return true;
