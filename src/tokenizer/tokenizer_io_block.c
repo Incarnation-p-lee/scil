@@ -104,8 +104,10 @@ tkz_io_block_lang_c_match(s_tkz_lang_t *tkz_lang,
         match_size = tkz_lang_c_tk_match(tkz_lang, tk_head, buf);
 
         if (match_size == NFA_SZ_UNMATCH) {
-            dp_printf("Cannot detect any token of '%s'.\n", io_block->buf);
-            log_print_and_exit("Cannot detect any token of '%s'.\n", io_block->buf);
+            dp_printf("Cannot detect any token of '%s' at line %d.\n",
+                io_block->buf, io_block->line_nmbr);
+            log_print_and_exit("Cannot detect any token of '%s'.\n",
+                io_block->buf);
         } else {
             buf += match_size;
             rest_size -= match_size;
