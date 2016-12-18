@@ -76,3 +76,7 @@ module="tkz"
 echo "    Generate .. Makefile.$module"
 perl script/produce_link_makefile.pl $obj_dir $module
 
+module="parser"
+echo "    Generate .. Makefile.$module"
+perl script/produce_link_makefile.pl $obj_dir $module
+

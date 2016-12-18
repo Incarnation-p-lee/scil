@@ -7,6 +7,7 @@ ld_library=
 debug_mode="Yes"
 verbose="/dev/null"
 tkz="tkz"
+parser="parser"
 
 if [ $# == 0 ]
 then
@@ -113,12 +114,18 @@ done
 mv -v *.o $obj_dir > $verbose
 
 
+cd $obj_dir
 ##################
 ## link tkz.elf ##
 ##################
 echo "    Link     .. tkz.elf"
-cd $obj_dir
 make -f Makefile.$tkz "ld_config=$ld_config" "ld_library=$ld_library" > $verbose
+
+#####################
+## link parser.elf ##
+#####################
+echo "    Link     .. parser.elf"
+make -f Makefile.$parser "ld_config=$ld_config" "ld_library=$ld_library" > $verbose
 
 if [ "$?" != 0 ]
 then
@@ -126,7 +133,6 @@ then
 else
     cd - > /dev/null
 fi
-
 
 #################################
 ## Update tags and cleanup log ##

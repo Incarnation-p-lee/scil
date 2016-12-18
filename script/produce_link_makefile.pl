@@ -17,7 +17,7 @@ $module_obj_map{"tkz"} =
     "common.o log.o test.o token.o finite_automata.o " .
     "nfa.o regular.o tokenizer.o libds.a";
 $module_obj_map{"parser"} =
-    "common.o log.o test.o parser.o nfa.o regular.o " .
+    "common.o log.o parser.o " .
     "libds.a";
 
 &produce_link_makefile($module);
