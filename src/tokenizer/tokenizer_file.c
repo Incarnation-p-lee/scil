@@ -10,9 +10,8 @@ tkz_file_process(char **file_list, uint32 count)
     while (fname < file_list + count) {
         tkz_file = tkz_file_create(*fname);
         tkz_file_tk_process(tkz_file);
-
-        tkz_file_print(tkz_file);
         tkz_file_destroy(tkz_file);
+
         fname++;
     }
 
@@ -39,6 +38,8 @@ tkz_file_create(char *fname)
     tkz_file->tkz_language = tkz_lang_obtain(fname);
     tkz_file->tkz_io_buffer = tkz_io_buf_create(fname);
 
+    dp_printf("==== tokenizer analysis '%s'\n", tkz_file->filename);
+
     return tkz_file;
 }
 
@@ -54,6 +55,8 @@ tkz_file_destroy(s_tkz_file_t *tkz_file)
 
     dp_free(tkz_file->filename);
     dp_free(tkz_file);
+
+    dp_printf("==== analysis token end.\n\n");
 }
 
 static inline void

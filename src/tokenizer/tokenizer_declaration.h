@@ -38,7 +38,6 @@ static inline void tkz_arguements_option_process(char *option);
 static inline void tkz_arguements_process(uint32 argc, char **argv);
 static inline void tkz_file_destroy(s_tkz_file_t *tkz_file);
 static inline void tkz_file_open_print(char *fname);
-static inline void tkz_file_print(s_tkz_file_t *tkz_file);
 static inline void tkz_file_process(char **file_list, uint32 count);
 static inline void tkz_file_tk_io_block_process(s_io_block_t *io_block, s_tk_t *tk_head, s_tkz_lang_t *tkz_lang);
 static inline void tkz_file_tk_io_buffer_process(s_tkz_io_buffer_t *tkz_io_buf, s_tkz_lang_t *tkz_lang, s_tk_t *tk_head);
