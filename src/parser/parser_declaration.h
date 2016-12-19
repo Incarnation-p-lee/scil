@@ -4,6 +4,6 @@
 #define PARSER_DECLARATION_H
 
 
-sint32 main(void);
+sint32 main(int argc, char **argv);
 
 #endif

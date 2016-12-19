@@ -1,9 +1,8 @@
 sint32
 main(int argc, char **argv)
 {
-    TKZ_LOGFILE_OPEN(argv[0]);
+    TKZ_LOGFILE_OPEN(argv[0], SCIL_MODULE_TKZ);
 
-    // skip binary name for argv[0]
     tkz_arguements_process(argc - 1, argv + 1);
     memory_cache_cleanup();
 

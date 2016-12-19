@@ -37,10 +37,8 @@
 #define TAIL_BUF_SIZE                128
 #define INDEX_INVALID                0xffffffffu
 #define BUF_PRINT_LEN                128
-#define PATH_ISOLATOR                '/'
 #define TKZ_LANG_C_COMMENT           '/'
 #define OPTION_CHAR                  '-'
-#define TKZ_LOG_SUFFIX               ".log"
 #define TKZ_IO_BLOCK_SIZE            256
 #define TKZ_LINE_TRACKER_SIZE        512
 

@@ -1,7 +1,11 @@
 sint32
-main(void)
+main(int argc, char **argv)
 {
+    PARSER_LOGFILE_OPEN(argv[0], "parser");
 
-    return 0;
+    memory_cache_cleanup();
+    PARSER_LOGFILE_CLOSE;
+
+    return argc - 1;
 }
 

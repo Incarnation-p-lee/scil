@@ -63,7 +63,5 @@ static inline void tkz_lang_c_nfa_engine_init(s_tkz_lang_t *tkz_lang);
 static inline void tkz_lang_cache_cleanup(void);
 static inline void tkz_lang_destroy(s_tkz_lang_t *tkz_lang);
 static inline void tkz_lang_init(s_tkz_lang_t *tkz_lang);
-static inline void tkz_logfile_close(void);
-static inline void tkz_logfile_open(char *binary_name);
 
 #endif

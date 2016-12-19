@@ -14,6 +14,8 @@ static inline void log_config_module_option_set_tail(char *option);
 static inline void log_config_module_seek(FILE *fd, char *module);
 void log_close(void);
 void log_config_initial(char *module);
+void log_file_close(void);
+void log_file_create(char *binary_name, char *module);
 void log_initial(char *logfile_name);
 void log_print(const char *format, ...);
 void log_print_and_exit(const char *format, ...);

@@ -9,38 +9,6 @@ tkz_file_open_print(char *fname)
 }
 
 static inline void
-tkz_logfile_open(char *binary_name)
-{
-    uint32 len;
-    char *logfile_name, *c;
-
-    assert_exit(binary_name);
-
-    c = dp_strrchr(binary_name, PATH_ISOLATOR);
-    c++;
-
-    len = dp_strlen(c);
-    logfile_name = dp_malloc(sizeof(char*) * (len + 5));
-
-    dp_memcpy(logfile_name, c, len);
-    dp_memcpy(logfile_name + len, TKZ_LOG_SUFFIX, sizeof(TKZ_LOG_SUFFIX));
-
-    log_initial(logfile_name);
-    log_config_initial(SCIL_MODULE_TKZ);
-    libds_log_file_create();
-
-    dp_free(logfile_name);
-}
-
-static inline void
-tkz_logfile_close(void)
-{
-    memory_track_counters_print();
-    libds_log_file_close();
-    log_close();
-}
-
-static inline void
 tkz_io_block_print(s_io_block_t *io_block)
 {
     assert_exit(tkz_io_block_structure_legal_p(io_block));

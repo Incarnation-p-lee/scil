@@ -13,6 +13,8 @@ extern void assert_print_caution(char *msg, const char *fname, const char *func,
 extern void assert_print_exit(char *msg, const char *fname, const char *func, uint32 line);
 extern void log_close(void);
 extern void log_config_initial(char *module);
+extern void log_file_close(void);
+extern void log_file_create(char *binary_name, char *module);
 extern void log_initial(char *logfile_name);
 extern void log_print(const char *format, ...);
 extern void log_print_and_exit(const char *format, ...);

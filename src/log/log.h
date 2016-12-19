@@ -5,6 +5,8 @@
 #define SCIL_CONFIG_LINE_MAX   64u
 #define SCIL_CONFIG_MASK       '-'
 #define SCIL_CONFIG_COMMENT    '#'
+#define PATH_ISOLATOR          '/'
+#define SCIL_LOG_SUFFIX        ".log"
 
 #define NFA_VERBOSE            "nfa_verbose"
 #define TOKEN_VERBOSE          "token_verbose"
