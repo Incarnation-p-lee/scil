@@ -20,10 +20,8 @@
     #include "tokenizer_debug.c"
 #endif
 
-#include "tokenizer_arguement.c"
 #include "tokenizer_io_buffer.c"
 #include "tokenizer_io_block.c"
 #include "tokenizer_language.c"
 #include "tokenizer_file.c"
-#include "tokenizer_main.c"
 

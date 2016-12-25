@@ -114,18 +114,15 @@ done
 mv -v *.o $obj_dir > $verbose
 
 
-cd $obj_dir
-##################
-## link tkz.elf ##
-##################
-echo "    Link     .. tkz.elf"
-make -f Makefile.$tkz "ld_config=$ld_config" "ld_library=$ld_library" > $verbose
+###############################
+## generate linking Makefile ##
+###############################
+echo "    Generate .. Link Makefile "
+perl script/produce_link_makefile.pl $obj_dir
 
-#####################
-## link parser.elf ##
-#####################
-echo "    Link     .. parser.elf"
-make -f Makefile.$parser "ld_config=$ld_config" "ld_library=$ld_library" > $verbose
+cd $obj_dir
+echo "    Link     .. scil.elf"
+make -f Makefile "ld_config=$ld_config" "ld_library=$ld_library" > $verbose
 
 if [ "$?" != 0 ]
 then

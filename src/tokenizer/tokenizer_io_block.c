@@ -114,7 +114,7 @@ tkz_io_block_lang_c_match(s_tkz_lang_t *tkz_lang,
 
             last_tk = tk_list_node_previous(tk_head);
             last_tk->line_nmbr = io_block->line_nmbr;
-            tk_print(last_tk, tkz_lang->type);
+            TK_LOG_PRINT(last_tk);
         }
     }
 }

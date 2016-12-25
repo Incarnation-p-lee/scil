@@ -8,11 +8,13 @@
     #define TKZ_LOGFILE_CLOSE              log_file_close()
     #define TKZ_IO_BLOCK_PRINT(io)         tkz_io_block_print(io)
     #define TKZ_LANG_C_BUFFER_PRINT(b)     tkz_lang_c_buffer_print(b)
+    #define TK_LOG_PRINT(t)                tk_log_print(t)
 #else
     #define TKZ_LOGFILE_OPEN(n, m)
     #define TKZ_LOGFILE_CLOSE
     #define TKZ_IO_BLOCK_PRINT(io)
     #define TKZ_LANG_C_BUFFER_PRINT(b)
+    #define TK_LOG_PRINT(t)
 #endif
 
 #endif

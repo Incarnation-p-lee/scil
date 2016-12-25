@@ -54,7 +54,7 @@ tkz_lang_create(e_tkz_lang_type_t type)
     return tkz_lang;
 }
 
-static inline void
+void
 tkz_lang_cache_cleanup(void)
 {
     s_tkz_lang_t **tkz_iterator;

@@ -146,7 +146,7 @@ test_nfa_engine_advance(void)
     nfa_engine_destroy(nfa);
 }
 
-void
+static inline void
 test_nfa_engine(void)
 {
     test_nfa_engine_basic();

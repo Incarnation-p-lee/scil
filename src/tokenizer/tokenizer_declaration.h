@@ -4,7 +4,7 @@
 #define TOKENIZER_DECLARATION_H
 
 
-sint32 main(int argc, char **argv);
+s_tkz_file_t * tkz_file_create(char *fname);
 static inline bool io_buf_structure_legal_p(s_io_buffer_t *io_buf);
 static inline bool tkz_file_structure_legal_p(s_tkz_file_t *tkz_file_list);
 static inline bool tkz_io_block_empty_p(s_io_block_t *io_block);
@@ -28,20 +28,14 @@ static inline char tkz_io_buf_single_comment_end(e_tkz_lang_type_t tkz_type);
 static inline e_tkz_lang_type_t tkz_lang_filename_to_type(char *filename);
 static inline s_io_block_t * tkz_io_block_create(void);
 static inline s_io_buffer_t * io_buf_create(void);
-static inline s_tkz_file_t * tkz_file_create(char *fname);
 static inline s_tkz_io_buffer_t * tkz_io_buf_create(char *fname);
 static inline s_tkz_lang_t * tkz_lang_create(e_tkz_lang_type_t type);
 static inline s_tkz_lang_t * tkz_lang_obtain(char *filename);
 static inline uint32 tkz_lang_c_tk_match(s_tkz_lang_t *tkz_lang, s_tk_t *tk_head, char *buf);
 static inline void io_buf_destroy(s_io_buffer_t *io_buffer);
-static inline void tkz_arguements_option_process(char *option);
-static inline void tkz_arguements_process(uint32 argc, char **argv);
-static inline void tkz_file_destroy(s_tkz_file_t *tkz_file);
 static inline void tkz_file_open_print(char *fname);
-static inline void tkz_file_process(char **file_list, uint32 count);
 static inline void tkz_file_tk_io_block_process(s_io_block_t *io_block, s_tk_t *tk_head, s_tkz_lang_t *tkz_lang);
 static inline void tkz_file_tk_io_buffer_process(s_tkz_io_buffer_t *tkz_io_buf, s_tkz_lang_t *tkz_lang, s_tk_t *tk_head);
-static inline void tkz_file_tk_process(s_tkz_file_t *tkz_file);
 static inline void tkz_io_block_char_fill(s_io_block_t *io_block, s_tkz_io_buffer_t *tkz_io_buf);
 static inline void tkz_io_block_cleanup(s_io_block_t *io_block);
 static inline void tkz_io_block_destroy(s_io_block_t *io_block);
@@ -60,8 +54,10 @@ static inline void tkz_lang_c_keyword_trie_destroy(s_tkz_lang_t *tkz_lang);
 static inline void tkz_lang_c_keyword_trie_init(s_tkz_lang_t *tkz_lang);
 static inline void tkz_lang_c_nfa_engine_destroy(s_tkz_lang_t *tkz_lang);
 static inline void tkz_lang_c_nfa_engine_init(s_tkz_lang_t *tkz_lang);
-static inline void tkz_lang_cache_cleanup(void);
 static inline void tkz_lang_destroy(s_tkz_lang_t *tkz_lang);
 static inline void tkz_lang_init(s_tkz_lang_t *tkz_lang);
+void tkz_file_destroy(s_tkz_file_t *tkz_file);
+void tkz_file_tk_process(s_tkz_file_t *tkz_file);
+void tkz_lang_cache_cleanup(void);
 
 #endif

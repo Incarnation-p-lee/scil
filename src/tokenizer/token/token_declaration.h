@@ -33,18 +33,16 @@ static inline uint32 tk_lang_c_nfa_match(s_nfa_t *nfa, char *buf);
 static inline void tk_lang_c_cnst_print(char *buf);
 static inline void tk_lang_c_idtr_print(char *buf);
 static inline void tk_lang_c_keyword_seek(s_trie_tree_t *keyword_trie, s_tk_t *token);
-static inline void tk_lang_c_log_print(s_tk_t *token);
-static inline void tk_lang_c_node_destroy(s_tk_t *tk_node);
 static inline void tk_lang_c_optr_print(char *buf);
 static inline void tk_lang_c_pctt_print(char *buf);
-static inline void tk_lang_c_print(s_tk_t *token);
 static inline void tk_list_insert_before(s_tk_t *tk_head, s_tk_t *inserted);
+static inline void tk_list_node_destroy(s_tk_t *tk_node);
 uint32 tk_lang_c_cnst_match(s_nfa_t *nfa, s_tk_t *tk_head, char *buf);
 uint32 tk_lang_c_idtr_match(s_nfa_t *nfa, s_trie_tree_t *keyword_trie, s_tk_t *tk_head, char *buf);
 uint32 tk_lang_c_optr_match(s_nfa_t *nfa, s_tk_t *tk_head, char *buf);
 uint32 tk_lang_c_pctt_match(s_nfa_t *nfa, s_tk_t *tk_head, char *buf);
-void tk_lang_c_destroy(s_tk_t *tk_list);
 void tk_lang_c_keyword_trie_destroy(s_trie_tree_t **keyword_trie);
-void tk_print(s_tk_t *token, e_tkz_lang_type_t tkz_lang_type);
+void tk_list_destroy(s_tk_t *tk_list);
+void tk_log_print(s_tk_t *token);
 
 #endif

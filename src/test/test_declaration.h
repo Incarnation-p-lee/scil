@@ -4,9 +4,10 @@
 #define TEST_DECLARATION_H
 
 
+static inline void test_nfa_engine(void);
 static inline void test_nfa_engine_advance(void);
 static inline void test_nfa_engine_basic(void);
 static inline void test_nfa_engine_translate(void);
-void test_nfa_engine(void);
+void test_scil(void);
 
 #endif

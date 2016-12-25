@@ -62,21 +62,10 @@ cp $libds_interface $inc_dir
 echo "    Makefile .. compile"
 perl script/produce_compile_makefile.pl $src_dir
 
-
-###############################
-## generate linking Makefile ##
-###############################
 echo "    Copy     .. Makefile"
 cp -v $src_dir/Makefile.in $obj_dir > $verbose
 
 echo "    Copy     .. libds.a"
 cp -v $libds_archive $obj_dir > $verbose
 
-module="tkz"
-echo "    Generate .. Makefile.$module"
-perl script/produce_link_makefile.pl $obj_dir $module
-
-module="parser"
-echo "    Generate .. Makefile.$module"
-perl script/produce_link_makefile.pl $obj_dir $module
 
