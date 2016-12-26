@@ -1,0 +1,10 @@
+#ifndef HAVE_DEFINED_GRAMMAR_SYMBOL_H
+#define HAVE_DEFINED_GRAMMAR_SYMBOL_H
+
+#define GR_SYMBOL_NAME_SIZE     32
+#define GR_SYMBOL_INFER_HEAD    '-'
+#define GR_SYMBOL_INFER_TAIL    '>'
+#define GR_SYMBOL_BODY_ISOLATOR '|'
+
+#endif
+
