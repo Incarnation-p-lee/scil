@@ -3,16 +3,7 @@
 #ifndef LOG_DECLARATION_H
 #define LOG_DECLARATION_H
 
-bool log_option_nfa_verbose_p(void);
-bool log_option_regular_verbose_p(void);
-bool log_option_token_verbose_p(void);
-bool log_option_tokenizer_verbose_p(void);
-static inline char * log_config_option_space_skip(char *option);
-static inline void log_config_option_parse(FILE *fd);
-static inline void log_config_option_set(char *option);
-static inline void log_config_option_set_tail(char *option);
 void log_close(void);
-void log_config_initial(void);
 void log_file_close(void);
 void log_file_create(char *binary_name);
 void log_initial(char *logfile_name);

@@ -15,46 +15,32 @@ libds_bin_dir=$libds_dir/output/bin
 libds_archive=$libds_bin_dir/libds.a
 libds_interface=$libds_inc_dir/data_structure_interface.h
 
-
 ###########################################
 ## update some header files and makefile ##
 ###########################################
 echo "    Generate .. declarnation"
 perl script/generate_declaration.pl $src_dir $debug_mode
 
-external_file=$src_dir/inc/external.h
-external_module_list="$src_dir/common $src_dir/log"
-echo "    Generate .. $external_file"
-perl script/generate_external_declaration.pl $external_file $external_module_list
-
-tokenizer_external_file=$src_dir/inc/tokenizer_external.h
-tokenizer_external_module_list="$src_dir/tokenizer"
-echo "    Generate .. $tokenizer_external_file"
-perl script/generate_external_declaration.pl $tokenizer_external_file $tokenizer_external_module_list
-
-regular_external_file=$src_dir/inc/regular_external.h
-regular_external_module_list="$src_dir/regular"
-echo "    Generate .. $regular_external_file"
-perl script/generate_external_declaration.pl $regular_external_file $regular_external_module_list
-
-token_external_file=$src_dir/inc/token_external.h
-token_external_module_list="$src_dir/tokenizer/token"
-echo "    Generate .. $token_external_file"
-perl script/generate_external_declaration.pl $token_external_file $token_external_module_list
-
-nfa_external_file=$src_dir/inc/nfa_external.h
-nfa_external_module_list="$src_dir/finite_automata/nfa"
-echo "    Generate .. $nfa_external_file"
-perl script/generate_external_declaration.pl $nfa_external_file $nfa_external_module_list
-
-test_external_file=$src_dir/inc/test_external.h
-test_external_module_list="$src_dir/test"
-echo "    Generate .. $test_external_file"
-perl script/generate_external_declaration.pl $test_external_file $test_external_module_list
-
 echo "    Copy     .. data_structure_interface.h"
 cp $libds_interface $inc_dir
 
+external_module_list="$src_dir/common
+                      $src_dir/log
+                      $src_dir/tokenizer
+                      $src_dir/regular
+                      $src_dir/tokenizer/token
+                      $src_dir/finite_automata/nfa
+                      $src_dir/test
+                      $src_dir/parser/grammar
+                      $src_dir/parser"
+
+for module in $external_module_list
+do
+    module_name=$(basename $module)
+    external_file=$src_dir/inc/${module_name}_external.h
+    echo "    Generate .. $external_file"
+    perl script/generate_external_declaration.pl $external_file $module
+done
 
 #######################
 ## Generate Makefile ##

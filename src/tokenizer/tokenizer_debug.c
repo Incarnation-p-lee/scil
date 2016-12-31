@@ -3,7 +3,7 @@ tkz_file_open_print(char *fname)
 {
     assert_exit(fname);
 
-    RETURN_IF_FALSE(log_option_tokenizer_verbose_p());
+    RETURN_IF_FALSE(config_tokenizer_verbose_p());
 
     log_print("[TKZ] Open source file %s\n", fname);
 }
@@ -13,7 +13,7 @@ tkz_io_block_print(s_io_block_t *io_block)
 {
     assert_exit(tkz_io_block_structure_legal_p(io_block));
 
-    RETURN_IF_FALSE(log_option_tokenizer_verbose_p());
+    RETURN_IF_FALSE(config_tokenizer_verbose_p());
 
     log_print("\n[TKZ] IO block %d '%s'\n", io_block->index, io_block->buf);
 }
@@ -23,7 +23,7 @@ tkz_lang_c_buffer_print(char *buf)
 {
     assert_exit(buf);
 
-    RETURN_IF_FALSE(log_option_tokenizer_verbose_p());
+    RETURN_IF_FALSE(config_tokenizer_verbose_p());
 
     log_print("[TKZ] matching '%s'\n", buf);
 }

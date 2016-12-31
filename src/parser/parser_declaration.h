@@ -4,6 +4,6 @@
 #define PARSER_DECLARATION_H
 
 
-sint32 main(int argc, char **argv);
+void parser_analysis(s_tk_t *tk_list);
 
 #endif

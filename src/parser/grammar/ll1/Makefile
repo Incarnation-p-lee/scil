@@ -3,10 +3,10 @@
 include /home/pli/workspace/scil/src/Makefile.in
 CFLAG += -I/home/pli/workspace/scil/src/inc
 
-TARGET = 1.o
+TARGET = ll1.o
 all:$(TARGET)
 
 .s.o:
 	nasm $(AFLAG) -o $@ $<
-1.o:src/parser/grammar/LL-1/1.c
+ll1.o:src/parser/grammar/ll1/ll1.c
 	cc $(CFLAG) -o $@ $<

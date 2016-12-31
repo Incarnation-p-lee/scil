@@ -7,9 +7,10 @@
 #include "token.h"
 #include "tokenizer.h"
 
-#include "token_external.h"
+#include "log_external.h"
 #include "nfa_external.h"
-#include "test_external.h"
+#include "token_external.h"
+#include "common_external.h"
 
 #include "tokenizer_define.h"
 #include "tokenizer_print.h"

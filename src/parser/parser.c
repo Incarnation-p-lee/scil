@@ -1,4 +1,7 @@
 #include "depends.h"
+#include "token.h"
+
+#include "grammar_external.h"
 
 #include "parser_define.h"
 

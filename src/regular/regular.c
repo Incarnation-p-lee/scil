@@ -1,6 +1,9 @@
 #include "depends.h"
 #include "finite_automata.h"
 
+#include "common_external.h"
+#include "log_external.h"
+
 #include "regular.h"
 #include "regular_declaration.h"
 #include "regular_expression.h"

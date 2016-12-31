@@ -66,7 +66,7 @@ regular_range_recover_print(char *regular)
 
     assert_exit(regular);
 
-    RETURN_IF_FALSE(log_option_regular_verbose_p());
+    RETURN_IF_FALSE(config_regular_verbose_p());
 
     log_print("[REGULAR] After regular expression range expand\n    '");
 
@@ -90,7 +90,7 @@ regular_char_and_insert_print(char *regular)
 
     assert_exit(regular);
 
-    RETURN_IF_FALSE(log_option_regular_verbose_p());
+    RETURN_IF_FALSE(config_regular_verbose_p());
 
     log_print("[REGULAR] After regular expression opt and insert\n    '");
 
@@ -114,7 +114,7 @@ regular_convert_to_polish_print(char *regular)
 
     assert_exit(regular);
 
-    RETURN_IF_FALSE(log_option_regular_verbose_p());
+    RETURN_IF_FALSE(config_regular_verbose_p());
 
     log_print("[REGULAR] After regular expression convert to polish\n    '");
 

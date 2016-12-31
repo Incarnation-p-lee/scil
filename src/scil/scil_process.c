@@ -24,6 +24,7 @@ scil_process_i(char *filename)
     assert_exit(filename);
 
     tk_head = scil_tkz_process(filename);
+    parser_analysis(tk_head);
 
     tk_list_destroy(tk_head);
 }

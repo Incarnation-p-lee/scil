@@ -4,10 +4,12 @@
 #include "depends.h"
 #include "finite_automata.h"
 #include "nfa.h"
-#include "nfa_external.h"
 #include "regular.h"
-#include "regular_external.h"
 #include "tokenizer.h"
+
+#include "log_external.h"
+#include "nfa_external.h"
+#include "common_external.h"
 
 #include "token.h"
 #include "token_data.h"

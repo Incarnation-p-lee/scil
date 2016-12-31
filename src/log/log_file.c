@@ -15,7 +15,6 @@ log_file_create(char *binary_name)
         dp_memcpy(logfile_name + len, SCIL_LOG_SUFFIX, sizeof(SCIL_LOG_SUFFIX));
 
         log_initial(logfile_name);
-        log_config_initial();
         libds_log_file_create();
 
         dp_free(logfile_name);

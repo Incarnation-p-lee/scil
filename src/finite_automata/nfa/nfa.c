@@ -4,13 +4,16 @@
 #include "depends.h"
 #include "finite_automata.h"
 #include "regular.h"
-#include "regular_external.h"
 
 #include "nfa.h"
 #include "nfa_data.h"
 #include "nfa_print.h"
 #include "nfa_define.h"
 #include "nfa_declaration.h"
+
+#include "log_external.h"
+#include "common_external.h"
+#include "regular_external.h"
 
 #if defined DEBUG
     #include "nfa_debug.c"

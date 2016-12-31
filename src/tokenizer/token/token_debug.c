@@ -8,7 +8,7 @@ tk_log_print(s_tk_t *token)
     s_tk_lang_c_cnst_t *cnst;
 
     RETURN_IF_FALSE(tk_structure_legal_p(token));
-    RETURN_IF_FALSE(log_option_token_verbose_p());
+    RETURN_IF_FALSE(config_token_verbose_p());
 
     line_nmbr = token->line_nmbr;
 
@@ -67,7 +67,7 @@ tk_lang_c_idtr_print(char *buf)
 {
     assert_exit(buf);
 
-    RETURN_IF_FALSE(log_option_token_verbose_p());
+    RETURN_IF_FALSE(config_token_verbose_p());
 
     log_print("[TK] try identifier on '%s'\n", buf);
 }
@@ -77,7 +77,7 @@ tk_lang_c_optr_print(char *buf)
 {
     assert_exit(buf);
 
-    RETURN_IF_FALSE(log_option_token_verbose_p());
+    RETURN_IF_FALSE(config_token_verbose_p());
 
     log_print("[TK] try operator on '%s'\n", buf);
 }
@@ -87,7 +87,7 @@ tk_lang_c_cnst_print(char *buf)
 {
     assert_exit(buf);
 
-    RETURN_IF_FALSE(log_option_token_verbose_p());
+    RETURN_IF_FALSE(config_token_verbose_p());
 
     log_print("[TK] try constant on '%s'\n", buf);
 }
@@ -97,7 +97,7 @@ tk_lang_c_pctt_print(char *buf)
 {
     assert_exit(buf);
 
-    RETURN_IF_FALSE(log_option_token_verbose_p());
+    RETURN_IF_FALSE(config_token_verbose_p());
 
     log_print("[TK] try punctuation on '%s'\n", buf);
 }
