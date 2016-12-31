@@ -1,6 +1,9 @@
 #include "depends.h"
 #include "scil_feature.h"
 
+#include "log_external.h"
+#include "common_declaration.h"
+
 #include "common.h"
 #include "config.h"
 #include "assert.c"

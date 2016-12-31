@@ -24,6 +24,11 @@ log_print(const char *format, ...)
 {
     dp_va_list vl;
 
+    if (!log_file) {
+        dp_printf("[LOG] log file not initialized.\n");
+        dp_exit(2);
+    }
+
     if (format) {
         dp_va_start(vl, format);
         dp_vfprintf(log_file, format, vl);

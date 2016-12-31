@@ -5,6 +5,8 @@
 #define SCIL_CONFIG_LINE_MAX   64u
 #define SCIL_CONFIG_COMMENT    '#'
 #define SCIL_CONFIG_ASSIGN     '='
+#define SCIL_CONFIG_SPACE      ' '
+#define SCIL_CONFIG_NEWLINE    '\n'
 
 typedef struct config_list s_config_list_t;
 

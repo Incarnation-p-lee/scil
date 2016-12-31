@@ -89,7 +89,6 @@ config_option_line_parse(char *option)
     if (*c == SCIL_CONFIG_COMMENT) {
         return;
     } else {
-        c++;
         c = string_space_skip(c);
         assign = dp_strchr(option, SCIL_CONFIG_ASSIGN);
 
@@ -101,12 +100,35 @@ config_option_line_parse(char *option)
     }
 }
 
+static inline bool
+config_option_line_empty_p(char *config_buf)
+{
+    char *c;
+
+    assert_exit(config_buf);
+
+    c = config_buf;
+
+    while (*c == SCIL_CONFIG_SPACE || *c == SCIL_CONFIG_COMMENT) {
+        c++;
+    }
+
+    if (*c == SCIL_CONFIG_NEWLINE) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 static inline void
 config_option_parse(FILE *config)
 {
     assert_exit(config);
 
     while (dp_fgets(config_buf, SCIL_CONFIG_LINE_MAX, config) == config_buf) {
+        if (config_option_line_empty_p(config_buf)) {
+            continue;
+        }
         config_option_line_parse(config_buf);
     }
 }
@@ -121,8 +143,8 @@ config_initial(void)
     if (!config_file) {
         dp_printf("Failed to open config %s.\n", SCIL_CONFIG_FILE);
     } else {
-        config_option_parse(config_file);
         log_print("[LOG] Read config file %s done.\n", SCIL_CONFIG_FILE);
+        config_option_parse(config_file);
     }
 
     dp_fclose(config_file);

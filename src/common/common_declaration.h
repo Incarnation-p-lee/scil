@@ -9,6 +9,7 @@ bool config_regular_verbose_p(void);
 bool config_token_verbose_p(void);
 bool config_tokenizer_verbose_p(void);
 char * string_space_skip(char *string);
+static inline bool config_option_line_empty_p(char *config_buf);
 static inline uint32 config_option_grammar_type(char *assign);
 static inline void config_option_bool_set(char *option);
 static inline void config_option_line_parse(char *option);
