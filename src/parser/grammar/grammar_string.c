@@ -31,24 +31,44 @@ grammar_string_head_obtain(char *symbol, uint32 size, char *pdt)
     c = pdt;
 
     while (*c) {
-        if (!dp_isspace(*c)) {
-            symbol[i++] = *c;
-
-            if (i >= size) {
-                log_print_and_exit("Grammar symbol overflow.\n");
-            }
-        } else if (c[0] == GR_STR_INFER_HEAD) {
+        if (c[0] == GR_STR_INFER_HEAD) {
             if (c[1] == GR_STR_INFER_TAIL) {
                 break;
             }
 
             log_print_and_exit("Invalid format of production '%s'\n", pdt);
-        }
+        } else if (!dp_isspace(*c)) {
+            symbol[i++] = *c;
 
+            if (i >= size) {
+                log_print_and_exit("Grammar symbol overflow.\n");
+            }
+        }
         c++;
     }
 
     symbol[i] = NULL_CHAR;
+}
+
+static inline char *
+grammar_string_head_skip(char *pdt)
+{
+    char *c;
+
+    assert_exit(pdt);
+
+    c = pdt;
+
+    while (*c) {
+        if (c[0] == GR_STR_INFER_HEAD && c[1] == GR_STR_INFER_TAIL) {
+            return string_space_skip(c + 2);
+        }
+        c++;
+    }
+
+    log_print_and_exit("Unknown production detected.\n");
+
+    return PTR_INVALID;
 }
 
 static inline uint32
@@ -64,7 +84,12 @@ grammar_string_body_fill(char *body, uint32 size, char *body_list)
     c = body_list;
     c = string_space_skip(c);
 
-    while (*c && *c != GR_STR_BODY_ISOLATOR) {
+    while (*c) {
+        if (*c == GR_STR_BODY_ISOLATOR) {
+            c++; /* skip the body isolator */
+            break;
+        }
+
         body[i++] = *c++;
 
         if (i >= size - 1) { /* reserved 1 char for NULL_CHAR */

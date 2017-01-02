@@ -47,7 +47,7 @@ grammar_non_terminal_structure_legal_p(s_gr_non_tr_t *gr_non_tr)
 static inline bool
 grammar_body_list_structure_illegal_p(s_gr_body_list_t *gr_body_list)
 {
-    return grammar_body_list_structure_legal_p(gr_body_list);
+    return !grammar_body_list_structure_legal_p(gr_body_list);
 }
 
 static inline bool

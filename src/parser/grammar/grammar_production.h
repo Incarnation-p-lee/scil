@@ -62,7 +62,6 @@ static char *gr_language[] = {
     "param -> param_head param_tail",
     "param_head -> param_head`type id,`$",
     "param_tail -> type id`void",
-
 };
 
 #endif

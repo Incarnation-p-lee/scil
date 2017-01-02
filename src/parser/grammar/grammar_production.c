@@ -1,16 +1,19 @@
 static inline s_gr_pdt_t *
 grammar_production_create(char *pdt)
 {
+    char *body_list;
     s_gr_pdt_t *gr_pdt;
 
     assert_exit(pdt);
+
+    body_list = grammar_string_head_skip(pdt);
 
     gr_pdt = dp_malloc(sizeof(*gr_pdt));
     gr_pdt->name = dp_malloc(sizeof(*pdt) * (dp_strlen(pdt) + 1));
     dp_strcpy(gr_pdt->name, pdt);
 
     gr_pdt->head = grammar_production_head_create(pdt);
-    gr_pdt->list = grammar_production_body_list_create(pdt);
+    gr_pdt->list = grammar_production_body_list_create(body_list);
 
     return gr_pdt;
 }
@@ -20,9 +23,11 @@ grammar_production_destroy(s_gr_pdt_t *pdt)
 {
     assert_exit(grammar_production_structure_legal_p(pdt));
 
-    dp_free(pdt->name);
     grammar_production_head_destroy(pdt->head);
     grammar_production_body_list_destroy(pdt->list);
+
+    dp_free(pdt->name);
+    dp_free(pdt);
 }
 
 static inline s_gr_non_tr_t *
@@ -157,6 +162,8 @@ grammar_production_symbol_create(char *symbol)
         gr_symbol->is_terminal = false;
         // To-be-continue
     }
+
+    gr_symbol->terminal = PTR_INVALID;
 
     return gr_symbol;
 }
