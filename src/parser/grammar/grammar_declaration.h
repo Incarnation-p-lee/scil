@@ -4,6 +4,14 @@
 #define GRAMMAR_DECLARATION_H
 
 
+static inline bool grammar_body_list_structure_illegal_p(s_gr_body_list_t *gr_body_list);
+static inline bool grammar_body_list_structure_legal_p(s_gr_body_list_t *gr_body_list);
+static inline bool grammar_body_structure_legal_p(s_gr_body_t *gr_body);
+static inline bool grammar_language_structure_legal_p(s_gr_lang_t *gr_lang);
+static inline bool grammar_non_terminal_structure_illegal_p(s_gr_non_tr_t *gr_non_tr);
+static inline bool grammar_non_terminal_structure_legal_p(s_gr_non_tr_t *gr_non_tr);
+static inline bool grammar_production_structure_legal_p(s_gr_pdt_t *gr_pdt);
+static inline bool grammar_symbol_structure_legal_p(s_gr_symbol_t *gr_symbol);
 static inline e_gr_non_tr_type_t grammar_string_non_terminal_obtain(char *name);
 static inline s_gr_body_list_t * grammar_production_body_list_create(char *body_list);
 static inline s_gr_body_t * grammar_production_body_create(char *body);
@@ -16,6 +24,11 @@ static inline uint32 grammar_string_symbol_fill(char *symbol, uint32 size, char 
 static inline void grammar_initial(s_gr_lang_t *gr_lang);
 static inline void grammar_language_destroy(s_gr_lang_t *gr_lang);
 static inline void grammar_language_production_append(s_gr_lang_t *gr_lang, s_gr_pdt_t *gr_pdt);
+static inline void grammar_production_body_destroy(s_gr_body_t *body);
+static inline void grammar_production_body_list_destroy(s_gr_body_list_t *body_list);
+static inline void grammar_production_destroy(s_gr_pdt_t *pdt);
+static inline void grammar_production_head_destroy(s_gr_non_tr_t *gr_non_tr);
+static inline void grammar_production_symbol_destroy(s_gr_symbol_t *gr_symbol);
 static inline void grammar_string_head_obtain(char *symbol, uint32 size, char *pdt);
 void grammar_analysis(void);
 

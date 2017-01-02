@@ -9,7 +9,12 @@
 #include "grammar_declaration.h"
 #include "grammar_string.h"
 
+#if defined DEBUG
+    #include "grammar_debug.c"
+#endif
+
 #include "grammar_main.c"
+#include "grammar_util.c"
 #include "grammar_string.c"
 #include "grammar_production.c"
 #include "grammar_language.c"

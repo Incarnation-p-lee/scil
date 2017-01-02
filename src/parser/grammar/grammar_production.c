@@ -15,6 +15,16 @@ grammar_production_create(char *pdt)
     return gr_pdt;
 }
 
+static inline void
+grammar_production_destroy(s_gr_pdt_t *pdt)
+{
+    assert_exit(grammar_production_structure_legal_p(pdt));
+
+    dp_free(pdt->name);
+    grammar_production_head_destroy(pdt->head);
+    grammar_production_body_list_destroy(pdt->list);
+}
+
 static inline s_gr_non_tr_t *
 grammar_production_head_create(char *pdt)
 {
@@ -29,6 +39,14 @@ grammar_production_head_create(char *pdt)
     gr_non_tr->non_tr_type = grammar_string_non_terminal_obtain(symbol);
 
     return gr_non_tr;
+}
+
+static inline void
+grammar_production_head_destroy(s_gr_non_tr_t *gr_non_tr)
+{
+    assert_exit(grammar_non_terminal_structure_legal_p(gr_non_tr));
+
+    dp_free(gr_non_tr);
 }
 
 static inline s_gr_body_list_t *
@@ -57,6 +75,25 @@ grammar_production_body_list_create(char *body_list)
     return gr_body_list;
 }
 
+static inline void
+grammar_production_body_list_destroy(s_gr_body_list_t *body_list)
+{
+    uint32 i;
+    uint32 limit;
+
+    assert_exit(grammar_body_list_structure_legal_p(body_list));
+
+    i = 0;
+    limit = body_list->index;
+
+    while (i < limit) {
+        grammar_production_body_destroy(body_list->body_list[i]);
+        i++;
+    }
+
+    dp_free(body_list);
+}
+
 static inline s_gr_body_t *
 grammar_production_body_create(char *body)
 {
@@ -83,6 +120,25 @@ grammar_production_body_create(char *body)
     return gr_body;
 }
 
+static inline void
+grammar_production_body_destroy(s_gr_body_t *body)
+{
+    uint32 i;
+    uint32 limit;
+
+    assert_exit(grammar_body_structure_legal_p(body));
+
+    i = 0;
+    limit = body->index;
+
+    while (i < limit) {
+        grammar_production_symbol_destroy(body->symbol_list[i]);
+        i++;
+    }
+
+    dp_free(body);
+}
+
 static inline s_gr_symbol_t *
 grammar_production_symbol_create(char *symbol)
 {
@@ -105,4 +161,11 @@ grammar_production_symbol_create(char *symbol)
     return gr_symbol;
 }
 
+static inline void
+grammar_production_symbol_destroy(s_gr_symbol_t *gr_symbol)
+{
+    assert_exit(grammar_symbol_structure_legal_p(gr_symbol));
+
+    dp_free(gr_symbol);
+}
 

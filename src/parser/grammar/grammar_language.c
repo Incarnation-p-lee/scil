@@ -43,6 +43,18 @@ grammar_language_create(void)
 static inline void
 grammar_language_destroy(s_gr_lang_t *gr_lang)
 {
+    uint32 i;
+    uint32 limit;
+
+    assert_exit(grammar_language_structure_legal_p(gr_lang));
+
+    i = 0;
+    limit = gr_lang->index;
+
+    while (i < limit) {
+        grammar_production_destroy(gr_lang->pdt_list[i]);
+        i++;
+    }
 
     dp_free(gr_lang->pdt_list);
     dp_free(gr_lang);
