@@ -18,6 +18,26 @@ grammar_string_non_terminal_obtain(char *name)
     return GR_NON_TR_INVALID;
 }
 
+static inline e_gr_tr_type_t
+grammar_string_terminal_obtain(char *name)
+{
+    uint32 i;
+
+    assert_exit(name);
+
+    i = 0;
+
+    while (i < ARRAY_SIZE_OF(tr_type_name)) {
+        if (dp_strcmp(name, tr_type_name[i]) == 0) {
+            return (e_gr_tr_type_t)i;
+        }
+
+        i++;
+    }
+
+    return GR_TR_INVALID;
+}
+
 static inline void
 grammar_string_head_obtain(char *symbol, uint32 size, char *pdt)
 {

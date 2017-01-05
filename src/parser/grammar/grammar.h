@@ -21,7 +21,9 @@
 #define GR_PDT_LIST_MAX                     128u
 
 typedef enum   grammar_symbol_type          e_gr_symbol_type_t;
+typedef enum   grammar_terminal_type        e_gr_tr_type_t;
 typedef enum   grammar_non_terminal_type    e_gr_non_tr_type_t;
+
 typedef struct grammar_terminal             s_gr_tr_t;
 typedef struct grammar_non_terminal         s_gr_non_tr_t;
 typedef struct grammar_symbol               s_gr_symbol_t;
@@ -36,6 +38,7 @@ enum grammar_symbol_type {
     SYMBOL_START,
 };
 
+/* *HACK* do NOT change the order of following type and name */
 static char *non_tr_type_name[] = {
     "func_decl",     /* 0 */
     "func_link",
@@ -73,12 +76,68 @@ enum grammar_non_terminal_type {
     GR_NON_TR_PARAM_HEAD,
     GR_NON_TR_PARAM_TAIL,    /* 15 */
 
-    GR_NON_TR_NULL,
     GR_NON_TR_INVALID,
 };
 
+static char *tr_type_name[] = {
+    "id",       /* 0 */
+    "(",
+    ")",
+    ";",
+    ",",
+
+    "static",   /* 5 */
+    "extern",
+    "inline",
+    "void",
+    "struct",
+    "union",    /* 10 */
+    "enum",
+    "unsigned",
+    "signed",
+    "char",
+    "int",      /* 15 */
+    "short",
+    "long",
+    "float",
+    "double",
+
+    "*",        /* 20 */
+
+    "$"
+};
+
+enum grammar_terminal_type {
+    GR_TR_IDTR,     /* 0 */
+    GR_TR_L_S_BRKT,
+    GR_TR_R_S_BRKT,
+    GR_TR_SEMI,
+    GR_TR_COMMA,
+
+    GR_TR_STATIC,   /* 5 */
+    GR_TR_EXTERN,
+    GR_TR_INLINE,
+    GR_TR_VOID,
+    GR_TR_STRUCT,
+    GR_TR_UNION,    /* 10 */
+    GR_TR_ENUM,
+    GR_TR_UNSIGNED,
+    GR_TR_SIGNED,
+    GR_TR_CHAR,
+    GR_TR_INT,      /* 15 */
+    GR_TR_SHORT,
+    GR_TR_LONG,
+    GR_TR_FLOAT,
+    GR_TR_DOUBLE,
+
+    GR_TR_STAR,     /* 20 */
+    GR_TR_NULL,     /* $ */
+
+    GR_TR_INVALID,
+};
+
 struct grammar_terminal {
-    e_tk_type_t tk_type;
+    e_gr_tr_type_t tr_type;
 };
 
 struct grammar_non_terminal {
@@ -88,8 +147,8 @@ struct grammar_non_terminal {
 struct grammar_symbol {
     bool is_terminal;
     union {
-        s_gr_tr_t     *terminal;
-        s_gr_non_tr_t *non_terminal;
+        s_gr_tr_t     terminal;
+        s_gr_non_tr_t non_terminal;
     };
 };
 

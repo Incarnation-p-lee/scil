@@ -147,6 +147,7 @@ grammar_production_body_destroy(s_gr_body_t *body)
 static inline s_gr_symbol_t *
 grammar_production_symbol_create(char *symbol)
 {
+    e_gr_tr_type_t tr_type;
     s_gr_symbol_t *gr_symbol;
     e_gr_non_tr_type_t non_tr_type;
 
@@ -154,16 +155,17 @@ grammar_production_symbol_create(char *symbol)
 
     gr_symbol = dp_malloc(sizeof(*gr_symbol));
     non_tr_type = grammar_string_non_terminal_obtain(symbol);
+    tr_type = grammar_string_terminal_obtain(symbol);
 
-    if (non_tr_type == GR_NON_TR_INVALID) {
-        gr_symbol->is_terminal = true;
-        // To-be-continue
-    } else {
+    if (non_tr_type != GR_NON_TR_INVALID) {
         gr_symbol->is_terminal = false;
-        // To-be-continue
+        gr_symbol->non_terminal.non_tr_type = non_tr_type;
+    } else if (tr_type != GR_TR_INVALID) {
+        gr_symbol->is_terminal = true;
+        gr_symbol->terminal.tr_type = tr_type;
+    } else {
+        log_print_and_exit("Unknown type of symbol '%s'.\n", symbol);
     }
-
-    gr_symbol->terminal = PTR_INVALID;
 
     return gr_symbol;
 }

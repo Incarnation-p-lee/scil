@@ -79,11 +79,8 @@ grammar_symbol_structure_legal_p(s_gr_symbol_t *gr_symbol)
 {
     if (!gr_symbol) {
         return false;
-    } else if (!gr_symbol->terminal) {
-        return false;
     } else {
         return true;
     }
 }
-
 

@@ -14,6 +14,7 @@ static inline bool grammar_production_structure_legal_p(s_gr_pdt_t *gr_pdt);
 static inline bool grammar_symbol_structure_legal_p(s_gr_symbol_t *gr_symbol);
 static inline char * grammar_string_head_skip(char *pdt);
 static inline e_gr_non_tr_type_t grammar_string_non_terminal_obtain(char *name);
+static inline e_gr_tr_type_t grammar_string_terminal_obtain(char *name);
 static inline s_gr_body_list_t * grammar_production_body_list_create(char *body_list);
 static inline s_gr_body_t * grammar_production_body_create(char *body);
 static inline s_gr_lang_t * grammar_language_create(void);

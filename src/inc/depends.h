@@ -26,6 +26,7 @@
 #define dp_exit                exit
 #define dp_fprintf             fprintf
 #define dp_vfprintf            vfprintf
+#define dp_vprintf             vprintf
 #define dp_sprintf             sprintf
 #define dp_va_list             va_list
 #define dp_va_start            va_start
