@@ -71,6 +71,8 @@ config_option_bool_set(char *option)
         config_list.token_verbose = true;
     } else if (dp_strcmp(c, TOKENIZER_VERBOSE) == 0) {
         config_list.tokenizer_verbose = true;
+    } else if (dp_strcmp(c, GRAMMAR_VERBOSE) == 0) {
+        config_list.grammar_verbose = true;
     } else {
         log_print("Unknown bool config '%s'\n", c);
     }
@@ -172,6 +174,12 @@ bool
 config_token_verbose_p(void)
 {
     return config_list.token_verbose;
+}
+
+bool
+config_grammar_verbose_p(void)
+{
+    return config_list.grammar_verbose;
 }
 
 uint32

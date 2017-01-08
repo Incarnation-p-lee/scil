@@ -3,6 +3,7 @@
 #ifndef HAVE_DEFINED_EXTERNAL_H_common_
 #define HAVE_DEFINED_EXTERNAL_H_common_
 
+extern bool config_grammar_verbose_p(void);
 extern bool config_nfa_verbose_p(void);
 extern bool config_regular_verbose_p(void);
 extern bool config_token_verbose_p(void);

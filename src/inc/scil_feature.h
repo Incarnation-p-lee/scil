@@ -5,6 +5,7 @@
 #define TOKEN_VERBOSE          "token_verbose"
 #define REGULAR_VERBOSE        "regular_verbose"
 #define TOKENIZER_VERBOSE      "tokenizer_verbose"
+#define GRAMMAR_VERBOSE        "grammar_verbose"
 
 #define GRAMMAR_TYPE           "grammar_type"
 #define GRAMMAR_TYPE_NAME_LL_1 "ll1"

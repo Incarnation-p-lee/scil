@@ -36,6 +36,7 @@ grammar_language_create(void)
         c++;
     }
 
+    GRAMMAR_LANGUAGE_PRINT(gr_lang);
     return gr_lang;
 }
 

@@ -56,6 +56,10 @@ static char *non_tr_type_name[] = {
     "param",
     "param_head",
     "param_tail",    /* 15 */
+    "func_impl",
+    "func_body",
+    "{",
+    "}",
 };
 
 enum grammar_non_terminal_type {
@@ -75,6 +79,10 @@ enum grammar_non_terminal_type {
     GR_NON_TR_PARAM,
     GR_NON_TR_PARAM_HEAD,
     GR_NON_TR_PARAM_TAIL,    /* 15 */
+    GR_NON_TR_FUNC_IMPL,
+    GR_NON_TR_FUNC_BODY,
+    GR_NON_TR_BLOCK_LEFT,
+    GR_NON_TR_BLOCK_RIGHT,
 
     GR_NON_TR_INVALID,
 };
@@ -131,6 +139,7 @@ enum grammar_terminal_type {
     GR_TR_DOUBLE,
 
     GR_TR_STAR,     /* 20 */
+
     GR_TR_NULL,     /* $ */
 
     GR_TR_INVALID,

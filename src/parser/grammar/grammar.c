@@ -4,6 +4,7 @@
 #include "log_external.h"
 
 #include "grammar.h"
+#include "grammar_define.h"
 #include "grammar_production.h"
 #include "grammar_declaration.h"
 #include "grammar_string.h"

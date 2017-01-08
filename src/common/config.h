@@ -16,13 +16,16 @@ struct config_list {
     bool regular_verbose;
     bool token_verbose;
     bool tokenizer_verbose;
+    bool grammar_verbose;
 
     /* feature */
     uint32 grammar_type;
 };
 
 static char config_buf[SCIL_CONFIG_LINE_MAX];
+
 static s_config_list_t config_list = {
+    false,
     false,
     false,
     false,

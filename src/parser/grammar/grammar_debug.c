@@ -84,3 +84,94 @@ grammar_symbol_structure_legal_p(s_gr_symbol_t *gr_symbol)
     }
 }
 
+static inline void
+grammar_production_body_print(s_gr_body_t *gr_body)
+{
+    uint32 i;
+    uint32 limit;
+    const char *name;
+    s_gr_symbol_t *gr_symbol;
+
+    assert_exit(grammar_body_structure_legal_p(gr_body));
+
+    log_print("            |-");
+
+    i = 0;
+    limit = gr_body->index;
+
+    while (i < limit) {
+        gr_symbol = gr_body->symbol_list[i];
+
+        if (gr_symbol->is_terminal) {
+            name = tr_type_name[gr_symbol->terminal.tr_type];
+        } else {
+            name = non_tr_type_name[gr_symbol->non_terminal.non_tr_type];
+        }
+
+        log_print(" %s", name);
+
+        i++;
+    }
+
+    log_print("\n");
+}
+
+static inline void
+grammar_production_body_list_print(s_gr_body_list_t *gr_body_list)
+{
+    uint32 i;
+    uint32 limit;
+
+    assert_exit(grammar_body_list_structure_legal_p(gr_body_list));
+
+    log_print("        |- body list\n");
+
+    i = 0;
+    limit = gr_body_list->index;
+
+    while (i < limit) {
+        grammar_production_body_print(gr_body_list->body_list[i++]);
+    }
+}
+
+static inline void
+grammar_production_print(s_gr_pdt_t *gr_pdt, uint32 idx)
+{
+    const char *name;
+
+    assert_exit(grammar_production_structure_legal_p(gr_pdt));
+
+    name = non_tr_type_name[gr_pdt->head->non_tr_type];
+
+    log_print("    production [%02d] '%s'\n", idx, gr_pdt->name);
+    log_print("        |- head %s\n", name);
+
+    grammar_production_body_list_print(gr_pdt->list);
+}
+
+static inline void
+grammar_language_print(s_gr_lang_t *gr_lang)
+{
+    uint32 i;
+    uint32 limit;
+    s_gr_pdt_t *gr_pdt;
+
+    assert_exit(grammar_language_structure_legal_p(gr_lang));
+
+    RETURN_IF_FALSE(config_grammar_verbose_p());
+
+    log_print("[GRAMMAR] grammar language production list print:\n");
+
+    i = 0;
+    limit = gr_lang->index;
+
+    while (i < limit) {
+        gr_pdt = gr_lang->pdt_list[i];
+        grammar_production_print(gr_pdt, i);
+
+        i++;
+    }
+
+    log_print("\n");
+}
+
