@@ -3,7 +3,7 @@
 #ifndef HAVE_DEFINED_EXTERNAL_H_grammar_
 #define HAVE_DEFINED_EXTERNAL_H_grammar_
 
-extern void grammar_analysis(void);
+extern void gr_analysis(void);
 
 #endif
 

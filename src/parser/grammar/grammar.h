@@ -17,7 +17,7 @@
  */
 
 #define GR_SYMBOL_LIST_MAX                  16u
-#define GR_BODY_LIST_MAX                    8u
+#define GR_BODY_LIST_MAX                    16u
 #define GR_PDT_LIST_MAX                     128u
 
 typedef enum   grammar_symbol_type          e_gr_symbol_type_t;
@@ -31,6 +31,7 @@ typedef struct grammar_body                 s_gr_body_t;
 typedef struct grammar_body_list            s_gr_body_list_t;
 typedef struct grammar_production           s_gr_pdt_t;
 typedef struct grammar_language             s_gr_lang_t;
+typedef struct grammar_pdt_null_symbol_set      s_gr_null_symbol_set_t;
 
 enum grammar_symbol_type {
     SYMBOL_TERMINAL,
@@ -60,10 +61,14 @@ static char *non_tr_type_name[] = {
     "func_body",
     "{",
     "}",
+
+    "non_tr_tmp_0",
+    "non_tr_tmp_1",
+    "non_tr_tmp_2",
 };
 
 enum grammar_non_terminal_type {
-    GR_NON_TR_FUNC_DECL,     /* 0 */
+    GR_NON_TR_FUNC_DECL = 0, /* 0 */
     GR_NON_TR_FUNC_LINK,
     GR_NON_TR_FUNC_ATTR,
     GR_NON_TR_TYPE,
@@ -84,8 +89,19 @@ enum grammar_non_terminal_type {
     GR_NON_TR_BLOCK_LEFT,
     GR_NON_TR_BLOCK_RIGHT,
 
+    GR_NON_TR_TMP_0,
+    GR_NON_TR_TMP_1,
+    GR_NON_TR_TMP_2,
+
+    GR_NON_TR_TMP_LIMIT,
+    GR_NON_TR_LIMIT,
     GR_NON_TR_INVALID,
+
+    GR_NON_TR_TMP_START = GR_NON_TR_TMP_0,
+    GR_NON_TR_START = GR_NON_TR_FUNC_DECL,
 };
+
+// static e_gr_non_tr_type_t gr_symbol_temp_base = GR_NON_TR_TMP_START;
 
 static char *tr_type_name[] = {
     "id",       /* 0 */
@@ -178,9 +194,16 @@ struct grammar_production {
 };
 
 struct grammar_language {
-    uint32     size;
-    uint32     index;
-    s_gr_pdt_t **pdt_list;
+    void        *data;
+    e_gr_type_t gr_type;
+    uint32      size;
+    uint32      index;
+    s_gr_pdt_t  **pdt_list;
+};
+
+struct grammar_pdt_null_symbol_set {
+    s_array_queue_t *queue;
+    s_bitmap_t      *bitmap;
 };
 
 #endif

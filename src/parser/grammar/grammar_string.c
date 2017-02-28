@@ -1,5 +1,5 @@
 static inline e_gr_non_tr_type_t
-grammar_string_non_terminal_obtain(char *name)
+gr_string_non_terminal_obtain(char *name)
 {
     uint32 i;
 
@@ -19,7 +19,7 @@ grammar_string_non_terminal_obtain(char *name)
 }
 
 static inline e_gr_tr_type_t
-grammar_string_terminal_obtain(char *name)
+gr_string_terminal_obtain(char *name)
 {
     uint32 i;
 
@@ -39,7 +39,7 @@ grammar_string_terminal_obtain(char *name)
 }
 
 static inline void
-grammar_string_head_obtain(char *symbol, uint32 size, char *pdt)
+gr_string_head_obtain(char *symbol, uint32 size, char *pdt)
 {
     char *c;
     uint32 i;
@@ -71,7 +71,7 @@ grammar_string_head_obtain(char *symbol, uint32 size, char *pdt)
 }
 
 static inline char *
-grammar_string_head_skip(char *pdt)
+gr_string_head_skip(char *pdt)
 {
     char *c;
 
@@ -92,7 +92,7 @@ grammar_string_head_skip(char *pdt)
 }
 
 static inline uint32
-grammar_string_body_fill(char *body, uint32 size, char *body_list)
+gr_string_body_fill(char *body, uint32 size, char *body_list)
 {
     char *c;
     uint32 i;
@@ -124,7 +124,7 @@ grammar_string_body_fill(char *body, uint32 size, char *body_list)
 }
 
 static inline uint32
-grammar_string_symbol_fill(char *symbol, uint32 size, char *body)
+gr_string_symbol_fill(char *symbol, uint32 size, char *body)
 {
     char *c;
     uint32 i;

@@ -1,5 +1,5 @@
 #include "depends.h"
-#include "scil_feature.h"
+#include "scil_config.h"
 
 #include "log_external.h"
 #include "common_declaration.h"

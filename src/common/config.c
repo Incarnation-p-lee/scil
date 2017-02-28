@@ -15,10 +15,10 @@ config_option_grammar_type(char *assign)
 
     c[i] = NULL_CHAR;
 
-    if (dp_strcmp(c, GRAMMAR_TYPE_NAME_LL_1) == 0) {
-        return GRAMMAR_TYPE_LL_1;
+    if (dp_strcmp(c, GR_TYPE_NAME_LL_1) == 0) {
+        return GR_TYPE_LL_1;
     } else {
-        return GRAMMAR_TYPE_UNKNOWN;
+        return GR_TYPE_UNKNOWN;
     }
 }
 
@@ -41,7 +41,7 @@ config_option_type_set(char *option, char *assign)
     c[i] = NULL_CHAR;
     assign++;
 
-    if (dp_strcmp(c, GRAMMAR_TYPE) == 0) {
+    if (dp_strcmp(c, GR_TYPE) == 0) {
         config_list.grammar_type = config_option_grammar_type(assign);
     }
 }
@@ -65,13 +65,13 @@ config_option_bool_set(char *option)
 
     if (dp_strcmp(c, NFA_VERBOSE) == 0) {
         config_list.nfa_verbose = true;
-    } else if (dp_strcmp(c, REGULAR_VERBOSE) == 0) {
+    } else if (dp_strcmp(c, RE_VERBOSE) == 0) {
         config_list.regular_verbose = true;
-    } else if (dp_strcmp(c, TOKEN_VERBOSE) == 0) {
+    } else if (dp_strcmp(c, TK_VERBOSE) == 0) {
         config_list.token_verbose = true;
-    } else if (dp_strcmp(c, TOKENIZER_VERBOSE) == 0) {
+    } else if (dp_strcmp(c, TKZ_VERBOSE) == 0) {
         config_list.tokenizer_verbose = true;
-    } else if (dp_strcmp(c, GRAMMAR_VERBOSE) == 0) {
+    } else if (dp_strcmp(c, GR_VERBOSE) == 0) {
         config_list.grammar_verbose = true;
     } else {
         log_print("Unknown bool config '%s'\n", c);

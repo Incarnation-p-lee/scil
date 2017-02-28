@@ -3,7 +3,7 @@
 #ifndef HAVE_DEFINED_EXTERNAL_H_parser_
 #define HAVE_DEFINED_EXTERNAL_H_parser_
 
-extern void grammar_analysis(void);
+extern void gr_analysis(void);
 extern void parser_analysis(s_tk_t *tk_list);
 
 #endif
