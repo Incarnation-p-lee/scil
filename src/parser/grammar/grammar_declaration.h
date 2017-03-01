@@ -48,6 +48,7 @@ static inline void gr_language_pdt_append(s_gr_lang_t *gr_lang, s_gr_pdt_t *gr_p
 static inline void gr_language_print(s_gr_lang_t *gr_lang);
 static inline void gr_ll1_format(s_gr_lang_t *gr_lang);
 static inline void gr_ll1_initial(s_gr_lang_t *gr_lang);
+static inline void gr_null_pdt_set_print(s_gr_null_symbol_set_t *gr_null_set);
 static inline void gr_pdt_body_destroy(s_gr_body_t *body);
 static inline void gr_pdt_body_list_destroy(s_gr_body_list_t *body_list);
 static inline void gr_pdt_body_list_print(s_gr_body_list_t *gr_body_list);

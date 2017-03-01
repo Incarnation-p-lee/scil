@@ -112,6 +112,7 @@ gr_transform_null_pdt_seek(s_gr_null_symbol_set_t *gr_null_set,
     }
 
     array_queue_destroy(&pdt_queue_tmp);
+    GR_NULL_PDT_PRINT(gr_null_set);
 }
 
 static inline void

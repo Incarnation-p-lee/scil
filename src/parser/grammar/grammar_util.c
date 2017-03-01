@@ -165,6 +165,8 @@ gr_pdt_null_symbol_set_destroy(s_gr_null_symbol_set_t *gr_null_set)
 
     array_queue_destroy(&gr_null_set->queue);
     bitmap_destroy(&gr_null_set->bitmap);
+
+    dp_free(gr_null_set);
 }
 
 static inline uint32

@@ -108,7 +108,7 @@ gr_pdt_body_print(s_gr_body_t *gr_body)
 
     assert_exit(gr_pdt_body_structure_legal_p(gr_body));
 
-    log_print("            |-");
+    log_print("    |          >");
 
     i = 0;
     limit = gr_body->index;
@@ -138,7 +138,7 @@ gr_pdt_body_list_print(s_gr_body_list_t *gr_body_list)
 
     assert_exit(gr_pdt_body_list_structure_legal_p(gr_body_list));
 
-    log_print("        |- body list\n");
+    log_print("    |     body_list\n");
 
     i = 0;
     limit = gr_body_list->index;
@@ -157,10 +157,13 @@ gr_pdt_print(s_gr_pdt_t *gr_pdt, uint32 idx)
 
     name = non_tr_type_name[gr_pdt->head->non_tr_type];
 
-    log_print("    production [%02d] '%s'\n", idx, gr_pdt->name);
-    log_print("        |- head %s\n", name);
+    log_print("    +------------------------------------------------------\n");
+    log_print("    | <%02d> pdt '%s'\n", idx, gr_pdt->name);
+    log_print("    |     head = %s\n", name);
 
     gr_pdt_body_list_print(gr_pdt->list);
+
+    log_print("    +------------------------------------------------------\n");
 }
 
 static inline void
@@ -187,5 +190,26 @@ gr_language_print(s_gr_lang_t *gr_lang)
     }
 
     log_print("\n");
+}
+
+static inline void
+gr_null_pdt_set_print(s_gr_null_symbol_set_t *gr_null_set)
+{
+    uint32 i;
+    s_gr_pdt_t *pdt;
+    s_array_iterator_t *iterator;
+
+    assert_exit(gr_pdt_null_symbol_set_structure_legal_p(gr_null_set));
+
+    log_print("[GRAMMAR] grammar null inferred pdt list print:\n");
+
+    i = 0;
+    iterator = array_queue_iterator_obtain(gr_null_set->queue);
+    iterator->fp_index_initial(gr_null_set->queue);
+
+    while (iterator->fp_next_exist_p(gr_null_set->queue)) {
+        pdt = iterator->fp_next_obtain(gr_null_set->queue);
+        gr_pdt_print(pdt, i++);
+    }
 }
 

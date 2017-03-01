@@ -69,8 +69,6 @@ gr_language_initial(s_gr_lang_t *gr_lang)
 {
     uint32 gr_type;
 
-    return ;
-
     assert_exit(gr_language_structure_legal_p(gr_lang));
 
     gr_type = config_grammar_type();
