@@ -195,7 +195,7 @@ gr_null_pdt_helper_body_copy(s_gr_null_pdt_helper_t *null_pdt_helper,
     s = i = 0;
     limit = gr_body_symbol_limit(body);
     s_limit = gr_null_pdt_helper_state_list_size(null_pdt_helper);
-    copy_body = gr_pdt_body_create("");
+    copy_body = gr_body_create("");
 
     while (i < limit) {
         if (s < s_limit && gr_null_pdt_helper_index(null_pdt_helper, s) == i) {

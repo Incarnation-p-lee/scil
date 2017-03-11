@@ -163,7 +163,6 @@ gr_pdt_print(s_gr_pdt_t *gr_pdt, uint32 idx)
 
     name = non_tr_type_name[gr_pdt->head->type];
 
-    log_print("    +------------------------------------------------------\n");
     log_print("    | <%02d> pdt '%s'\n", idx, gr_pdt->name);
     log_print("    |     head = %s\n", name);
 
@@ -180,6 +179,8 @@ gr_language_print_i(s_gr_lang_t *gr_lang)
     s_gr_pdt_t *gr_pdt;
 
     assert_exit(gr_language_structure_legal_p(gr_lang));
+
+    log_print("    +------------------------------------------------------\n");
 
     i = 0;
     limit = gr_lang->index;
@@ -201,7 +202,7 @@ gr_language_print(s_gr_lang_t *gr_lang)
 
     RETURN_IF_FALSE(config_grammar_verbose_p());
 
-    log_print("[GRAMMAR] grammar language print:\n");
+    log_print("\n[GRAMMAR] grammar language print:\n");
 
     gr_language_print_i(gr_lang);
 }
@@ -213,7 +214,7 @@ gr_language_after_unfold_print(s_gr_lang_t *gr_lang)
 
     RETURN_IF_FALSE(config_grammar_verbose_p());
 
-    log_print("[GRAMMAR] grammar language after unfold print:\n");
+    log_print("\n[GRAMMAR] grammar language after unfold print:\n");
 
     gr_language_print_i(gr_lang);
 }
@@ -225,7 +226,7 @@ gr_language_eliminate_print(s_gr_lang_t *gr_lang)
 
     RETURN_IF_FALSE(config_grammar_verbose_p());
 
-    log_print("[GRAMMAR] grammar language after null eliminate print:\n");
+    log_print("\n[GRAMMAR] grammar language after null eliminate print:\n");
 
     gr_language_print_i(gr_lang);
 }
@@ -240,11 +241,13 @@ gr_null_pdt_helper_print(s_gr_null_pdt_helper_t *null_pdt_helper)
 
     assert_exit(gr_null_pdt_helper_structure_legal_p(null_pdt_helper));
 
-    log_print("[GRAMMAR] grammar null pdt helper print:\n");
+    log_print("\n[GRAMMAR] grammar null pdt helper print:\n");
+    log_print("    +------------------------------------------------------\n");
 
     i = 0;
     queue = gr_null_pdt_helper_null_pdt_queue(null_pdt_helper);
-    log_print("    | null inferred pdt:\n");
+    log_print("    | NULL inferred pdt:\n");
+    log_print("    +------------------------------------------------------\n");
 
     iterator = array_queue_iterator_obtain(queue);
     iterator->fp_index_initial(queue);
@@ -256,8 +259,9 @@ gr_null_pdt_helper_print(s_gr_null_pdt_helper_t *null_pdt_helper)
 
 
     i = 0;
-    queue = gr_null_pdt_helper_null_pdt_queue(null_pdt_helper);
-    log_print("    | non-null inferred pdt:\n");
+    queue = gr_null_pdt_helper_pdt_queue(null_pdt_helper);
+    log_print("    | NON-NULL inferred pdt:\n");
+    log_print("    +------------------------------------------------------\n");
 
     iterator = array_queue_iterator_obtain(queue);
     iterator->fp_index_initial(queue);

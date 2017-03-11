@@ -170,33 +170,6 @@ gr_pdt_null_body_contains_p(s_gr_pdt_t *pdt)
     return false;
 }
 
-static inline s_gr_null_pdt_helper_t *
-gr_null_pdt_helper_create(void)
-{
-    s_gr_null_pdt_helper_t *null_pdt_helper;
-
-    null_pdt_helper = dp_malloc(sizeof(*null_pdt_helper));
-
-    null_pdt_helper->i = null_pdt_helper->s = 0;
-    null_pdt_helper->pdt_queue = array_queue_create();
-    null_pdt_helper->null_pdt_queue = array_queue_create();
-    null_pdt_helper->null_pdt_bitmap = bitmap_create(GR_NON_TR_START, GR_NON_TR_LIMIT);
-
-    return null_pdt_helper;
-}
-
-static inline void
-gr_null_pdt_helper_destroy(s_gr_null_pdt_helper_t *null_pdt_helper)
-{
-    assert_exit(gr_null_pdt_helper_structure_legal_p(null_pdt_helper));
-
-    array_queue_destroy(&null_pdt_helper->null_pdt_queue);
-    bitmap_destroy(&null_pdt_helper->null_pdt_bitmap);
-    array_queue_destroy(&null_pdt_helper->pdt_queue);
-
-    dp_free(null_pdt_helper);
-}
-
 static inline uint32
 gr_null_pdt_helper_null_pdt_count(s_gr_null_pdt_helper_t *null_pdt_helper)
 {

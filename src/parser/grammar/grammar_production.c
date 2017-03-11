@@ -1,21 +1,21 @@
 static inline s_gr_pdt_t *
-gr_pdt_create(char *pdt)
+gr_pdt_create(char *pdt_name)
 {
-    char *body_list;
-    s_gr_pdt_t *gr_pdt;
+    char *body_list_name;
+    s_gr_pdt_t *pdt;
 
-    assert_exit(pdt);
+    assert_exit(pdt_name);
 
-    body_list = gr_string_head_skip(pdt);
+    body_list_name = gr_string_head_skip(pdt_name);
 
-    gr_pdt = dp_malloc(sizeof(*gr_pdt));
-    gr_pdt->name = dp_malloc(sizeof(*pdt) * (dp_strlen(pdt) + 1));
-    dp_strcpy(gr_pdt->name, pdt);
+    pdt = dp_malloc(sizeof(*pdt));
+    pdt->name = dp_malloc(sizeof(*pdt_name) * (dp_strlen(pdt_name) + 1));
+    dp_strcpy(pdt->name, pdt_name);
 
-    gr_pdt->head = gr_pdt_head_create(pdt);
-    gr_pdt->list = gr_pdt_body_list_create(body_list);
+    pdt->head = gr_pdt_head_create(pdt_name);
+    pdt->list = gr_body_list_create(body_list_name);
 
-    return gr_pdt;
+    return pdt;
 }
 
 static inline void
@@ -31,53 +31,53 @@ gr_pdt_destroy(s_gr_pdt_t *pdt)
 }
 
 static inline s_gr_non_tr_t *
-gr_pdt_head_create(char *pdt)
+gr_pdt_head_create(char *pdt_name)
 {
-    s_gr_non_tr_t *gr_non_tr;
+    s_gr_non_tr_t *non_tr;
     char symbol[GR_STR_NAME_SIZE];
 
-    assert_exit(pdt);
+    assert_exit(pdt_name);
 
-    gr_string_head_obtain(symbol, GR_STR_NAME_SIZE, pdt);
+    gr_string_head_obtain(symbol, GR_STR_NAME_SIZE, pdt_name);
 
-    gr_non_tr = dp_malloc(sizeof(*gr_non_tr));
-    gr_non_tr->type = gr_string_non_terminal_obtain(symbol);
+    non_tr = dp_malloc(sizeof(*non_tr));
+    non_tr->type = gr_string_non_terminal_obtain(symbol);
 
-    return gr_non_tr;
+    return non_tr;
 }
 
 static inline void
-gr_pdt_head_destroy(s_gr_non_tr_t *gr_non_tr)
+gr_pdt_head_destroy(s_gr_non_tr_t *non_tr)
 {
-    assert_exit(gr_non_terminal_structure_legal_p(gr_non_tr));
+    assert_exit(gr_non_terminal_structure_legal_p(non_tr));
 
-    dp_free(gr_non_tr);
+    dp_free(non_tr);
 }
 
 static inline s_gr_body_list_t *
-gr_pdt_body_list_create(char *body_list)
+gr_body_list_create(char *body_list_name)
 {
     char *c;
-    s_gr_body_t *gr_body;
-    s_gr_body_list_t *gr_body_list;
-    char body[GR_STR_BODY_SIZE];
+    s_gr_body_t *body;
+    s_gr_body_list_t *body_list;
+    char body_name[GR_STR_BODY_SIZE];
 
-    assert_exit(body_list);
+    assert_exit(body_list_name);
 
-    gr_body_list = dp_malloc(sizeof(*gr_body_list));
-    gr_body_list->index = 0;
-    c = body_list;
+    body_list = dp_malloc(sizeof(*body_list));
+    body_list->index = 0;
+    c = body_list_name;
 
     while (*c) {
-        c += gr_string_body_fill(body, GR_STR_BODY_SIZE, c);
+        c += gr_string_body_fill(body_name, GR_STR_BODY_SIZE, c);
 
-        gr_body = gr_pdt_body_create(body);
-        gr_body_list->body_list[gr_body_list->index++] = gr_body;
+        body = gr_body_create(body_name);
+        body_list->body_list[body_list->index++] = body;
 
-        assert_exit(gr_body_list->index <= GR_BODY_LIST_MAX);
+        assert_exit(body_list->index <= GR_BODY_LIST_MAX);
     }
 
-    return gr_body_list;
+    return body_list;
 }
 
 static inline void
@@ -100,31 +100,31 @@ gr_body_list_destroy(s_gr_body_list_t *body_list)
 }
 
 /*
- * body can be null string here.
+ * body_name can be null string here.
  */
 static inline s_gr_body_t *
-gr_pdt_body_create(char *body)
+gr_body_create(char *body_name)
 {
     char *c;
-    s_gr_body_t *gr_body;
+    s_gr_body_t *body;
     s_gr_symbol_t *symbol;
     char symbol_name[GR_STR_NAME_SIZE];
 
-    assert_exit(body);
+    assert_exit(body_name);
 
-    gr_body = dp_malloc(sizeof(*gr_body));
-    gr_body->index = 0;
-    c = body;
+    body = dp_malloc(sizeof(*body));
+    body->index = 0;
+    c = body_name;
 
     while (*c) {
         c += gr_string_symbol_fill(symbol_name, GR_STR_NAME_SIZE, c);
 
-        symbol = gr_pdt_symbol_create(symbol_name);
+        symbol = gr_symbol_create(symbol_name);
 
-        gr_body_symbol_append(gr_body, symbol);
+        gr_body_symbol_append(body, symbol);
     }
 
-    return gr_body;
+    return body;
 }
 
 static inline void
@@ -147,7 +147,7 @@ gr_body_destroy(s_gr_body_t *body)
 }
 
 static inline s_gr_symbol_t *
-gr_pdt_symbol_create(char *symbol_name)
+gr_symbol_create(char *symbol_name)
 {
     s_gr_symbol_t *symbol;
     e_gr_tr_type_t tr_type;
@@ -178,5 +178,32 @@ gr_symbol_destroy(s_gr_symbol_t *symbol)
     assert_exit(gr_pdt_symbol_structure_legal_p(symbol));
 
     dp_free(symbol);
+}
+
+static inline s_gr_null_pdt_helper_t *
+gr_null_pdt_helper_create(void)
+{
+    s_gr_null_pdt_helper_t *null_pdt_helper;
+
+    null_pdt_helper = dp_malloc(sizeof(*null_pdt_helper));
+
+    null_pdt_helper->i = null_pdt_helper->s = 0;
+    null_pdt_helper->pdt_queue = array_queue_create();
+    null_pdt_helper->null_pdt_queue = array_queue_create();
+    null_pdt_helper->null_pdt_bitmap = bitmap_create(GR_NON_TR_START, GR_NON_TR_LIMIT);
+
+    return null_pdt_helper;
+}
+
+static inline void
+gr_null_pdt_helper_destroy(s_gr_null_pdt_helper_t *null_pdt_helper)
+{
+    assert_exit(gr_null_pdt_helper_structure_legal_p(null_pdt_helper));
+
+    array_queue_destroy(&null_pdt_helper->null_pdt_queue);
+    bitmap_destroy(&null_pdt_helper->null_pdt_bitmap);
+    array_queue_destroy(&null_pdt_helper->pdt_queue);
+
+    dp_free(null_pdt_helper);
 }
 
