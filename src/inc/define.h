@@ -51,5 +51,8 @@
     #define inline             inline
 #endif
 
+#define BIT_64_MASK               0x1ull
+#define BIT_64_GET(u, idx)        (((uint64)(u) >> (idx)) & BIT_64_MASK)
+
 #endif
 

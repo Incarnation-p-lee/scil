@@ -5,7 +5,7 @@ gr_ll1_format(s_gr_lang_t *gr_lang)
 
     gr_lang->gr_type = GR_TYPE_LL_1;
 
-    gr_transform_null_pdt_eliminate(gr_lang);
+    gr_null_pdt_eliminate(gr_lang);
 }
 
 static inline void

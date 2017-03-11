@@ -24,7 +24,7 @@ gr_pdt_destroy(s_gr_pdt_t *pdt)
     assert_exit(gr_pdt_structure_legal_p(pdt));
 
     gr_pdt_head_destroy(pdt->head);
-    gr_pdt_body_list_destroy(pdt->list);
+    gr_body_list_destroy(pdt->list);
 
     dp_free(pdt->name);
     dp_free(pdt);
@@ -41,7 +41,7 @@ gr_pdt_head_create(char *pdt)
     gr_string_head_obtain(symbol, GR_STR_NAME_SIZE, pdt);
 
     gr_non_tr = dp_malloc(sizeof(*gr_non_tr));
-    gr_non_tr->non_tr_type = gr_string_non_terminal_obtain(symbol);
+    gr_non_tr->type = gr_string_non_terminal_obtain(symbol);
 
     return gr_non_tr;
 }
@@ -81,7 +81,7 @@ gr_pdt_body_list_create(char *body_list)
 }
 
 static inline void
-gr_pdt_body_list_destroy(s_gr_body_list_t *body_list)
+gr_body_list_destroy(s_gr_body_list_t *body_list)
 {
     uint32 i;
     uint32 limit;
@@ -92,20 +92,23 @@ gr_pdt_body_list_destroy(s_gr_body_list_t *body_list)
     limit = body_list->index;
 
     while (i < limit) {
-        gr_pdt_body_destroy(body_list->body_list[i]);
+        gr_body_destroy(body_list->body_list[i]);
         i++;
     }
 
     dp_free(body_list);
 }
 
+/*
+ * body can be null string here.
+ */
 static inline s_gr_body_t *
 gr_pdt_body_create(char *body)
 {
     char *c;
     s_gr_body_t *gr_body;
-    s_gr_symbol_t *gr_symbol;
-    char symbol[GR_STR_NAME_SIZE];
+    s_gr_symbol_t *symbol;
+    char symbol_name[GR_STR_NAME_SIZE];
 
     assert_exit(body);
 
@@ -114,19 +117,18 @@ gr_pdt_body_create(char *body)
     c = body;
 
     while (*c) {
-        c += gr_string_symbol_fill(symbol, GR_STR_NAME_SIZE, c);
+        c += gr_string_symbol_fill(symbol_name, GR_STR_NAME_SIZE, c);
 
-        gr_symbol = gr_pdt_symbol_create(symbol);
-        gr_body->symbol_list[gr_body->index++] = gr_symbol;
+        symbol = gr_pdt_symbol_create(symbol_name);
 
-        assert_exit(gr_body->index <= GR_SYMBOL_LIST_MAX);
+        gr_body_symbol_append(gr_body, symbol);
     }
 
     return gr_body;
 }
 
 static inline void
-gr_pdt_body_destroy(s_gr_body_t *body)
+gr_body_destroy(s_gr_body_t *body)
 {
     uint32 i;
     uint32 limit;
@@ -137,7 +139,7 @@ gr_pdt_body_destroy(s_gr_body_t *body)
     limit = body->index;
 
     while (i < limit) {
-        gr_pdt_symbol_destroy(body->symbol_list[i]);
+        gr_symbol_destroy(body->symbol_list[i]);
         i++;
     }
 
@@ -145,36 +147,36 @@ gr_pdt_body_destroy(s_gr_body_t *body)
 }
 
 static inline s_gr_symbol_t *
-gr_pdt_symbol_create(char *symbol)
+gr_pdt_symbol_create(char *symbol_name)
 {
+    s_gr_symbol_t *symbol;
     e_gr_tr_type_t tr_type;
-    s_gr_symbol_t *gr_symbol;
     e_gr_non_tr_type_t non_tr_type;
 
-    assert_exit(symbol);
+    assert_exit(symbol_name);
 
-    gr_symbol = dp_malloc(sizeof(*gr_symbol));
-    non_tr_type = gr_string_non_terminal_obtain(symbol);
-    tr_type = gr_string_terminal_obtain(symbol);
+    symbol = dp_malloc(sizeof(*symbol));
+    non_tr_type = gr_string_non_terminal_obtain(symbol_name);
+    tr_type = gr_string_terminal_obtain(symbol_name);
 
     if (non_tr_type != GR_NON_TR_INVALID) {
-        gr_symbol->is_terminal = false;
-        gr_symbol->non_terminal.non_tr_type = non_tr_type;
+        symbol->is_terminal = false;
+        symbol->non_terminal.type = non_tr_type;
     } else if (tr_type != GR_TR_INVALID) {
-        gr_symbol->is_terminal = true;
-        gr_symbol->terminal.tr_type = tr_type;
+        symbol->is_terminal = true;
+        symbol->terminal.type = tr_type;
     } else {
-        log_print_and_exit("Unknown type of symbol '%s'.\n", symbol);
+        log_print_and_exit("Unknown type of symbol '%s'.\n", symbol_name);
     }
 
-    return gr_symbol;
+    return symbol;
 }
 
 static inline void
-gr_pdt_symbol_destroy(s_gr_symbol_t *gr_symbol)
+gr_symbol_destroy(s_gr_symbol_t *symbol)
 {
-    assert_exit(gr_pdt_symbol_structure_legal_p(gr_symbol));
+    assert_exit(gr_pdt_symbol_structure_legal_p(symbol));
 
-    dp_free(gr_symbol);
+    dp_free(symbol);
 }
 

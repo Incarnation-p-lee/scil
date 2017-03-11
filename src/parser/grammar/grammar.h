@@ -16,13 +16,14 @@
  * +------+-------------+
  */
 
-#define GR_SYMBOL_LIST_MAX                  16u
-#define GR_BODY_LIST_MAX                    16u
+#define GR_SYMBOL_LIST_MAX                  64u
+#define GR_BODY_LIST_MAX                    64u
 #define GR_PDT_LIST_MAX                     128u
 
 typedef enum   grammar_symbol_type          e_gr_symbol_type_t;
 typedef enum   grammar_terminal_type        e_gr_tr_type_t;
 typedef enum   grammar_non_terminal_type    e_gr_non_tr_type_t;
+typedef enum   grammar_symbol_state         e_gr_symbol_state_t;
 
 typedef struct grammar_terminal             s_gr_tr_t;
 typedef struct grammar_non_terminal         s_gr_non_tr_t;
@@ -31,7 +32,13 @@ typedef struct grammar_body                 s_gr_body_t;
 typedef struct grammar_body_list            s_gr_body_list_t;
 typedef struct grammar_production           s_gr_pdt_t;
 typedef struct grammar_language             s_gr_lang_t;
-typedef struct grammar_pdt_null_symbol_set      s_gr_null_symbol_set_t;
+typedef struct grammar_null_pdt_helper      s_gr_null_pdt_helper_t;
+
+enum grammar_symbol_state {
+    GR_SYMBOL_STATE_OFF = 0u,
+    GR_SYMBOL_STATE_ON  = 1u,
+    GR_SYMBOL_STATE_INVALID,
+};
 
 enum grammar_symbol_type {
     SYMBOL_TERMINAL,
@@ -162,11 +169,11 @@ enum grammar_terminal_type {
 };
 
 struct grammar_terminal {
-    e_gr_tr_type_t tr_type;
+    e_gr_tr_type_t type;
 };
 
 struct grammar_non_terminal {
-    e_gr_non_tr_type_t non_tr_type;
+    e_gr_non_tr_type_t type;
 };
 
 struct grammar_symbol {
@@ -201,9 +208,15 @@ struct grammar_language {
     s_gr_pdt_t  **pdt_list;
 };
 
-struct grammar_pdt_null_symbol_set {
-    s_array_queue_t *queue;
-    s_bitmap_t      *bitmap;
+struct grammar_null_pdt_helper {
+    s_array_queue_t     *pdt_queue;
+    s_array_queue_t     *null_pdt_queue;
+    s_bitmap_t          *null_pdt_bitmap;
+
+    uint32              i; /* for index list */
+    uint32              index_list[GR_SYMBOL_LIST_MAX];
+    uint32              s; /* for state list */
+    e_gr_symbol_state_t state_list[GR_SYMBOL_LIST_MAX];
 };
 
 #endif
